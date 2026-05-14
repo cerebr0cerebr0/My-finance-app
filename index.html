@@ -3,2203 +3,470 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Was I Stupid?</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<title>Wealth Discipline — Financial Tracking</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#08080a;--card:#111114;--card2:#1a1a1f;--border:#252530;
-  --text:#f0f0f5;--muted:#666672;--dim:#2a2a34;
+  --bg:#08080a;--card:#111114;--card2:#1a1a1f;--border:#262631;
+  --text:#f2f2f6;--muted:#777783;--dim:#34343d;
   --green:#00ff88;--red:#ff3b3b;--amber:#ffaa00;--blue:#4d9fff;--purple:#bb77ff;
   --f:'Inter',sans-serif;--d:'Bebas Neue',sans-serif;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
-body{font-family:var(--f);background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:80px}
-
-/* HEADER */
-.hdr{text-align:center;padding:36px 20px 0}
-.hdr-eye{font-size:10px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-bottom:8px}
-.hdr-title{font-family:var(--d);font-size:clamp(56px,14vw,96px);line-height:.9;letter-spacing:1px}
-.hdr-title em{color:var(--red);font-style:normal}
-.hdr-sub{font-size:13px;color:var(--muted);margin-top:10px;line-height:1.6}
-.hdr-note{font-size:11px;color:var(--muted);opacity:.6;margin-top:6px}
-
-/* MONTH NAV */
-.month-nav{display:flex;align-items:center;justify-content:center;gap:14px;margin:28px 20px 0}
-.mbtn{width:42px;height:42px;border-radius:50%;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.2s;flex-shrink:0}
-.mbtn:hover{border-color:var(--green);background:var(--card2)}
-.mlabel{font-family:var(--d);font-size:30px;letter-spacing:2px;min-width:200px;text-align:center}
-
-/* WRAP */
-.wrap{max-width:860px;margin:0 auto;padding:0 20px}
-
-/* TOP CARDS */
-.top-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:24px}
-@media(max-width:500px){.top-grid{grid-template-columns:1fr 1fr}}
-.icard{background:var(--card);border:1.5px solid var(--border);border-radius:16px;padding:16px 18px;transition:border-color .2s}
-.icard:focus-within{border-color:var(--green)}
-.icard-label{font-size:10px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;margin-bottom:10px}
-.icard-input{width:100%;background:none;border:none;outline:none;font-family:var(--f);font-size:24px;font-weight:700;color:var(--text);caret-color:var(--green)}
-.icard-input::placeholder{color:var(--dim)}
-.icard-sub{font-size:11px;color:var(--muted);margin-top:5px}
-
-/* SECTION TITLE */
-.sec-title{display:flex;align-items:center;justify-content:space-between;margin-top:28px;margin-bottom:12px}
+body{font-family:var(--f);background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:40px}
+.hdr{text-align:center;padding:24px 18px 8px}
+.hdr-eye{font-size:10px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-bottom:6px}
+.hdr-title{font-family:var(--d);font-size:clamp(46px,10vw,78px);line-height:.88;letter-spacing:1px}
+.hdr-title em{color:var(--green);font-style:normal}
+.hdr-sub{font-size:13px;color:var(--muted);line-height:1.6;margin-top:8px}
+.wrap{max-width:1080px;margin:0 auto;padding:0 16px}
+.month-nav{display:flex;align-items:center;justify-content:center;gap:12px;margin:14px 0 18px}
+.mbtn{width:40px;height:40px;border-radius:50%;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:22px;cursor:pointer}
+.mbtn:hover{border-color:var(--green)}
+.mlabel{font-family:var(--d);font-size:30px;letter-spacing:2px;min-width:190px;text-align:center}
+.dashboard{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:12px}
+@media(max-width:900px){.dashboard{grid-template-columns:repeat(2,1fr)}}
+.dcard{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:15px}
+.dlbl{font-size:9px;letter-spacing:1.6px;color:var(--muted);text-transform:uppercase;margin-bottom:6px}
+.dval{font-family:var(--d);font-size:34px;line-height:1}
+.dsub{font-size:11px;color:var(--muted);margin-top:5px}
+.tabs{position:sticky;top:0;z-index:50;background:var(--bg);display:grid;grid-template-columns:repeat(5,1fr);gap:8px;padding:10px 0;margin-bottom:10px}
+@media(max-width:760px){.tabs{grid-template-columns:repeat(3,1fr)}}
+.tab{border:1px solid var(--border);background:var(--card);color:var(--text);padding:11px 8px;border-radius:12px;font-weight:800;font-size:12px;cursor:pointer}
+.tab.active,.tab:hover{border-color:var(--green);color:var(--green);background:rgba(0,255,136,.06)}
+.section{display:none}
+.section.show{display:block}
+.sec-title{display:flex;align-items:center;justify-content:space-between;margin:16px 0 10px}
 .sec-label{font-size:11px;letter-spacing:2px;color:var(--muted);text-transform:uppercase}
-.add-btn{display:flex;align-items:center;gap:5px;background:none;border:1px solid var(--border);border-radius:8px;padding:7px 13px;color:var(--green);font-family:var(--f);font-size:12px;font-weight:600;cursor:pointer;transition:.2s}
-.add-btn:hover{border-color:var(--green);background:rgba(0,255,136,.06)}
-
-/* COL HEADERS */
-.col-hdrs{display:grid;grid-template-columns:1fr 105px 105px 72px 34px;gap:8px;margin-bottom:6px;padding:0 2px}
-@media(max-width:480px){.col-hdrs{grid-template-columns:1fr 82px 82px 58px 28px}}
-.ch{font-size:9px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;text-align:right}
-.ch:first-child{text-align:left}
-
-/* CATEGORY ROW */
-.cat-row{display:grid;grid-template-columns:1fr 105px 105px 72px 34px;gap:8px;align-items:center;margin-bottom:8px}
-@media(max-width:480px){.cat-row{grid-template-columns:1fr 82px 82px 58px 28px}}
-
-.cname{background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;display:flex;align-items:center;gap:8px;min-width:0;transition:border-color .2s;position:relative}
-.cname:focus-within{border-color:rgba(255,170,0,.5)}
-.cemoji{font-size:17px;background:none;border:none;cursor:pointer;flex-shrink:0;line-height:1;padding:0;transition:transform .1s}
-.cemoji:hover{transform:scale(1.2)}
-.cname-inp{background:none;border:none;outline:none;font-family:var(--f);font-size:13px;font-weight:600;color:var(--text);width:100%;min-width:0}
-.cname-inp::placeholder{color:var(--dim)}
-
-.cnum{background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:8px 10px;transition:border-color .2s}
-.cnum:focus-within{border-color:var(--amber)}
-.cnum.actual:focus-within{border-color:var(--blue)}
-.cnum-lbl{font-size:8px;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-bottom:3px}
-.cnum-inp{width:100%;background:none;border:none;outline:none;font-family:var(--f);font-size:15px;font-weight:700;color:var(--text);caret-color:var(--green)}
-.cnum-inp::placeholder{color:var(--dim)}
-
-.vpill{border-radius:8px;padding:7px 6px;text-align:center;font-size:11px;font-weight:700;font-family:monospace;line-height:1.2}
-.vpill.none{background:var(--dim);color:var(--muted);font-size:9px}
-.vpill.even{background:rgba(0,255,136,.08);color:var(--green)}
-.vpill.over{background:rgba(255,59,59,.1);color:var(--red)}
-.vpill.under{background:rgba(0,255,136,.08);color:var(--green)}
-
-.xbtn{width:30px;height:30px;border-radius:8px;border:1px solid var(--border);background:none;color:var(--muted);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.2s;flex-shrink:0}
-.xbtn:hover{color:var(--red);border-color:var(--red);background:rgba(255,59,59,.08)}
-.xbtn:disabled{opacity:.2;pointer-events:none}
-
-/* TOTALS */
-.totals{display:grid;grid-template-columns:1fr 105px 105px 72px 34px;gap:8px;align-items:center;border-top:1px solid var(--border);padding-top:12px;margin-top:4px}
-@media(max-width:480px){.totals{grid-template-columns:1fr 82px 82px 58px 28px}}
-.tlabel{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
-.tval{font-size:13px;font-weight:700;font-family:monospace;text-align:right;padding-right:2px}
-
-/* EMOJI PICKER */
-.epicker{position:absolute;top:calc(100% + 6px);left:0;z-index:999;background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:10px;display:flex;flex-wrap:wrap;gap:4px;width:230px;box-shadow:0 10px 30px rgba(0,0,0,.6);display:none}
-.epicker.show{display:flex}
-.eopt{font-size:20px;background:none;border:none;cursor:pointer;padding:5px;border-radius:6px;transition:.15s}
-.eopt:hover{background:var(--dim)}
-
-/* JUDGE */
-.judge-wrap{margin-top:28px}
-.judge-btn{width:100%;padding:22px;background:var(--text);border:none;border-radius:16px;font-family:var(--d);font-size:36px;letter-spacing:3px;color:var(--bg);cursor:pointer;transition:.15s}
-.judge-btn:hover{background:#d8d8e8}
-.judge-btn:active{transform:scale(.98)}
-
-/* VERDICT */
-.verdict{margin-top:36px;display:none}
-.verdict.show{display:block}
-
-.vhero{border-radius:20px;padding:32px 28px;margin-bottom:14px;border:1.5px solid;position:relative;overflow:hidden}
-.vhero::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(45deg,currentColor 0,currentColor 1px,transparent 0,transparent 50%);background-size:8px 8px;opacity:.04;pointer-events:none}
-.vgrade{font-family:var(--d);font-size:clamp(88px,20vw,148px);line-height:1;position:relative;z-index:1}
-.vlabel{font-size:clamp(18px,4vw,26px);font-weight:700;margin-bottom:10px;position:relative;z-index:1}
-.vtext{font-size:14px;line-height:1.75;opacity:.85;max-width:580px;position:relative;z-index:1}
-
-.stiles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
-.stile{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;text-align:center}
-.stile-lbl{font-size:9px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;margin-bottom:7px}
-.stile-val{font-family:var(--d);font-size:32px;letter-spacing:1px}
-
-.ntiles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
-@media(max-width:460px){.ntiles{grid-template-columns:repeat(2,1fr)}}
-.ntile{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center}
-.ntile-lbl{font-size:9px;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-bottom:5px}
-.ntile-val{font-family:var(--d);font-size:22px;letter-spacing:1px}
-
-/* VERDICT BREAKDOWN */
-.vbreak{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:14px}
-.vbreak-ttl{font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:14px}
-.vbrow{display:grid;grid-template-columns:1fr 80px 80px 72px;gap:8px;align-items:center;padding:9px 0;border-bottom:1px solid var(--dim)}
-.vbrow:last-child{border-bottom:none}
-@media(max-width:460px){.vbrow{grid-template-columns:1fr 60px 60px 56px}}
-.vbname{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:500}
-.vbnum{font-size:13px;font-family:monospace;font-weight:700;text-align:right}
-.vbar-wrap{height:3px;background:var(--dim);border-radius:2px;overflow:hidden;margin-top:3px}
-.vbar{height:100%;border-radius:2px;transition:width .7s ease}
-.vbvar{font-size:11px;font-family:monospace;font-weight:700;text-align:center;padding:4px 6px;border-radius:6px}
-.vbvar.none{color:var(--muted)}
-.vbvar.even{color:var(--green);background:rgba(0,255,136,.08)}
-.vbvar.over{color:var(--red);background:rgba(255,59,59,.1)}
-.vbvar.under{color:var(--green);background:rgba(0,255,136,.08)}
-
-/* INSIGHTS */
-.insights{display:grid;gap:10px;margin-bottom:14px}
-.ins{display:flex;gap:13px;align-items:flex-start;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:15px}
-.ins-ico{font-size:20px;flex-shrink:0;line-height:1;margin-top:1px}
-.ins-txt{font-size:13px;line-height:1.65;color:var(--muted)}
-.ins-txt strong{color:var(--text);font-weight:600}
-
-/* HISTORY */
-.hist{margin-top:32px}
-.hist-lbl{font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:12px}
-.hrow{display:flex;align-items:center;gap:12px;padding:13px 16px;background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:8px;cursor:pointer;transition:.2s}
-.hrow:hover{border-color:var(--green)}
-.hrow-month{font-size:13px;font-weight:600;flex:1}
-.hrow-inc{font-size:12px;color:var(--muted)}
-.hrow-grade{font-family:var(--d);font-size:24px;letter-spacing:1px}
-.hrow-score{font-size:12px;color:var(--muted);min-width:45px;text-align:right}
-.hrow-del{background:none;border:none;color:var(--dim);font-size:14px;cursor:pointer;padding:4px 7px;border-radius:6px;transition:.2s}
-.hrow-del:hover{color:var(--red)}
-.clear-all{display:block;background:none;border:none;font-size:12px;color:var(--muted);cursor:pointer;text-decoration:underline;padding:8px;margin:10px auto 0}
-.clear-all:hover{color:var(--red)}
-
-@keyframes pop{0%{opacity:0;transform:scale(.8)}60%{transform:scale(1.04)}100%{opacity:1;transform:scale(1)}}
-@keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
-.pop{animation:pop .4s ease forwards}
-.up{animation:up .35s ease forwards}
-
-/* DASHBOARD + SECTIONS */
-.dashboard{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:24px}
-@media(max-width:760px){.dashboard{grid-template-columns:repeat(2,1fr)}}
-.dash-card{background:var(--card);border:1.5px solid var(--border);border-radius:18px;padding:18px}
-.dash-lbl{font-size:10px;letter-spacing:1.6px;color:var(--muted);text-transform:uppercase;margin-bottom:8px}
-.dash-val{font-family:var(--d);font-size:34px;letter-spacing:1px}
-.dash-sub{font-size:11px;color:var(--muted);margin-top:5px;line-height:1.5}
-.section-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:20px}
-@media(max-width:640px){.section-tabs{grid-template-columns:repeat(2,1fr)}}
-.tab-btn{border:1.5px solid var(--border);background:var(--card);color:var(--text);border-radius:14px;padding:14px 10px;font-family:var(--f);font-size:13px;font-weight:700;cursor:pointer;transition:.2s}
-.tab-btn:hover,.tab-btn.active{border-color:var(--green);background:rgba(0,255,136,.06);color:var(--green)}
-.app-section{display:none}
-.app-section.show{display:block}
-.quick-warning{margin-top:14px;background:rgba(255,170,0,.06);border:1px solid rgba(255,170,0,.18);border-radius:14px;padding:14px;font-size:13px;color:var(--muted);line-height:1.6}
-.quick-warning strong{color:var(--text)}
-
-
-.sub-row .cname{background:#0d0d10;border-color:#1f1f28}
-.sub-row .cname-inp{font-size:12px;color:var(--muted)}
-.parent-row .cname{border-color:rgba(0,255,136,.18)}
-.parent-total{font-size:14px;font-weight:800;color:var(--text);padding-top:5px;font-family:monospace}
-
-
-.wealth-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:18px}
-@media(max-width:760px){.wealth-grid{grid-template-columns:repeat(2,1fr)}}
-.wealth-card{background:linear-gradient(180deg,#101018,#0a0a10);border:1px solid #222230;border-radius:18px;padding:18px}
-.wealth-title{font-size:10px;letter-spacing:1.6px;color:var(--muted);text-transform:uppercase;margin-bottom:8px}
-.wealth-score{font-family:var(--d);font-size:42px;line-height:1}
-.wealth-desc{font-size:11px;color:var(--muted);margin-top:6px;line-height:1.5}
-.wealth-insight{margin-top:16px;background:rgba(0,255,136,.05);border:1px solid rgba(0,255,136,.14);padding:16px;border-radius:16px;font-size:13px;line-height:1.7;color:var(--muted)}
-.wealth-insight strong{color:var(--text)}
-
-
-.advice-box{background:rgba(77,159,255,.05);border:1px solid rgba(77,159,255,.18);border-radius:14px;padding:15px;margin-bottom:10px}
-.advice-title{font-size:12px;font-weight:800;color:var(--text);margin-bottom:6px}
-.advice-text{font-size:13px;line-height:1.65;color:var(--muted)}
-.advice-text strong{color:var(--text)}
-
-
-.savings-balance-card{background:rgba(0,255,136,.05);border:1px solid rgba(0,255,136,.18);border-radius:16px;padding:16px;margin-top:14px}
-.savings-balance-title{font-size:10px;letter-spacing:1.6px;color:var(--muted);text-transform:uppercase;margin-bottom:6px}
-.savings-balance-value{font-family:var(--d);font-size:38px;color:var(--green)}
-.savings-balance-note{font-size:12px;color:var(--muted);line-height:1.6;margin-top:6px}
-
-
-.score-guide{margin-top:22px;background:var(--card);border:1px solid var(--border);border-radius:18px;padding:20px}
-.score-guide-title{font-size:11px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:16px}
-.score-guide-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-@media(max-width:700px){.score-guide-grid{grid-template-columns:1fr}}
-.score-item{background:#0f0f15;border:1px solid #232330;border-radius:14px;padding:16px}
-.score-item h3{font-size:16px;margin-bottom:8px}
-.score-item p{font-size:13px;line-height:1.7;color:var(--muted)}
-.score-item strong{color:var(--text)}
-
-
-.score-status{
-  margin-top:8px;
-  font-size:12px;
-  font-weight:700;
-  letter-spacing:.5px
-}
-
-
-/* COMPACT MODE */
-body{padding-bottom:35px}
-.hdr{padding:22px 20px 0}
-.hdr-title{font-size:clamp(42px,9vw,70px)}
-.hdr-sub{font-size:12px}
-.month-nav{margin-top:18px}
-.wrap{max-width:980px}
-.dashboard,.wealth-grid{gap:8px;margin-top:14px}
-.dash-card,.wealth-card,.icard{padding:13px 14px;border-radius:14px}
-.dash-val,.wealth-score{font-size:30px}
-.sec-title{margin-top:18px;margin-bottom:8px}
-.section-tabs{position:sticky;top:0;z-index:50;background:var(--bg);padding:8px 0;margin-top:12px}
-.tab-btn{padding:10px 8px;font-size:12px;border-radius:10px}
-.cat-row{margin-bottom:6px}
-.cname,.cnum{padding:7px 9px}
-.judge-wrap{margin-top:18px}
-.judge-btn{padding:16px;font-size:30px}
-.score-guide{display:none}
-.score-guide.show{display:block}
-.compact-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-@media(max-width:640px){.compact-row{grid-template-columns:1fr}}
-
-
-.firebase-panel{margin-top:16px;background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px}
-.firebase-title{font-size:10px;letter-spacing:1.7px;color:var(--muted);text-transform:uppercase;margin-bottom:12px}
-.firebase-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-@media(max-width:640px){.firebase-grid{grid-template-columns:1fr}}
-.firebase-input{width:100%;background:#0c0c10;border:1px solid var(--border);border-radius:10px;padding:12px;color:var(--text);outline:none;font-family:var(--f)}
-.firebase-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
-.firebase-btn{border:1px solid var(--border);background:#0c0c10;color:var(--text);border-radius:10px;padding:10px 12px;cursor:pointer;font-family:var(--f);font-weight:700;font-size:12px}
-.firebase-btn:hover{border-color:var(--green);color:var(--green)}
-.firebase-status{margin-top:10px;font-size:12px;color:var(--muted);line-height:1.5}
-
-
-/* AUTH GATE */
-.auth-gate{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:var(--bg)}
-.auth-box{width:100%;max-width:430px;background:var(--card);border:1px solid var(--border);border-radius:22px;padding:26px;box-shadow:0 20px 50px rgba(0,0,0,.35)}
-.auth-logo{font-family:var(--d);font-size:48px;line-height:.95;margin-bottom:8px}
-.auth-logo em{color:var(--green);font-style:normal}
-.auth-sub{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:18px}
-.auth-main{display:grid;gap:10px}
-.auth-app{display:none}
-.auth-app.unlocked{display:block}
-.auth-error{font-size:12px;color:var(--red);margin-top:10px;line-height:1.5}
-
+.btn{border:1px solid var(--border);background:var(--card);color:var(--text);border-radius:10px;padding:9px 12px;font-weight:800;font-size:12px;cursor:pointer}
+.btn:hover{border-color:var(--green);color:var(--green)}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media(max-width:800px){.grid{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){.grid{grid-template-columns:1fr}}
+.card{background:var(--card);border:1.5px solid var(--border);border-radius:16px;padding:15px}
+.label{font-size:10px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;margin-bottom:8px}
+.input{width:100%;background:none;border:none;outline:none;color:var(--text);font-family:var(--f);font-size:22px;font-weight:800;caret-color:var(--green)}
+.input::placeholder{color:var(--dim)}
+.sub{font-size:11px;color:var(--muted);margin-top:4px}
+.table-head,.row,.total-row{display:grid;grid-template-columns:1.3fr 1fr 1fr .8fr 42px;gap:8px;align-items:center}
+@media(max-width:640px){.table-head,.row,.total-row{grid-template-columns:1.2fr .85fr .85fr .7fr 34px;gap:5px}}
+.table-head{margin:8px 0 6px;color:var(--muted);font-size:9px;letter-spacing:1.4px;text-transform:uppercase}
+.row{margin-bottom:7px}
+.cell{background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:9px}
+.cell input{width:100%;background:none;border:none;outline:none;color:var(--text);font-weight:800;font-family:var(--f)}
+.name-input{font-size:13px}
+.num-input{font-size:15px;text-align:right}
+.diff{font-family:monospace;font-size:12px;font-weight:800;text-align:center;border-radius:8px;padding:8px 4px}
+.diff.none{background:var(--dim);color:var(--muted)}
+.diff.good{background:rgba(0,255,136,.08);color:var(--green)}
+.diff.bad{background:rgba(255,59,59,.09);color:var(--red)}
+.x{height:34px;border-radius:9px;border:1px solid var(--border);background:none;color:var(--muted);cursor:pointer}
+.x:hover{color:var(--red);border-color:var(--red)}
+.total-row{border-top:1px solid var(--border);padding-top:10px;margin-top:8px}
+.total-label{font-size:12px;font-weight:900;color:var(--muted);text-transform:uppercase}
+.total-val{text-align:right;font-family:monospace;font-weight:900}
+.note{width:100%;min-height:110px;background:var(--card);border:1.5px solid var(--border);border-radius:16px;color:var(--text);padding:14px;font-family:var(--f);outline:none;resize:vertical}
+.verdict{background:var(--card);border:1.5px solid var(--border);border-radius:18px;padding:18px;margin-top:12px}
+.verdict-title{font-family:var(--d);font-size:46px;line-height:1}
+.verdict-msg{font-size:14px;line-height:1.7;color:var(--muted);margin-top:8px}
+.hist-row{display:grid;grid-template-columns:1.2fr .9fr .9fr .9fr .6fr 42px;gap:8px;align-items:center;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:8px;cursor:pointer}
+@media(max-width:760px){.hist-row{grid-template-columns:1fr 1fr 1fr;gap:6px}}
+.hist-row:hover{border-color:var(--green)}
+.small{font-size:12px;color:var(--muted)}
+.strong{font-weight:900}
 </style>
 </head>
 <body>
-<div id="auth-gate" class="auth-gate">
-  <div class="auth-box">
-    <div class="auth-logo">WEALTH<br><em>DISCIPLINE</em></div>
-    <div class="auth-sub">Login before accessing your financial dashboard. Your data will sync with Firebase.</div>
-    <div class="auth-main">
-      <input class="firebase-input" id="gate-email" type="email" placeholder="Email">
-      <input class="firebase-input" id="gate-password" type="password" placeholder="Password">
-      <button class="firebase-btn" onclick="firebaseLoginFromGate()">Login</button>
-      <button class="firebase-btn" onclick="firebaseRegisterFromGate()">Create Account</button>
-    </div>
-    <div id="auth-error" class="auth-error"></div>
-  </div>
-</div>
-<div id="auth-app" class="auth-app">
-
 <div class="hdr">
-  <div class="hdr-eye">Monthly Finance Verdict</div>
-  <div class="hdr-title">WAS I<br><em>STUPID?</em></div>
-  <div class="hdr-sub">Plan your spending. Track what actually happened.<br>Get an honest verdict — and find out if your budget even makes sense financially.</div>
-  <div class="hdr-note">🏠 Housing = Maintenance + Gas + Light + Generator + Trash + Internet + Washing Soap</div>
+  <div class="hdr-eye">Phase 1 Foundation</div>
+  <div class="hdr-title">FINANCIAL<br><em>TRACKING</em></div>
+  <div class="hdr-sub">Revenus, dépenses, historique, catégories, savings, budget vs actual.</div>
 </div>
 
 <div class="month-nav">
   <button class="mbtn" onclick="changeMonth(-1)">‹</button>
-  <div class="mlabel" id="mlabel">MAY 2026</div>
+  <div class="mlabel" id="month-label"></div>
   <button class="mbtn" onclick="changeMonth(1)">›</button>
 </div>
 
-
 <div class="wrap">
-  <div class="firebase-panel">
-    <div class="firebase-title">Cloud Sync / Firebase</div>
-    <div style="font-size:12px;color:var(--muted)">Cloud account controls.</div>
-    <div class="firebase-actions">
-      
-      
-      <button class="firebase-btn" onclick="firebaseLogout()">Logout</button>
-      <button class="firebase-btn" onclick="saveCloudNow()">Save Cloud</button>
-      <button class="firebase-btn" onclick="loadCloudNow()">Load Cloud</button>
-    </div>
-    <div class="firebase-status" id="firebase-status">
-      Firebase not connected yet. Add your Firebase config inside the HTML file.
-    </div>
-  </div>
-</div>
-
-
-<div class="wrap">
-
-  <!-- DASHBOARD -->
   <div class="dashboard">
-    <div class="dash-card">
-      <div class="dash-lbl">Total Income</div>
-      <div class="dash-val" id="dash-income" style="color:var(--green)">GH₵0</div>
-      <div class="dash-sub">All income sources combined</div>
-    </div>
-    <div class="dash-card">
-      <div class="dash-lbl">Planned Budget</div>
-      <div class="dash-val" id="dash-planned" style="color:var(--amber)">GH₵0</div>
-      <div class="dash-sub">What you planned to spend</div>
-    </div>
-    <div class="dash-card">
-      <div class="dash-lbl">Actual Spend</div>
-      <div class="dash-val" id="dash-actual" style="color:var(--blue)">GH₵0</div>
-      <div class="dash-sub">What actually happened</div>
-    </div>
-    <div class="dash-card">
-      <div class="dash-lbl">Savings Rate</div>
-      <div class="dash-val" id="dash-srate">—</div>
-      <div class="dash-sub">Based on actual spending</div>
-    </div>
+    <div class="dcard"><div class="dlbl">Income</div><div class="dval" id="dash-income">GH₵0</div><div class="dsub">Total monthly income</div></div>
+    <div class="dcard"><div class="dlbl">Planned</div><div class="dval" id="dash-planned" style="color:var(--amber)">GH₵0</div><div class="dsub">Budget plan</div></div>
+    <div class="dcard"><div class="dlbl">Actual</div><div class="dval" id="dash-actual" style="color:var(--blue)">GH₵0</div><div class="dsub">Real spending</div></div>
+    <div class="dcard"><div class="dlbl">Savings</div><div class="dval" id="dash-savings" style="color:var(--green)">GH₵0</div><div class="dsub">Income - actual - debt</div></div>
+    <div class="dcard"><div class="dlbl">Status</div><div class="dval" id="dash-status">—</div><div class="dsub" id="dash-status-sub">Not judged</div></div>
   </div>
 
-  
-<div class="wealth-grid">
-  <div class="wealth-card">
-    <div class="wealth-title">Wealth Score</div>
-    <div class="wealth-score" id="wealth-score" style="color:var(--green)">—</div>
-    <div class="wealth-desc">How much your behavior builds long-term wealth</div><div class="score-status" id="wealth-status">—</div>
+  <div class="tabs">
+    <button class="tab active" onclick="showSection('income',this)">💼 Income</button>
+    <button class="tab" onclick="showSection('budget',this)">📊 Budget</button>
+    <button class="tab" onclick="showSection('savings',this)">🏦 Savings</button>
+    <button class="tab" onclick="showSection('history',this)">🕒 History</button>
+    <button class="tab" onclick="showAll(this)">👁 All</button>
   </div>
-  <div class="wealth-card">
-    <div class="wealth-title">Freedom Score</div>
-    <div class="wealth-score" id="freedom-score" style="color:var(--blue)">—</div>
-    <div class="wealth-desc">Dependence on one income source</div><div class="score-status" id="freedom-status">—</div>
-  </div>
-  <div class="wealth-card">
-    <div class="wealth-title">Growth Score</div>
-    <div class="wealth-score" id="growth-score" style="color:var(--amber)">—</div>
-    <div class="wealth-desc">Income expansion & future trajectory</div><div class="score-status" id="growth-status">—</div>
-  </div>
-  <div class="wealth-card">
-    <div class="wealth-title">Lifestyle Risk</div>
-    <div class="wealth-score" id="risk-score" style="color:var(--red)">—</div>
-    <div class="wealth-desc">How dangerous your lifestyle is financially</div><div class="score-status" id="risk-status">—</div>
-  </div>
+
+  <section id="income" class="section show">
+    <div class="sec-title"><div class="sec-label">Income Sources</div><button class="btn" onclick="addIncome()">＋ Add Income</button></div>
+    <div class="grid" id="income-list"></div>
+  </section>
+
+  <section id="budget" class="section">
+    <div class="sec-title"><div class="sec-label">Budget vs Actual</div><button class="btn" onclick="addCategory()">＋ Add Category</button></div>
+    <div class="table-head">
+      <div>Category</div><div style="text-align:right;color:var(--amber)">Planned</div><div style="text-align:right;color:var(--blue)">Actual</div><div style="text-align:center">Diff</div><div></div>
+    </div>
+    <div id="category-list"></div>
+    <div class="total-row">
+      <div class="total-label">Total</div>
+      <div class="total-val" id="total-planned" style="color:var(--amber)">GH₵0</div>
+      <div class="total-val" id="total-actual" style="color:var(--blue)">GH₵0</div>
+      <div class="total-val" id="total-diff">—</div>
+      <div></div>
+    </div>
+  </section>
+
+  <section id="savings" class="section">
+    <div class="sec-title"><div class="sec-label">Savings & Debt</div></div>
+    <div class="grid">
+      <div class="card">
+        <div class="label">💳 Debt Payments</div>
+        <input class="input" id="debt" type="number" min="0" placeholder="0" oninput="recalc(); saveDraft()">
+        <div class="sub">Debt paid this month</div>
+      </div>
+      <div class="card">
+        <div class="label">🏦 Calculated Monthly Savings</div>
+        <div class="input" id="monthly-savings-display">GH₵0</div>
+        <div class="sub">Income − Actual Spending − Debt</div>
+      </div>
+      <div class="card">
+        <div class="label">💰 Total Savings Balance</div>
+        <div class="input" id="total-savings-display">GH₵0</div>
+        <div class="sub">Sum of judged months</div>
+      </div>
+    </div>
+
+    <div class="sec-title"><div class="sec-label">Monthly Comment</div></div>
+    <textarea class="note" id="comment" placeholder="What happened this month?" oninput="saveDraft()"></textarea>
+
+    <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn" onclick="judgeMonth()">⚖️ Judge Month</button>
+      <button class="btn" onclick="saveDraft()">💾 Save Draft</button>
+      <button class="btn" onclick="clearCurrentMonth()">🧹 Clear Actuals</button>
+    </div>
+
+    <div class="verdict" id="verdict">
+      <div class="verdict-title" id="verdict-grade">—</div>
+      <div class="verdict-msg" id="verdict-msg">Enter your data and judge the month.</div>
+    </div>
+  </section>
+
+  <section id="history" class="section">
+    <div class="sec-title"><div class="sec-label">Monthly History</div><button class="btn" onclick="clearAllData()">Clear All</button></div>
+    <div id="history-list"></div>
+  </section>
 </div>
-
-
-<button class="add-btn" style="margin-top:14px" onclick="toggleScoreGuide()">ℹ️ Explain Scores</button>
-<div class="score-guide" id="score-guide">
-  <div class="score-guide-title">Understanding Your Wealth Metrics</div>
-
-  <div class="score-guide-grid">
-
-    <div class="score-item">
-      <h3 style="color:var(--green)">💰 Wealth Score</h3>
-      <p>
-        Measures whether your overall financial behavior is helping you
-        <strong>build long-term wealth</strong> or simply survive month to month.
-        <br><br>
-        It analyzes:
-        savings behavior, spending discipline, lifestyle inflation,
-        and how much money you keep versus consume.
-      </p>
-    </div>
-
-    <div class="score-item">
-      <h3 style="color:var(--blue)">🕊 Freedom Score</h3>
-      <p>
-        Measures your level of <strong>financial dependence</strong>.
-        <br><br>
-        If most of your money comes from only one source,
-        your score becomes lower.
-        <br><br>
-        Multiple income streams increase financial freedom and resilience.
-      </p>
-    </div>
-
-    <div class="score-item">
-      <h3 style="color:var(--amber)">📈 Growth Score</h3>
-      <p>
-        Measures your <strong>future financial trajectory</strong>.
-        <br><br>
-        It evaluates:
-        income diversification, savings growth,
-        and whether your financial system is expanding over time.
-      </p>
-    </div>
-
-    <div class="score-item">
-      <h3 style="color:var(--red)">⚠️ Lifestyle Risk</h3>
-      <p>
-        Measures how dangerous your current lifestyle is financially.
-        <br><br>
-        High consumption, weak savings,
-        and expensive habits increase this score.
-        <br><br>
-        A high risk score means your lifestyle could become unstable
-        if income drops or emergencies happen.
-      </p>
-    </div>
-
-  </div>
-</div>
-
-
-<div class="wealth-insight" id="wealth-insight">
-  <strong>Wealth Intelligence:</strong> Add your income and spending to see whether your decisions are moving you toward wealth.
-</div>
-
-<div class="quick-warning" id="dash-warning">
-    <strong>Dashboard view:</strong> enter your details below, then use “Judge Me” to generate the full financial verdict.
-  </div>
-
-  <!-- NAVIGATION BUTTONS -->
-  <div class="section-tabs">
-    <button class="tab-btn active" onclick="showSection('income', this)">💼 Income</button>
-    <button class="tab-btn" onclick="showSection('budget', this)">📊 Budget</button>
-    <button class="tab-btn" onclick="showSection('comments', this)">📝 Comments</button>
-    <button class="tab-btn" onclick="showSection('verdictSec', this)">⚖️ Verdict</button>
-    <button class="tab-btn" onclick="showSection('historySec', this)">🕒 History</button>
-    <button class="tab-btn" onclick="showAllSections(this)">👁 Show All</button>
-  </div>
-
-  <div id="income" class="app-section show">
-
-  
-<!-- TOP INPUTS -->
-
-<div class="sec-title" style="margin-top:24px">
-  <div class="sec-label">Income Sources</div>
-</div>
-
-<div id="income-sources" class="top-grid"></div>
-
-<div class="totals" style="margin-top:10px">
-  <div class="tlabel">Total Income</div>
-  <div class="tval" id="total-income-display" style="color:var(--green)">GH₵0</div>
-  <div></div>
-  <div></div>
-  <div></div>
-</div>
-
-<div class="sec-title">
-  <div class="sec-label">Savings, Debt & Notes</div>
-</div>
-
-<div class="top-grid" style="grid-template-columns:1fr 1fr;">
-  <div class="icard">
-    <div class="icard-label">🏦 This Month Saved</div>
-    <input class="icard-input" id="inp-saved" type="number" placeholder="0" min="0" oninput="updateDashboard();
-updateSavingsBalanceDisplay(); saveCurrentMonthDraft()">
-    <div class="icard-sub">GH₵ intentionally put aside this month</div>
-  </div>
-
-  <div class="icard">
-    <div class="icard-label">💳 Debt Payments</div>
-    <input class="icard-input" id="inp-debt" type="number" placeholder="0" min="0" oninput="updateDashboard(); saveCurrentMonthDraft()">
-    <div class="icard-sub">GH₵ to loans</div>
-  </div>
-</div>
-
-<div class="savings-balance-card">
-  <div class="savings-balance-title">Total Savings Balance</div>
-  <div class="savings-balance-value" id="savings-balance-display">GH₵0</div>
-  <div class="savings-balance-note" id="savings-balance-note">
-    This is calculated automatically after you click Judge Me. Formula: Income − Actual Spending − Debt.
-  </div></div>
-
-<div class="icard" style="margin-top:14px">
-  <div class="icard-label">📝 Monthly Comments</div>
-  <textarea id="monthly-comments"
-    style="width:100%;min-height:120px;background:none;border:none;outline:none;color:var(--text);font-family:var(--f);font-size:14px;resize:vertical"
-    placeholder="What happened this month? Why did you overspend? Any major event, emergency or achievement?" oninput="saveCurrentMonthDraft()"></textarea>
-</div>
-
-</div>
-
-  <div id="budget" class="app-section">
-
-  <!-- CATEGORIES -->
-
-  <div class="sec-title">
-    <div class="sec-label">Spending by Category</div>
-    <button class="add-btn" onclick="addCat()">＋ Add Category</button>
-  </div>
-
-  <div class="col-hdrs">
-    <div class="ch" style="text-align:left">Category</div>
-    <div class="ch" style="color:var(--amber)">Planned</div>
-    <div class="ch" style="color:var(--blue)">Actual</div>
-    <div class="ch">Diff</div>
-    <div></div>
-  </div>
-
-  <div id="cat-rows"></div>
-
-  <div class="totals">
-    <div class="tlabel">Total</div>
-    <div class="tval" id="tot-planned" style="color:var(--amber)">—</div>
-    <div class="tval" id="tot-actual" style="color:var(--blue)">—</div>
-    <div class="tval" id="tot-diff">—</div>
-    <div></div>
-  </div>
-
-  </div>
-
-  <div id="comments" class="app-section">
-
-
-
-  <!-- JUDGE -->
-  <div class="judge-wrap">
-    <button class="judge-btn" onclick="judge()">JUDGE ME</button>
-  </div>
-
-  </div>
-
-  <div id="verdictSec" class="app-section">
-
-  <!-- VERDICT -->
-  <div class="verdict" id="verdict">
-    <div class="vhero pop" id="vhero">
-      <div class="vgrade" id="vgrade">A+</div>
-      <div class="vlabel" id="vlabel">Financial Genius</div>
-      <div class="vtext" id="vtext"></div>
-    </div>
-    <div class="stiles up">
-      <div class="stile"><div class="stile-lbl">Score</div><div class="stile-val" id="vs-score">—</div></div>
-      <div class="stile"><div class="stile-lbl">Savings Rate</div><div class="stile-val" id="vs-srate">—</div></div>
-      <div class="stile"><div class="stile-lbl">Budget Kept</div><div class="stile-val" id="vs-bkeep">—</div></div>
-    </div>
-    <div class="ntiles up">
-      <div class="ntile"><div class="ntile-lbl">Earned</div><div class="ntile-val" id="vn-inc" style="color:var(--green)">—</div></div>
-      <div class="ntile"><div class="ntile-lbl">Planned</div><div class="ntile-val" id="vn-plan" style="color:var(--amber)">—</div></div>
-      <div class="ntile"><div class="ntile-lbl">Actually Spent</div><div class="ntile-val" id="vn-act" style="color:var(--blue)">—</div></div>
-      <div class="ntile"><div class="ntile-lbl">Saved</div><div class="ntile-val" id="vn-saved" style="color:var(--purple)">—</div></div>
-      <div class="ntile"><div class="ntile-lbl">Overspent by</div><div class="ntile-val" id="vn-over" style="color:var(--red)">—</div></div>
-      <div class="ntile"><div class="ntile-lbl">Under Budget</div><div class="ntile-val" id="vn-under" style="color:var(--green)">—</div></div>
-    </div>
-    <div class="vbreak up" id="vbreak">
-      <div class="vbreak-ttl">Planned vs Actual — Category Breakdown</div>
-      <div id="vbrows"></div>
-    </div>
-    <div class="insights up" id="insights"></div>
-  </div>
-
-  </div>
-
-  <div id="historySec" class="app-section">
-
-  <!-- HISTORY -->
-  <div class="hist">
-    <div class="hist-lbl">Past Verdicts</div>
-    <div id="hist-list"></div>
-    <button class="clear-all" onclick="clearAll()">Clear all data</button>
-  </div>
-
-</div>
-
-</div><!-- /wrap -->
 
 <script>
 const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
-const MS=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
-const EMOJIS=['🏠','💍','🍔','🏋️','🚌','🙏','📱','💈','👨‍👩‍👧','💊','🎬','☕','🛍','✈️','🎮','👔','💅','🎁','🛒','🍕','📚','🔧','💰','🎵','🏖','🐾','🧴','🍺','💡','🎯'];
-
-const INCOME_SOURCES = [
-  {id:'salary', name:'Salary'},
-  {id:'training', name:'Training'},
-  {id:'consulting', name:'Consulting'},
-  {id:'bonus', name:'Bonus'},
-  {id:'gift', name:'Gift'},
-  {id:'business', name:'Business'},
-  {id:'other', name:'Other'}
+const SHORT=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+const DEFAULT_INCOME=[
+  {id:'salary',name:'Salary',amount:0},
+  {id:'training',name:'Training',amount:0},
+  {id:'consulting',name:'Consulting',amount:0},
+  {id:'bonus',name:'Bonus',amount:0},
+  {id:'gift',name:'Gift',amount:0},
+  {id:'business',name:'Business',amount:0},
+  {id:'other',name:'Other',amount:0}
+];
+const DEFAULT_CATS=[
+  {id:'housing_maintenance',name:'Housing - Maintenance Fee',planned:0,actual:0},
+  {id:'housing_gas',name:'Housing - Gas',planned:0,actual:0},
+  {id:'housing_light',name:'Housing - Light',planned:0,actual:0},
+  {id:'housing_generator',name:'Housing - Generator',planned:0,actual:0},
+  {id:'housing_trash',name:'Housing - Trash',planned:0,actual:0},
+  {id:'housing_internet',name:'Housing - Internet',planned:0,actual:0},
+  {id:'housing_soap',name:'Housing - Washing Soap',planned:0,actual:0},
+  {id:'fiancee',name:'Fiancée',planned:0,actual:0},
+  {id:'food',name:'Food',planned:0,actual:0},
+  {id:'gym',name:'Gym',planned:0,actual:0},
+  {id:'transport',name:'Transport',planned:0,actual:0},
+  {id:'tithes',name:'Tithes',planned:0,actual:0},
+  {id:'data',name:'Personal Data & Airtime',planned:0,actual:0},
+  {id:'haircut',name:'Haircut',planned:0,actual:0},
+  {id:'family',name:'Daughter & Mum',planned:0,actual:0},
+  {id:'medical',name:'Medical',planned:0,actual:0},
+  {id:'shows',name:'Shows',planned:0,actual:0}
 ];
 
-function renderIncomeSources() {
-  const entry = history.find(h => h.key === mkKey());
-  const profile = getPermanentProfile();
-  const container = document.getElementById('income-sources');
-  if (!container) return;
+let curYear=new Date().getFullYear();
+let curMonth=new Date().getMonth();
+let incomeSources=[];
+let categories=[];
+let history=[];
 
-  let total = 0;
+const S='wd_phase1_history';
+const P='wd_phase1_profile';
 
-  container.innerHTML = INCOME_SOURCES.map(src => {
-    const val = entry?.incomeSources?.[src.id] ?? profile.incomeSources?.[src.id] ?? 0;
-    total += val;
+function fmt(v){return 'GH₵'+Math.round(v||0).toLocaleString('en-GH')}
+function key(){return curYear+'-'+String(curMonth+1).padStart(2,'0')}
+function loadHistory(){try{history=JSON.parse(localStorage.getItem(S)||'[]')}catch(e){history=[]}}
+function saveHistory(){localStorage.setItem(S,JSON.stringify(history))}
+function loadProfile(){try{return JSON.parse(localStorage.getItem(P)||'{}')}catch(e){return {}}}
+function saveProfile(profile){localStorage.setItem(P,JSON.stringify(profile))}
+function updateMonthLabel(){document.getElementById('month-label').textContent=SHORT[curMonth]+' '+curYear}
 
-    return `
-      <div class="icard">
-        <div class="icard-label">💼 ${src.name}</div>
-        <input
-          class="icard-input income-input"
-          data-income="${src.id}"
-          type="number"
-          value="${val || ''}"
-          placeholder="0"
-          min="0"
-          oninput="updateIncomeTotal(); collectPermanentProfile(); saveCurrentMonthDraft();">
-        <div class="icard-sub">GH₵ ${src.name.toLowerCase()} income</div>
-      </div>
-    `;
-  }).join('');
-
-  const totalEl = document.getElementById('total-income-display');
-  if (totalEl) totalEl.textContent = fmtG(total);
+function getEntry(){return history.find(h=>h.key===key())}
+function getProfileDefaults(){
+  const p=loadProfile();
+  incomeSources=p.incomeSources||DEFAULT_INCOME.map(x=>({...x}));
+  categories=p.categories||DEFAULT_CATS.map(x=>({...x}));
 }
 
-function updateIncomeTotal() {
-  let total = 0;
-
-  document.querySelectorAll('.income-input').forEach(inp => {
-    total += parseFloat(inp.value) || 0;
+function renderIncome(){
+  const entry=getEntry();
+  const list=document.getElementById('income-list');
+  list.innerHTML='';
+  incomeSources.forEach(src=>{
+    const val=entry?.income?.[src.id] ?? src.amount ?? 0;
+    const div=document.createElement('div');
+    div.className='card';
+    div.innerHTML=`
+      <div class="label">💼 <input value="${src.name}" style="background:none;border:none;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:1.2px;font-weight:900;outline:none;width:80%" oninput="renameIncome('${src.id}',this.value)"></div>
+      <input class="input" type="number" min="0" value="${val||''}" placeholder="0" id="inc-${src.id}" oninput="recalc(); saveDraft(); savePermanent()">
+      <div class="sub">Monthly income source</div>`;
+    list.appendChild(div);
   });
-
-  const totalEl = document.getElementById('total-income-display');
-  if (totalEl) totalEl.textContent = fmtG(total);
-
-  if (typeof updateDashboard === 'function') updateDashboard();
 }
 
-
-
-// YOUR PERSONAL CATEGORIES — edit these anytime
-const MY_CATS = [
-  {
-    id:'housing',
-    name:'Housing',
-    emoji:'🏠',
-    subcategories:[
-      {id:'maintenance', name:'Maintenance Fee'},
-      {id:'gas', name:'Gas'},
-      {id:'light', name:'Light'},
-      {id:'generator', name:'Generator'},
-      {id:'trash', name:'Trash'},
-      {id:'internet', name:'Internet'},
-      {id:'soap', name:'Washing Soap'}
-    ]
-  },
-  {id:'fiancee',   name:'Fiancée', emoji:'💍'},
-  {id:'food',      name:'Food', emoji:'🍔'},
-  {id:'gym',       name:'Gym', emoji:'🏋️'},
-  {id:'transport', name:'Transport', emoji:'🚌'},
-  {id:'tithes',    name:'Tithes', emoji:'🙏'},
-  {id:'data',      name:'Personal Data & Airtime', emoji:'📱'},
-  {id:'haircut',   name:'Haircut', emoji:'💈'},
-  {id:'family',    name:'Daughter & Mum', emoji:'👨‍👩‍👧'},
-  {id:'medical',   name:'Medical', emoji:'💊'},
-  {id:'shows',     name:'Shows', emoji:'🎬'},
-];
-
-let curYear = new Date().getFullYear();
-let curMonth = new Date().getMonth();
-let cats = MY_CATS.map(c => ({...c}));
-let history = [];
-let openPicker = null;
-
-// STORAGE
-const S_HIS = 'wis_h', S_CATS = 'wis_c', S_VER = 'v9-wealth-fixed-housing';
-function loadStorage() {
-  try {
-    history = JSON.parse(localStorage.getItem(S_HIS) || '[]');
-    const v = localStorage.getItem(S_VER);
-    const sc = localStorage.getItem(S_CATS);
-    if (sc && v === VER) cats = JSON.parse(sc);
-    else { cats = MY_CATS.map(c => ({...c})); localStorage.setItem(S_VER, VER);
-    if (typeof window.scheduleCloudSave === 'function') window.scheduleCloudSave(); }
-  } catch(e) {}
-}
-
-function getPermanentProfile() {
-  try {
-    return JSON.parse(localStorage.getItem(S_PERM) || '{}');
-  } catch(e) {
-    return {};
-  }
-}
-
-function savePermanentProfile(profile) {
-  try {
-    localStorage.setItem(S_PERM, JSON.stringify(profile));
-  } catch(e) {}
-}
-
-function collectPermanentProfile() {
-  const profile = getPermanentProfile();
-
-  profile.incomeSources = {};
-  document.querySelectorAll('.income-input').forEach(inp => {
-    profile.incomeSources[inp.dataset.income] = parseFloat(inp.value) || 0;
+function renderCategories(){
+  const entry=getEntry();
+  const list=document.getElementById('category-list');
+  list.innerHTML='';
+  categories.forEach(cat=>{
+    const planned=entry?.categories?.[cat.id]?.planned ?? cat.planned ?? 0;
+    const actual=entry?.categories?.[cat.id]?.actual ?? '';
+    const row=document.createElement('div');
+    row.className='row';
+    row.innerHTML=`
+      <div class="cell"><input class="name-input" value="${cat.name}" oninput="renameCat('${cat.id}',this.value); savePermanent()"></div>
+      <div class="cell"><input class="num-input" id="pl-${cat.id}" type="number" min="0" value="${planned||''}" placeholder="0" oninput="recalc(); saveDraft(); savePermanent()"></div>
+      <div class="cell"><input class="num-input" id="ac-${cat.id}" type="number" min="0" value="${actual||''}" placeholder="0" oninput="recalc(); saveDraft()"></div>
+      <div class="diff none" id="df-${cat.id}">—</div>
+      <button class="x" onclick="deleteCat('${cat.id}')">✕</button>`;
+    list.appendChild(row);
   });
+}
 
-  profile.plannedBudget = {};
-  cats.forEach(cat => {
-    if (cat.subcategories && cat.subcategories.length) {
-      cat.subcategories.forEach(sub => {
-        const key = cat.id + '_' + sub.id;
-        profile.plannedBudget[key] = parseFloat(document.getElementById('p-' + key)?.value) || 0;
-      });
-      return;
-    }
+function renameIncome(id,name){const x=incomeSources.find(i=>i.id===id); if(x){x.name=name; savePermanent()}}
+function renameCat(id,name){const c=categories.find(x=>x.id===id); if(c){c.name=name; savePermanent()}}
+function addIncome(){const id='income_'+Date.now(); incomeSources.push({id,name:'New Income',amount:0}); savePermanent(); renderIncome(); recalc()}
+function addCategory(){const id='cat_'+Date.now(); categories.push({id,name:'New Category',planned:0,actual:0}); savePermanent(); renderCategories(); recalc()}
+function deleteCat(id){categories=categories.filter(c=>c.id!==id); savePermanent(); renderCategories(); recalc(); saveDraft()}
 
-    profile.plannedBudget[cat.id] = parseFloat(document.getElementById('p-' + cat.id)?.value) || 0;
+function collectIncome(){
+  const data={}; let total=0;
+  incomeSources.forEach(src=>{
+    const v=parseFloat(document.getElementById('inc-'+src.id)?.value)||0;
+    data[src.id]=v; total+=v;
   });
-
-  profile.categories = cats.map(c => ({...c}));
-  profile.savedTarget = parseFloat(document.getElementById('inp-saved')?.value) || 0;
-
-  savePermanentProfile(profile);
+  return {data,total};
 }
 
-
-
-
-
-
-
-function applyPermanentProfileToInputs(entry) {
-  const profile = getPermanentProfile();
-
-  // income sources are permanent unless this month already has saved values
-  document.querySelectorAll('.income-input').forEach(inp => {
-    const id = inp.dataset.income;
-    const monthVal = entry?.incomeSources?.[id];
-    const permVal = profile.incomeSources?.[id];
-    inp.value = (monthVal ?? permVal ?? '') || '';
+function collectCategories(){
+  const data={}; let planned=0, actual=0, kept=0, count=0;
+  categories.forEach(cat=>{
+    const p=parseFloat(document.getElementById('pl-'+cat.id)?.value)||0;
+    const a=parseFloat(document.getElementById('ac-'+cat.id)?.value)||0;
+    data[cat.id]={name:cat.name,planned:p,actual:a};
+    planned+=p; actual+=a;
+    if(p>0){count++; if(a<=p) kept++}
+    const d=a-p, el=document.getElementById('df-'+cat.id);
+    if(el){
+      if(!p&&!a){el.className='diff none';el.textContent='—'}
+      else if(!p){el.className='diff none';el.textContent='no plan'}
+      else if(Math.abs(d)<1){el.className='diff good';el.textContent='✓'}
+      else{el.className='diff '+(d>0?'bad':'good');el.textContent=(d>0?'+':'')+Math.round(d)}
+    }
   });
-
-  // Planned values are permanent defaults unless month has saved values
-  cats.forEach(cat => {
-    if (cat.subcategories && cat.subcategories.length) {
-      cat.subcategories.forEach(sub => {
-        const key = cat.id + '_' + sub.id;
-        const el = document.getElementById('p-' + key);
-        if (!el) return;
-        const monthVal = entry?.catData?.[key]?.planned;
-        const permVal = profile.plannedBudget?.[key];
-        el.value = (monthVal ?? permVal ?? '') || '';
-      });
-      return;
-    }
-
-    const el = document.getElementById('p-' + cat.id);
-    if (!el) return;
-    const monthVal = entry?.catData?.[cat.id]?.planned;
-    const permVal = profile.plannedBudget?.[cat.id];
-    el.value = (monthVal ?? permVal ?? '') || '';
-  });
-
-  const savedEl = document.getElementById('inp-saved');
-  if (savedEl) savedEl.value = (entry?.saved ?? profile.savedTarget ?? '') || '';
-
-  updateSavingsBalanceDisplay();
+  return {data,planned,actual,kept,count};
 }
 
-
-
-function saveStorage() {
-  try {
-    localStorage.setItem(S_HIS, JSON.stringify(history));
-    localStorage.setItem(S_CATS, JSON.stringify(cats));
-    localStorage.setItem(S_VER, VER);
-  } catch(e) {}
-}
-loadStorage();
-
-// FORMAT
-const fmtK = v => v === 0 ? '0' : v >= 1000 ? (v/1000).toFixed(1)+'k' : String(Math.round(v));
-const fmtG = v => 'GH₵' + Number(v).toLocaleString('en-GH', {minimumFractionDigits:0, maximumFractionDigits:0});
-const mkKey = () => curYear + '-' + String(curMonth+1).padStart(2,'0');
-
-// MONTH NAV
-function updateLabel() { document.getElementById('mlabel').textContent = MS[curMonth] + ' ' + curYear; }
-function changeMonth(d) {
-  saveCurrentMonthDraft();
-  curMonth += d;
-  if (curMonth > 11) { curMonth = 0; curYear++; }
-  if (curMonth < 0) { curMonth = 11; curYear--; }
-  updateLabel(); loadMonth();
-}
-updateLabel();
-
-// RENDER CATEGORY ROWS
-function renderRows() {
-  const entry = history.find(h => h.key === mkKey());
-  const container = document.getElementById('cat-rows');
-  container.innerHTML = '';
-
-  cats.forEach(cat => {
-    if (cat.subcategories && cat.subcategories.length) {
-      const parent = document.createElement('div');
-      parent.className = 'cat-row parent-row';
-      parent.innerHTML = `
-        <div class="cname">
-          <span class="cemoji">${cat.emoji}</span>
-          <div style="min-width:0">
-            <div style="font-weight:800">${cat.name}</div>
-            <div style="font-size:11px;color:var(--muted)">Total from ${cat.subcategories.length} sub-categories</div>
-          </div>
-        </div>
-        <div class="cnum">
-          <div class="cnum-lbl" style="color:var(--amber)">Planned Total</div>
-          <div class="parent-total" id="pt-${cat.id}">—</div>
-        </div>
-        <div class="cnum actual">
-          <div class="cnum-lbl" style="color:var(--blue)">Actual Total</div>
-          <div class="parent-total" id="at-${cat.id}">—</div>
-        </div>
-        <div class="vpill none" id="vp-${cat.id}">—</div>
-        <div></div>`;
-      container.appendChild(parent);
-
-      cat.subcategories.forEach(sub => {
-        const key = cat.id + '_' + sub.id;
-        const saved = entry && entry.catData && entry.catData[key];
-        const planned = saved ? (saved.planned || 0) : 0;
-        const actual  = saved ? (saved.actual  || 0) : 0;
-
-        const row = document.createElement('div');
-        row.className = 'cat-row sub-row';
-        row.innerHTML = `
-          <div class="cname" style="margin-left:18px">
-            <span style="font-size:13px;color:var(--muted)">└</span>
-            <input class="cname-inp" value="${sub.name}" readonly>
-          </div>
-          <div class="cnum">
-            <div class="cnum-lbl" style="color:var(--amber)">Planned</div>
-            <input class="cnum-inp" id="p-${key}" type="number" placeholder="0" min="0" value="${planned||''}" oninput="recalc(); collectPermanentProfile(); saveCurrentMonthDraft()">
-          </div>
-          <div class="cnum actual">
-            <div class="cnum-lbl" style="color:var(--blue)">Actual</div>
-            <input class="cnum-inp" id="a-${key}" type="number" placeholder="0" min="0" value="${actual||''}" oninput="recalc(); collectPermanentProfile(); saveCurrentMonthDraft()">
-          </div>
-          <div class="vpill none" id="vp-${key}">—</div>
-          <div></div>`;
-        container.appendChild(row);
-      });
-      return;
-    }
-
-    const saved = entry && entry.catData && entry.catData[cat.id];
-    const planned = saved ? (saved.planned || 0) : 0;
-    const actual  = saved ? (saved.actual  || 0) : 0;
-
-    const row = document.createElement('div');
-    row.className = 'cat-row';
-    row.id = 'row-' + cat.id;
-    row.innerHTML = `
-      <div class="cname" id="cname-${cat.id}">
-        <button class="cemoji" onclick="togglePicker('${cat.id}',event)">${cat.emoji}</button>
-        <input class="cname-inp" value="${cat.name}" placeholder="Name" oninput="renameCat('${cat.id}',this.value)">
-        <div class="epicker" id="ep-${cat.id}"></div>
-      </div>
-      <div class="cnum">
-        <div class="cnum-lbl" style="color:var(--amber)">Planned</div>
-        <input class="cnum-inp" id="p-${cat.id}" type="number" placeholder="0" min="0" value="${planned||''}" oninput="recalc(); collectPermanentProfile(); saveCurrentMonthDraft()">
-      </div>
-      <div class="cnum actual">
-        <div class="cnum-lbl" style="color:var(--blue)">Actual</div>
-        <input class="cnum-inp" id="a-${cat.id}" type="number" placeholder="0" min="0" value="${actual||''}" oninput="recalc(); collectPermanentProfile(); saveCurrentMonthDraft()">
-      </div>
-      <div class="vpill none" id="vp-${cat.id}">—</div>
-      <button class="xbtn" onclick="delCat('${cat.id}')" ${cats.length <= 1 ? 'disabled' : ''}>✕</button>`;
-    container.appendChild(row);
-  });
-
-  recalc();
+function monthlySavings(income,actual,debt){return Math.max(0,income-actual-debt)}
+function totalSavingsBalance(){
+  const seen=new Set();
+  return history.reduce((sum,h)=>{
+    if(!h||h.score==null||seen.has(h.key))return sum;
+    seen.add(h.key);
+    return sum+monthlySavings(h.totalIncome,h.totalActual,h.debt||0);
+  },0);
 }
 
-// RECALC VARIANCE + TOTALS
-function recalc() {
-  let tP = 0, tA = 0;
+function recalc(){
+  const inc=collectIncome();
+  const cats=collectCategories();
+  const debt=parseFloat(document.getElementById('debt')?.value)||0;
+  const save=monthlySavings(inc.total,cats.actual,debt);
 
-  cats.forEach(cat => {
-    if (cat.subcategories && cat.subcategories.length) {
-      let parentP = 0, parentA = 0;
+  document.getElementById('dash-income').textContent=fmt(inc.total);
+  document.getElementById('dash-planned').textContent=fmt(cats.planned);
+  document.getElementById('dash-actual').textContent=fmt(cats.actual);
+  document.getElementById('dash-savings').textContent=fmt(save);
+  document.getElementById('monthly-savings-display').textContent=fmt(save);
+  document.getElementById('total-savings-display').textContent=fmt(totalSavingsBalance());
 
-      cat.subcategories.forEach(sub => {
-        const key = cat.id + '_' + sub.id;
-        const p = parseFloat(document.getElementById('p-' + key)?.value) || 0;
-        const a = parseFloat(document.getElementById('a-' + key)?.value) || 0;
-        parentP += p; parentA += a;
+  document.getElementById('total-planned').textContent=fmt(cats.planned);
+  document.getElementById('total-actual').textContent=fmt(cats.actual);
+  const diff=cats.actual-cats.planned;
+  const td=document.getElementById('total-diff');
+  td.textContent=cats.planned?((diff>0?'+':'')+Math.round(diff)):'—';
+  td.style.color=diff>0?'var(--red)':diff<0?'var(--green)':'var(--muted)';
 
-        const pill = document.getElementById('vp-' + key);
-        if (pill) {
-          if (!p && !a) { pill.className = 'vpill none'; pill.textContent = '—'; }
-          else if (!p) { pill.className = 'vpill none'; pill.textContent = 'no plan'; }
-          else {
-            const d = a - p;
-            if (Math.abs(d) < 1) { pill.className = 'vpill even'; pill.textContent = '✓ on'; }
-            else { pill.className = 'vpill ' + (d > 0 ? 'over' : 'under'); pill.textContent = (d > 0 ? '+' : '') + fmtK(d); }
-          }
-        }
-      });
-
-      tP += parentP; tA += parentA;
-
-      const pt = document.getElementById('pt-' + cat.id);
-      const at = document.getElementById('at-' + cat.id);
-      if (pt) pt.textContent = parentP ? fmtG(parentP) : '—';
-      if (at) at.textContent = parentA ? fmtG(parentA) : '—';
-
-      const ppill = document.getElementById('vp-' + cat.id);
-      if (ppill) {
-        if (!parentP && !parentA) { ppill.className = 'vpill none'; ppill.textContent = '—'; }
-        else if (!parentP) { ppill.className = 'vpill none'; ppill.textContent = 'no plan'; }
-        else {
-          const d = parentA - parentP;
-          if (Math.abs(d) < 1) { ppill.className = 'vpill even'; ppill.textContent = '✓ on'; }
-          else { ppill.className = 'vpill ' + (d > 0 ? 'over' : 'under'); ppill.textContent = (d > 0 ? '+' : '') + fmtK(d); }
-        }
-      }
-      return;
-    }
-
-    const p = parseFloat(document.getElementById('p-' + cat.id)?.value) || 0;
-    const a = parseFloat(document.getElementById('a-' + cat.id)?.value) || 0;
-    tP += p; tA += a;
-    const pill = document.getElementById('vp-' + cat.id);
-    if (!pill) return;
-    if (!p && !a) { pill.className = 'vpill none'; pill.textContent = '—'; return; }
-    if (!p)       { pill.className = 'vpill none'; pill.textContent = 'no plan'; return; }
-    const d = a - p;
-    if (Math.abs(d) < 1) { pill.className = 'vpill even'; pill.textContent = '✓ on'; return; }
-    pill.className = 'vpill ' + (d > 0 ? 'over' : 'under');
-    pill.textContent = (d > 0 ? '+' : '') + fmtK(d);
-  });
-
-  document.getElementById('tot-planned').textContent = tP ? fmtG(tP) : '—';
-  document.getElementById('tot-actual').textContent  = tA ? fmtG(tA) : '—';
-  const diff = tA - tP;
-  const el = document.getElementById('tot-diff');
-  if (!tP && !tA) { el.textContent = '—'; el.style.color = 'var(--muted)'; }
-  else if (!tP)   { el.textContent = '—'; el.style.color = 'var(--muted)'; }
-  else { el.textContent = (diff > 0 ? '+' : '') + fmtK(diff); el.style.color = diff > 0 ? 'var(--red)' : diff < 0 ? 'var(--green)' : 'var(--muted)'; }
-
-  updateDashboard();
-}
-
-// CAT OPERATIONS
-function addCat() {
-  const id = 'c' + Date.now();
-  const emoji = EMOJIS[Math.floor(Math.random() * EMOJIS.length)];
-  cats.push({ id, name: 'New Category', emoji });
-  saveStorage(); renderIncomeSources();
-renderRows();
-  setTimeout(() => { const el = document.querySelector('#row-' + id + ' .cname-inp'); if (el) { el.focus(); el.select(); } }, 60);
-}
-function delCat(id) {
-  if (cats.length <= 1) return;
-  cats = cats.filter(c => c.id !== id);
-  saveStorage(); renderRows();
-}
-function renameCat(id, val) {
-  const c = cats.find(c => c.id === id);
-  if (c) { c.name = val; saveStorage(); }
-}
-
-// EMOJI PICKER
-function togglePicker(id, e) {
-  e.stopPropagation();
-  if (openPicker && openPicker !== id) {
-    const prev = document.getElementById('ep-' + openPicker);
-    if (prev) prev.classList.remove('show');
-  }
-  const el = document.getElementById('ep-' + id);
-  if (!el) return;
-  if (!el.innerHTML) {
-    el.innerHTML = EMOJIS.map(em => `<button class="eopt" onclick="pickEmoji('${id}','${em}')">${em}</button>`).join('');
-  }
-  el.classList.toggle('show');
-  openPicker = el.classList.contains('show') ? id : null;
-}
-function pickEmoji(id, emoji) {
-  const c = cats.find(c => c.id === id);
-  if (c) c.emoji = emoji;
-  const el = document.getElementById('ep-' + id);
-  if (el) el.classList.remove('show');
-  openPicker = null;
-  saveStorage(); renderRows();
-}
-document.addEventListener('click', () => {
-  if (openPicker) { const el = document.getElementById('ep-' + openPicker); if (el) el.classList.remove('show'); openPicker = null; }
-});
-
-// LOAD MONTH DATA INTO INPUTS
-function loadMonth() {
-  const entry = history.find(h => h.key === mkKey());
-  const profile = getPermanentProfile();
-
-  if (profile.categories && profile.categories.length) {
-    cats = profile.categories.map(c => ({...c}));
-  } else if (entry && entry.catDefs) {
-    cats = entry.catDefs.map(c => ({...c}));
-  }
-
-  renderIncomeSources();
-  renderRows();
-
-  applyPermanentProfileToInputs(entry);
-
-  const debtEl = document.getElementById('inp-debt');
-  const commentsEl = document.getElementById('monthly-comments');
-
-  // Actual, debt and comments are monthly
-  if (debtEl) debtEl.value = entry ? entry.debt || '' : '';
-  if (commentsEl) commentsEl.value = entry ? entry.comments || '' : '';
-
-  // Actual values should load only when that month has data, otherwise they reset
-  cats.forEach(cat => {
-    if (cat.subcategories && cat.subcategories.length) {
-      cat.subcategories.forEach(sub => {
-        const key = cat.id + '_' + sub.id;
-        const el = document.getElementById('a-' + key);
-        if (el) el.value = entry?.catData?.[key]?.actual || '';
-      });
-      return;
-    }
-
-    const el = document.getElementById('a-' + cat.id);
-    if (el) el.value = entry?.catData?.[cat.id]?.actual || '';
-  });
-
-  recalc();
-  updateIncomeTotal();
-  updateDashboard();
-  updateSavingsBalanceDisplay();
-
-  if (entry && entry.score != null) {
-    renderVerdict(entry);
-    document.getElementById('verdict').classList.add('show');
-  } else {
-    document.getElementById('verdict').classList.remove('show');
+  const entry=getEntry();
+  if(entry?.score!=null){
+    document.getElementById('dash-status').textContent=entry.grade;
+    document.getElementById('dash-status-sub').textContent=entry.title;
+  }else{
+    document.getElementById('dash-status').textContent='—';
+    document.getElementById('dash-status-sub').textContent='Not judged';
   }
 }
 
-// GRADE SYSTEM
-const GRADES = [
-  { min:90, g:'A+', l:'Financial Genius', c:'var(--green)', bg:'rgba(0,255,136,.06)', bc:'rgba(0,255,136,.22)',
-    t:"You absolutely crushed it. Savings solid, spending controlled, budget respected. This is what financial discipline actually looks like. Keep this standard." },
-  { min:80, g:'A',  l:'Very Smart',       c:'var(--green)', bg:'rgba(0,255,136,.04)', bc:'rgba(0,255,136,.15)',
-    t:"Great month. A few small slips but you're making genuinely smart choices. Most of your plan held. You know what you're doing." },
-  { min:70, g:'B',  l:'Pretty Good',      c:'var(--blue)',  bg:'rgba(77,159,255,.06)', bc:'rgba(77,159,255,.2)',
-    t:"Solid month. Mostly in control, a couple of categories slipped. Not bad at all — you know exactly what to tighten next month." },
-  { min:60, g:'C',  l:'Could Do Better',  c:'var(--amber)', bg:'rgba(255,170,0,.06)', bc:'rgba(255,170,0,.2)',
-    t:"Average. You had a plan and partially followed it. The gap between what you planned and what happened is your problem. That gap is a choice." },
-  { min:45, g:'D',  l:'Needs Work',       c:'var(--amber)', bg:'rgba(255,170,0,.04)', bc:'rgba(255,170,0,.12)',
-    t:"Rough month. Multiple categories over budget, savings too low. You had the plan — you just didn't follow it. What happened?" },
-  { min:0,  g:'F',  l:'Yes. You Were Stupid.', c:'var(--red)', bg:'rgba(255,59,59,.07)', bc:'rgba(255,59,59,.25)',
-    t:"This month was bad and the numbers prove it. Spent more than planned, saved nothing meaningful. Stop pretending it just happened. Make a real plan and actually follow it next month." }
-];
-
-function score(income, totalActual, saved, debt, totalPlanned, catData) {
-  if (!income && !totalActual) return null;
-  let s = 100;
-  const sR = income > 0 ? ((income - totalActual) / income) * 100 : null;
-  const eR = income > 0 ? (totalActual / income) * 100 : null;
-  const dR = income > 0 ? (debt / income) * 100 : 0;
-  // savings rate (40 pts)
-  if (sR === null) s -= 20;
-  else if (sR < 0) s -= 42; else if (sR < 5) s -= 32; else if (sR < 10) s -= 20;
-  else if (sR < 15) s -= 12; else if (sR < 20) s -= 5;
-  if (income > 0 && saved / income >= 0.2) s += 5;
-  // expense ratio (35 pts)
-  if (eR !== null) {
-    if (eR > 120) s -= 35; else if (eR > 100) s -= 25; else if (eR > 90) s -= 14; else if (eR > 80) s -= 6;
-  }
-  // debt ratio (20 pts)
-  if (dR > 50) s -= 20; else if (dR > 40) s -= 14; else if (dR > 30) s -= 8; else if (dR > 20) s -= 3;
-  // budget overshoot (15 pts)
-  if (totalPlanned > 0) {
-    const pct = (totalActual - totalPlanned) / totalPlanned * 100;
-    if (pct > 50) s -= 15; else if (pct > 25) s -= 10; else if (pct > 10) s -= 5;
-  }
-  // category discipline (10 pts)
-  const withPlan = Object.keys(catData).filter(k => catData[k].planned > 0);
-  if (withPlan.length) {
-    const broken = withPlan.filter(k => catData[k].actual > catData[k].planned).length / withPlan.length;
-    if (broken > 0.6) s -= 10; else if (broken > 0.3) s -= 6; else if (broken > 0) s -= 2;
-  }
-  return Math.max(0, Math.min(100, Math.round(s)));
+function savePermanent(){
+  const inc=collectIncome();
+  const cats=collectCategories();
+  incomeSources.forEach(s=>s.amount=inc.data[s.id]||0);
+  categories.forEach(c=>c.planned=cats.data[c.id]?.planned||0);
+  saveProfile({incomeSources,categories});
 }
 
-
-// =========================
-// FINANCIAL INTELLIGENCE
-// =========================
-const FINANCIAL_RULES = {
-  housing: 35,
-  food: 15,
-  transport: 10,
-  shows: 10,
-  savings: 20,
-  debt: 30
-};
-
-function analyzeBudgetStructure(income, saved, debt, catData) {
-
-  if (!income) return [];
-
-  const insights = [];
-
-  const percent = v => Math.round((v / income) * 100);
-
-  // HOUSING
-  const housingTotal = catData['housing']?.planned || Object.keys(catData)
-    .filter(k => k.startsWith('housing_'))
-    .reduce((s,k)=>s+(catData[k].planned||0),0);
-
-  if (housingTotal > 0) {
-    const hp = percent(housingTotal);
-
-    if (hp > 45) {
-      insights.push({
-        level:'bad',
-        icon:'🔴',
-        text:`Housing consumes ${hp}% of your income. This is financially dangerous and leaves little room for savings or emergencies.`
-      });
-    }
-    else if (hp > 35) {
-      insights.push({
-        level:'warn',
-        icon:'⚠️',
-        text:`Housing is ${hp}% of your income. Recommended maximum is 35%.`
-      });
-    }
-    else {
-      insights.push({
-        level:'good',
-        icon:'🏠',
-        text:`Housing allocation (${hp}%) is within a healthy financial range.`
-      });
-    }
-  }
-
-  // FOOD
-  const food = catData['food']?.planned || 0;
-  if (food) {
-    const fp = percent(food);
-
-    if (fp > 20) {
-      insights.push({
-        level:'warn',
-        icon:'🍔',
-        text:`Food spending is ${fp}% of your income. You may be overspending on lifestyle consumption.`
-      });
-    }
-  }
-
-  // ENTERTAINMENT
-  const shows = catData['shows']?.planned || 0;
-  if (shows) {
-    const sp = percent(shows);
-
-    if (sp > 10) {
-      insights.push({
-        level:'bad',
-        icon:'🎬',
-        text:`Entertainment exceeds 10% of income. This may slow wealth building significantly over time.`
-      });
-    }
-  }
-
-  // SAVINGS
-  const savingsRate = percent(saved);
-
-  if (saved === 0) {
-    insights.push({
-      level:'bad',
-      icon:'💸',
-      text:`Your budget does not prioritize savings. You are one emergency away from financial instability.`
-    });
-  }
-  else if (savingsRate < 10) {
-    insights.push({
-      level:'warn',
-      icon:'🟡',
-      text:`Savings rate is only ${savingsRate}%. Long-term wealth accumulation will be slow at this pace.`
-    });
-  }
-  else if (savingsRate >= 20) {
-    insights.push({
-      level:'good',
-      icon:'🟢',
-      text:`Savings rate of ${savingsRate}% is strong. Your budget supports future financial growth.`
-    });
-  }
-
-  // DEBT
-  if (debt > 0) {
-    const dp = percent(debt);
-
-    if (dp > 40) {
-      insights.push({
-        level:'bad',
-        icon:'⛓️',
-        text:`Debt payments consume ${dp}% of your income. Your financial flexibility is critically reduced.`
-      });
-    }
-    else if (dp > 25) {
-      insights.push({
-        level:'warn',
-        icon:'⚠️',
-        text:`Debt payments are relatively high (${dp}% of income).`
-      });
-    }
-  }
-
-  return insights;
-}
-
-
-
-
-
-
-
-
-
-// JUDGE
-function judgeCore() {
-
-  const incomeSources = {};
-  let income = 0;
-
-  document.querySelectorAll('.income-input').forEach(inp => {
-    const val = parseFloat(inp.value) || 0;
-    incomeSources[inp.dataset.income] = val;
-    income += val;
-  });
-
-  const saved  = parseFloat(document.getElementById('inp-saved').value)  || 0;
-  const debt   = parseFloat(document.getElementById('inp-debt').value)   || 0;
-  const comments = document.getElementById('monthly-comments').value || '';
-  let totalPlanned = 0, totalActual = 0;
-  const catData = {};
-  cats.forEach(cat => {
-    if (cat.subcategories && cat.subcategories.length) {
-      let pTotal = 0, aTotal = 0;
-      cat.subcategories.forEach(sub => {
-        const key = cat.id + '_' + sub.id;
-        const p = parseFloat(document.getElementById('p-' + key)?.value) || 0;
-        const a = parseFloat(document.getElementById('a-' + key)?.value) || 0;
-        catData[key] = { planned: p, actual: a, name: sub.name, emoji: cat.emoji, parent: cat.name };
-        pTotal += p; aTotal += a;
-      });
-      catData[cat.id] = { planned: pTotal, actual: aTotal, name: cat.name, emoji: cat.emoji, isParent:true };
-      totalPlanned += pTotal; totalActual += aTotal;
-      return;
-    }
-
-    const p = parseFloat(document.getElementById('p-' + cat.id)?.value) || 0;
-    const a = parseFloat(document.getElementById('a-' + cat.id)?.value) || 0;
-    catData[cat.id] = { planned: p, actual: a, name: cat.name, emoji: cat.emoji };
-    totalPlanned += p; totalActual += a;
-  });
-  if (!income && !totalActual) { alert('Enter at least your income or some spending.'); return; }
-  const sc = score(income, totalActual, saved, debt, totalPlanned, catData);
-  const record = { key: mkKey(), month: MONTHS[curMonth], year: curYear, income, incomeSources, saved, debt, comments, totalPlanned, totalActual, catData, catDefs: cats.map(c=>({...c})), score: sc, ts: Date.now() };
-  const idx = history.findIndex(h => h.key === record.key);
-  if (idx >= 0) history[idx] = record; else history.unshift(record);
-  saveStorage(); collectPermanentProfile(); collectPermanentProfile();
-  applyMonthlySavingsGrowth(record);
-  applyMonthlySavingsGrowth(record);
-  renderVerdict(record);
-  document.getElementById('verdict').classList.add('show');
-  setTimeout(() => document.getElementById('verdict').scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
-  renderHistory();
-updateDashboard();
-}
-
-
-// ACTIONABLE FINANCIAL ADVICE ENGINE
-function buildActionAdvice(r, cd) {
-  const advice = [];
-  const income = r.income || 0;
-  if (!income) return advice;
-
-  const pct = v => Math.round((v / income) * 100);
-  const targetAmount = p => Math.round(income * p / 100);
-
-  const savedRate = pct(r.saved || 0);
-  const savingsPotentialRate = pct(Math.max(0, income - (r.totalActual || 0)));
-
-  // Savings advice
-  if ((r.saved || 0) === 0) {
-    advice.push({
-      title:'Savings Action',
-      text:`You saved <strong>0%</strong> intentionally. Start with at least <strong>${fmtG(targetAmount(10))}</strong> next month, then push toward <strong>${fmtG(targetAmount(20))}</strong> for a strong wealth-building habit.`
-    });
-  } else if (savedRate < 10) {
-    advice.push({
-      title:'Savings Action',
-      text:`Your intentional savings rate is <strong>${savedRate}%</strong>. Minimum target should be <strong>10%</strong> (${fmtG(targetAmount(10))}). Wealth-builder target is <strong>20%</strong> (${fmtG(targetAmount(20))}). Increase savings by at least <strong>${fmtG(Math.max(0, targetAmount(10) - r.saved))}</strong> next month.`
-    });
-  } else if (savedRate < 20) {
-    advice.push({
-      title:'Savings Action',
-      text:`Your intentional savings rate is <strong>${savedRate}%</strong>. Good start, but not yet wealth-building level. Push it to <strong>20%</strong> — target: <strong>${fmtG(targetAmount(20))}</strong>.`
-    });
-  } else {
-    advice.push({
-      title:'Savings Action',
-      text:`Your intentional savings rate is <strong>${savedRate}%</strong>. This is strong. Protect it first before increasing lifestyle expenses.`
-    });
-  }
-
-  // Food advice
-  const food = cd.food?.actual || cd.food?.planned || 0;
-  if (food) {
-    const foodPct = pct(food);
-    const idealFood = targetAmount(15);
-    const maxFood = targetAmount(20);
-
-    if (foodPct > 25) {
-      advice.push({
-        title:'Food Budget Advice',
-        text:`Food is <strong>${foodPct}%</strong> of income (${fmtG(food)}). Recommended range is <strong>10–15%</strong>; maximum acceptable is around <strong>20%</strong> (${fmtG(maxFood)}). Try reducing Food by <strong>${fmtG(Math.max(0, food - idealFood))}</strong> toward a target of <strong>${fmtG(idealFood)}</strong>.`
-      });
-    } else if (foodPct > 20) {
-      advice.push({
-        title:'Food Budget Advice',
-        text:`Food is <strong>${foodPct}%</strong>. This is slightly high. Keep it below <strong>${fmtG(maxFood)}</strong> and aim for <strong>${fmtG(idealFood)}</strong>.`
-      });
-    } else {
-      advice.push({
-        title:'Food Budget Advice',
-        text:`Food is <strong>${foodPct}%</strong>. This is acceptable. Keep it controlled and avoid letting it grow faster than income.`
-      });
-    }
-  }
-
-  // Housing advice
-  const housing = cd.housing?.actual || cd.housing?.planned || 0;
-  if (housing) {
-    const hPct = pct(housing);
-    const idealHousing = targetAmount(30);
-    const maxHousing = targetAmount(35);
-
-    if (hPct > 35) {
-      advice.push({
-        title:'Housing Advice',
-        text:`Housing is <strong>${hPct}%</strong> of income. Recommended range is <strong>25–30%</strong>; maximum should be around <strong>35%</strong> (${fmtG(maxHousing)}). Try to reduce housing-related costs by <strong>${fmtG(Math.max(0, housing - idealHousing))}</strong> over time.`
-      });
-    } else {
-      advice.push({
-        title:'Housing Advice',
-        text:`Housing is <strong>${hPct}%</strong>. This is financially healthy. Do not increase fixed housing costs unless income grows first.`
-      });
-    }
-  }
-
-  // Entertainment / shows advice
-  const shows = cd.shows?.actual || cd.shows?.planned || 0;
-  if (shows) {
-    const showsPct = pct(shows);
-    const maxShows = targetAmount(10);
-    if (showsPct > 10) {
-      advice.push({
-        title:'Lifestyle Spending Advice',
-        text:`Shows/entertainment is <strong>${showsPct}%</strong>. Keep lifestyle spending below <strong>10%</strong> (${fmtG(maxShows)}). Cut at least <strong>${fmtG(Math.max(0, shows - maxShows))}</strong> and move it to savings or debt reduction.`
-      });
-    }
-  }
-
-  // Under budget advice
-  const underBudget = Math.max(0, (r.totalPlanned || 0) - (r.totalActual || 0));
-  if (underBudget > 0) {
-    advice.push({
-      title:'What To Do With The Extra Money',
-      text:`You spent <strong>${fmtG(underBudget)}</strong> less than planned. It has been added to your accumulated savings when the month is judged. Suggested split for future excess cash: <strong>50%</strong> to emergency savings (${fmtG(underBudget*0.5)}), <strong>30%</strong> to investments/business growth (${fmtG(underBudget*0.3)}), and <strong>20%</strong> for flexibility (${fmtG(underBudget*0.2)}).`
-    });
-  }
-
-  // Wealth behavior advice
-  if (savingsPotentialRate >= 20 && savedRate < 20) {
-    advice.push({
-      title:'Wealth Discipline Gap',
-      text:`Your savings potential is <strong>${savingsPotentialRate}%</strong>, but intentional savings is only <strong>${savedRate}%</strong>. That means money may remain available but not protected. Move savings immediately when income arrives.`
-    });
-  }
-
-  // Next month mission
-  const nextSavingsTarget = Math.max(targetAmount(20), r.saved || 0);
-  advice.push({
-    title:'Next Month Mission',
-    text:`Target: save at least <strong>${fmtG(nextSavingsTarget)}</strong>, keep Food below <strong>${fmtG(targetAmount(20))}</strong>, and keep lifestyle spending below <strong>${fmtG(targetAmount(10))}</strong>. The goal is not just to survive the month — it is to become wealthier.`
-  });
-
-  return advice;
-}
-
-
-
-function judge() {
-  try {
-    judgeCore();
-    if (typeof updateSavingsBalanceDisplay === 'function') updateSavingsBalanceDisplay();
-    if (typeof updateDashboard === 'function') updateDashboard();
-  } catch (e) {
-    console.error(e);
-    alert('Judge error: ' + e.message + '\n\nThe verdict was calculated, but one function failed. This version fixes the savings function reference.');
-  }
-}
-
-// RENDER VERDICT
-function renderVerdict(r) {
-  const g = GRADES.find(gr => r.score >= gr.min) || GRADES[GRADES.length - 1];
-  const hero = document.getElementById('vhero');
-  hero.style.background = g.bg; hero.style.borderColor = g.bc;
-  document.getElementById('vgrade').textContent = g.g; document.getElementById('vgrade').style.color = g.c;
-  document.getElementById('vlabel').textContent = g.l; document.getElementById('vlabel').style.color = g.c;
-  document.getElementById('vtext').textContent  = g.t;
-
-  const sR = r.income > 0 ? Math.round((r.income - r.totalActual) / r.income * 100) : null;
-  const srEl = document.getElementById('vs-srate');
-  srEl.textContent = sR !== null ? sR + '%' : '—';
-  srEl.style.color = sR === null ? 'var(--muted)' : sR >= 20 ? 'var(--green)' : sR >= 10 ? 'var(--amber)' : 'var(--red)';
-  document.getElementById('vs-score').textContent = r.score ?? '—';
-  document.getElementById('vs-score').style.color = g.c;
-
-  const cd = r.catData || {};
-  const withPlan = Object.keys(cd).filter(k => cd[k].planned > 0);
-  const kept = withPlan.filter(k => cd[k].actual <= cd[k].planned).length;
-  const bkEl = document.getElementById('vs-bkeep');
-  bkEl.textContent = withPlan.length ? kept + '/' + withPlan.length : '—';
-  bkEl.style.color = !withPlan.length ? 'var(--muted)' : kept === withPlan.length ? 'var(--green)' : kept >= withPlan.length * .6 ? 'var(--amber)' : 'var(--red)';
-
-  document.getElementById('vn-inc').textContent   = fmtG(r.income);
-  document.getElementById('vn-plan').textContent  = r.totalPlanned ? fmtG(r.totalPlanned) : '—';
-  document.getElementById('vn-act').textContent   = fmtG(r.totalActual);
-  document.getElementById('vn-saved').textContent = fmtG(r.saved);
-  const over  = withPlan.reduce((s,k) => s + Math.max(0, cd[k].actual - cd[k].planned), 0);
-  const under = withPlan.reduce((s,k) => s + Math.max(0, cd[k].planned - cd[k].actual), 0);
-  document.getElementById('vn-over').textContent  = over  ? fmtG(over)  : 'GH₵0';
-  document.getElementById('vn-under').textContent = under ? fmtG(under) : 'GH₵0';
-
-  // BREAKDOWN TABLE
-  const keys = Object.keys(cd).filter(k => cd[k].planned || cd[k].actual).sort((a,b) => cd[b].actual - cd[a].actual);
-  const maxV = keys.reduce((m,k) => Math.max(m, cd[k].actual, cd[k].planned), 1);
-  document.getElementById('vbrows').innerHTML = keys.map(k => {
-    const row = cd[k], diff = row.actual - row.planned;
-    const vc = !row.planned ? 'none' : Math.abs(diff) < 1 ? 'even' : diff > 0 ? 'over' : 'under';
-    const vt = !row.planned ? 'no plan' : Math.abs(diff) < 1 ? '✓' : (diff > 0 ? '+' : '') + fmtG(diff);
-    const pw = row.planned ? Math.round(row.planned / maxV * 100) : 0;
-    const aw = row.actual  ? Math.round(row.actual  / maxV * 100) : 0;
-    const barColor = vc === 'over' ? 'var(--red)' : 'var(--blue)';
-    return `<div class="vbrow">
-      <div class="vbname"><span>${row.emoji||'📌'}</span><span>${row.name}</span></div>
-      <div>
-        <div class="vbnum" style="color:var(--amber)">${row.planned ? fmtG(row.planned) : '—'}</div>
-        <div class="vbar-wrap"><div class="vbar" style="width:${pw}%;background:var(--amber);opacity:.5"></div></div>
-      </div>
-      <div>
-        <div class="vbnum" style="color:${barColor}">${row.actual ? fmtG(row.actual) : '—'}</div>
-        <div class="vbar-wrap"><div class="vbar" style="width:${aw}%;background:${barColor}"></div></div>
-      </div>
-      <div class="vbvar ${vc}">${vt}</div>
-    </div>`;
-  }).join('');
-
-  // INSIGHTS
-  const ins = [];
-  if (sR === null) ins.push({i:'💡', t:'<strong>No income entered.</strong> Add your income to get savings rate and full verdict.'});
-  else if (sR < 0) ins.push({i:'🔴', t:`<strong>You spent ${fmtG(r.totalActual - r.income)} more than you earned.</strong> That is a deficit, not a budget. Every month like this you fall further behind.`});
-  else if (sR < 10) ins.push({i:'🟡', t:`<strong>Savings rate: ${sR}%.</strong> Target is 20%+. You're saving a fraction of what you should. Even cutting one category could change this fast.`});
-  else if (sR >= 20) ins.push({i:'🟢', t:`<strong>Savings rate: ${sR}% — above the 20% benchmark.</strong> You're actually building something. Most people never get here consistently.`});
-  else ins.push({i:'🟡', t:`<strong>Savings rate: ${sR}%.</strong> Getting close to 20%. One more push and you'd be in the strong zone.`});
-
-  if (r.totalPlanned > 0) {
-    const gap = r.totalActual - r.totalPlanned;
-    if (gap > 0) ins.push({i:'⚠️', t:`<strong>You overspent your plan by ${fmtG(gap)}.</strong> You had a plan — you just didn't follow it. That's not a money problem, that's a discipline problem.`});
-    else if (gap < 0) ins.push({i:'✅', t:`<strong>You spent ${fmtG(Math.abs(gap))} less than planned.</strong> Genuine discipline. The plan worked because you made it work.`});
-    else ins.push({i:'✅', t:'<strong>You hit your budget almost exactly.</strong> That is rare. Perfect control.'});
-  } else {
-    ins.push({i:'💡', t:'<strong>No planned amounts set.</strong> Set a Planned amount for each category next month. You can\'t know if you failed without a plan to compare against.'});
-  }
-
-  if (withPlan.length) {
-    const broken = withPlan.filter(k => cd[k].actual > cd[k].planned);
-    if (!broken.length) ins.push({i:'✅', t:`<strong>All ${withPlan.length} category budgets respected.</strong> Every single one. That's real discipline.`});
-    else {
-      const worst = broken.sort((a,b) => (cd[b].actual-cd[b].planned) - (cd[a].actual-cd[a].planned))[0];
-      ins.push({i:'❌', t:`<strong>${broken.length}/${withPlan.length} categories went over budget.</strong> Worst offender: <strong>${cd[worst].name}</strong> — planned ${fmtG(cd[worst].planned)}, spent ${fmtG(cd[worst].actual)} (+${fmtG(cd[worst].actual - cd[worst].planned)}).`});
-    }
-  }
-
-  if (keys.length && r.totalActual > 0) {
-    const top = keys[0]; const pct = Math.round(cd[top].actual / r.totalActual * 100);
-    ins.push({i: cd[top].emoji||'📌', t:`<strong>${cd[top].name} was your biggest spend — ${pct}% of total (${fmtG(cd[top].actual)}).</strong>${pct > 35 ? ' That\'s dominating your budget. Is it truly essential?' : ' That looks proportionate.'}`});
-  }
-
-  if (r.debt > 0 && r.income > 0) {
-    const dp = Math.round(r.debt / r.income * 100);
-    ins.push({i: dp > 30 ? '💸' : '👍', t:`<strong>${dp}% of income went to debt payments (${fmtG(r.debt)}).</strong>${dp > 40 ? ' That is a debt crisis — you are working for your creditors.' : dp > 20 ? ' Manageable, but pay it down faster to free up cash.' : ' Healthy debt load — keep chipping away.'}`});
-  }
-
-  if (history.length >= 2) {
-    const prev = history.find(h => h.key !== mkKey() && h.score != null);
-    if (prev && r.score != null) {
-      const d = r.score - prev.score;
-      if (Math.abs(d) >= 8) ins.push({i: d > 0 ? '📈' : '📉', t:`<strong>Score ${d > 0 ? 'up' : 'down'} ${Math.abs(d)} points</strong> vs ${prev.month} ${prev.year} (${prev.score}/100 → ${r.score}/100). ${d > 0 ? 'Real progress — keep going.' : 'Something slipped. What changed?'}`});
-    }
-  }
-
-  // FINANCIAL STRUCTURE ANALYSIS
-  const budgetInsights = analyzeBudgetStructure(r.income, r.saved, r.debt, cd);
-
-  budgetInsights.forEach(b => {
-    ins.push({
-      i:b.icon,
-      t:`<strong>Budget Structure Analysis:</strong> ${b.text}`
-    });
-  });
-
-  const actionAdvice = buildActionAdvice(r, cd);
-  actionAdvice.forEach(a => {
-    ins.push({
-      i:'🎯',
-      t:`<div class="advice-title">${a.title}</div><div class="advice-text">${a.text}</div>`
-    });
-  });
-
-  document.getElementById('insights').innerHTML = ins.map(i => `<div class="ins"><div class="ins-ico">${i.i}</div><div class="ins-txt">${i.t}</div></div>`).join('');
-}
-
-// HISTORY
-function renderHistory() {
-  const el = document.getElementById('hist-list');
-  if (!history.length) { el.innerHTML = '<div style="font-size:13px;color:var(--muted);padding:8px 0">No past verdicts yet. Judge yourself first.</div>'; return; }
-  el.innerHTML = history.slice(0, 12).map(h => {
-    const g = GRADES.find(gr => h.score >= gr.min) || GRADES[GRADES.length - 1];
-    return `<div class="hrow" onclick="loadEntry('${h.key}')">
-      <div class="hrow-month">${h.month} ${h.year}</div>
-      <div class="hrow-inc">${fmtG(h.income)}</div>
-      <div class="hrow-grade" style="color:${g.c}">${g.g}</div>
-      <div class="hrow-score">${h.score ?? '—'}/100</div>
-      <button class="hrow-del" onclick="event.stopPropagation();delEntry('${h.key}')">✕</button>
-    </div>`;
-  }).join('');
-}
-function loadEntry(key) {
-  const e = history.find(h => h.key === key); if (!e) return;
-  curYear = e.year; curMonth = MONTHS.indexOf(e.month);
-  updateLabel(); loadMonth();
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-function delEntry(key) { history = history.filter(h => h.key !== key); saveStorage(); renderHistory(); }
-function clearAll() { if (confirm('Delete all saved data?')) { history = []; saveStorage(); renderHistory(); document.getElementById('verdict').classList.remove('show'); } }
-
-
-
-
-
-
-
-
-// ACCUMULATED SAVINGS ENGINE - RELIABLE VERSION
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// ACCUMULATED SAVINGS ENGINE - SIMPLE VERSION
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// ACCUMULATED SAVINGS ENGINE - AUTOMATIC DERIVED VERSION
-function getMonthlySavingsAmount(record) {
-  if (!record) return 0;
-
-  const income = record.income || 0;
-  const actual = record.totalActual || 0;
-  const debt = record.debt || 0;
-
-  // Money left after real spending and debt.
-  return Math.max(0, Math.round(income - actual - debt));
-}
-
-function getSavingsBalance() {
-  const seen = new Set();
-  return history.reduce((sum, record) => {
-    if (!record || !record.key || seen.has(record.key)) return sum;
-    seen.add(record.key);
-
-    // Only judged months count toward accumulated savings.
-    if (record.score == null) return sum;
-
-    return sum + getMonthlySavingsAmount(record);
-  }, 0);
-}
-
-function updateSavingsBalanceDisplay() {
-  const el = document.getElementById('savings-balance-display');
-  if (el) el.textContent = fmtG(getSavingsBalance());
-
-  const note = document.getElementById('savings-balance-note');
-  if (note) {
-    const current = history.find(h => h.key === mkKey() && h.score != null);
-    const added = current ? getMonthlySavingsAmount(current) : 0;
-    note.innerHTML = current
-      ? `This is calculated automatically from judged months. This month added: <strong>${fmtG(added)}</strong>.`
-      : `This is calculated automatically after you click Judge Me. Formula: Income − Actual Spending − Debt.`;
-  }
-}
-
-function applyMonthlySavingsGrowth(record) {
-  // No manual addition anymore. Balance is derived from saved monthly history.
-  if (record) {
-    record.rolloverAdded = getMonthlySavingsAmount(record);
-    const idx = history.findIndex(h => h.key === record.key);
-    if (idx >= 0) history[idx] = record;
-    saveStorage();
-  }
-  updateSavingsBalanceDisplay();
-}
-
-function applySavingsGrowthAfterJudgment(record) {
-  applyMonthlySavingsGrowth(record);
-}
-
-
-// AUTOSAVE CURRENT MONTH DATA
-function saveCurrentMonthDraft() {
-  const incomeSources = {};
-  let income = 0;
-
-  document.querySelectorAll('.income-input').forEach(inp => {
-    const val = parseFloat(inp.value) || 0;
-    incomeSources[inp.dataset.income] = val;
-    income += val;
-  });
-
-  const saved = parseFloat(document.getElementById('inp-saved')?.value) || 0;
-  const debt = parseFloat(document.getElementById('inp-debt')?.value) || 0;
-  const comments = document.getElementById('monthly-comments')?.value || '';
-
-  let totalPlanned = 0, totalActual = 0;
-  const catData = {};
-
-  cats.forEach(cat => {
-    if (cat.subcategories && cat.subcategories.length) {
-      let pTotal = 0, aTotal = 0;
-
-      cat.subcategories.forEach(sub => {
-        const key = cat.id + '_' + sub.id;
-        const p = parseFloat(document.getElementById('p-' + key)?.value) || 0;
-        const a = parseFloat(document.getElementById('a-' + key)?.value) || 0;
-        catData[key] = { planned:p, actual:a, name:sub.name, emoji:cat.emoji, parent:cat.name };
-        pTotal += p;
-        aTotal += a;
-      });
-
-      catData[cat.id] = { planned:pTotal, actual:aTotal, name:cat.name, emoji:cat.emoji, isParent:true };
-      totalPlanned += pTotal;
-      totalActual += aTotal;
-      return;
-    }
-
-    const p = parseFloat(document.getElementById('p-' + cat.id)?.value) || 0;
-    const a = parseFloat(document.getElementById('a-' + cat.id)?.value) || 0;
-    catData[cat.id] = { planned:p, actual:a, name:cat.name, emoji:cat.emoji };
-    totalPlanned += p;
-    totalActual += a;
-  });
-
-  const existing = history.find(h => h.key === mkKey()) || {};
-  const record = {
-    ...existing,
-    key: mkKey(),
-    month: MONTHS[curMonth],
-    year: curYear,
-    income,
-    incomeSources,
-    saved,
-    debt,
-    comments,
-    totalPlanned,
-    totalActual,
-    catData,
-    catDefs: cats.map(c => ({...c})),
-    ts: Date.now()
+function saveDraft(){
+  const inc=collectIncome();
+  const cats=collectCategories();
+  const entry={
+    ...(getEntry()||{}),
+    key:key(),month:MONTHS[curMonth],year:curYear,
+    income:inc.data,totalIncome:inc.total,
+    categories:cats.data,totalPlanned:cats.planned,totalActual:cats.actual,
+    kept:cats.kept,totalCats:cats.count,
+    debt:parseFloat(document.getElementById('debt')?.value)||0,
+    comment:document.getElementById('comment')?.value||'',
+    updatedAt:Date.now()
   };
-
-  const idx = history.findIndex(h => h.key === record.key);
-  if (idx >= 0) history[idx] = record;
-  else history.unshift(record);
-
-  saveStorage();
-  collectPermanentProfile();
+  const idx=history.findIndex(h=>h.key===entry.key);
+  if(idx>=0)history[idx]=entry; else history.unshift(entry);
+  saveHistory();
   renderHistory();
-  updateSavingsBalanceDisplay();
+  recalc();
 }
 
-
-
-
-function getScoreEvaluation(score, reverse=false) {
-  if (reverse) {
-    if (score <= 25) return {label:'Low Risk', color:'var(--green)'};
-    if (score <= 50) return {label:'Moderate Risk', color:'var(--amber)'};
-    if (score <= 75) return {label:'High Risk', color:'#ff884d'};
-    return {label:'Dangerously High', color:'var(--red)'};
-  }
-
-  if (score >= 85) return {label:'Excellent', color:'var(--green)'};
-  if (score >= 70) return {label:'Strong', color:'#7dffb3'};
-  if (score >= 55) return {label:'Average', color:'var(--amber)'};
-  if (score >= 40) return {label:'Weak', color:'#ff884d'};
-  return {label:'Critical', color:'var(--red)'};
+function gradeMonth(totalIncome,totalActual,debt,kept,totalCats){
+  const savings=monthlySavings(totalIncome,totalActual,debt);
+  const sr=totalIncome?(savings/totalIncome)*100:0;
+  const keptRatio=totalCats?kept/totalCats:0;
+  let grade='D',title='Financial Danger',score=35,msg='Your structure is unstable. Spending and income need immediate correction.';
+  if(sr>=35&&keptRatio>=.95){grade='A+';title='Elite Wealth Builder';score=96;msg='Excellent. You kept a large percentage of your income and respected nearly all budgets.'}
+  else if(sr>=25&&keptRatio>=.8){grade='A';title='Strong Discipline';score=86;msg='Strong month. You are keeping serious money and your spending is mostly controlled.'}
+  else if(sr>=20){grade='B+';title='Healthy but Improvable';score=78;msg='Good month. You are saving, but there is still room to improve budget discipline or lifestyle control.'}
+  else if(sr>=10){grade='B';title='Stable';score=68;msg='You are stable, but not yet building wealth aggressively.'}
+  else if(sr>=0){grade='C';title='Consumption Heavy';score=55;msg='Most of your income is being consumed. Wealth acceleration is weak.'}
+  return {grade,title,score,msg,savingsRate:Math.round(sr)}
 }
 
-
-// WEALTH INTELLIGENCE ENGINE
-function calculateWealthMetrics() {
-  let income = 0;
-  const incomes = [];
-
-  document.querySelectorAll('.income-input').forEach(inp => {
-    const val = parseFloat(inp.value) || 0;
-    income += val;
-    incomes.push(val);
-  });
-
-  let actual = 0;
-  let food = 0;
-  let shows = 0;
-
-  cats.forEach(cat => {
-    if (cat.subcategories && cat.subcategories.length) {
-      cat.subcategories.forEach(sub => {
-        actual += parseFloat(document.getElementById('a-' + cat.id + '_' + sub.id)?.value) || 0;
-      });
-      return;
-    }
-
-    const val = parseFloat(document.getElementById('a-' + cat.id)?.value) || 0;
-    actual += val;
-
-    if (cat.id === 'food') food = val;
-    if (cat.id === 'shows') shows = val;
-  });
-
-  const saved = parseFloat(document.getElementById('inp-saved')?.value) || 0;
-
-  if (!income) {
-    ['wealth-score','freedom-score','growth-score','risk-score'].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.textContent = '—';
-    });
-    return;
-  }
-
-  let wealth = 50;
-  const savingsPotentialRate = ((income - actual) / income) * 100;
-
-  if (savingsPotentialRate >= 40) wealth += 35;
-  else if (savingsPotentialRate >= 25) wealth += 25;
-  else if (savingsPotentialRate >= 15) wealth += 10;
-  else wealth -= 15;
-
-  if (saved > 0) wealth += 10;
-  if ((food + shows) / income > 0.35) wealth -= 15;
-  wealth = Math.max(0, Math.min(100, Math.round(wealth)));
-
-  const largestIncome = Math.max(...incomes, 0);
-  const dependency = income ? largestIncome / income : 1;
-  const freedom = Math.max(0, Math.round((1 - dependency) * 100));
-
-  let growth = 40;
-  if (incomes.filter(v => v > 0).length >= 3) growth += 30;
-  if (saved > income * 0.2) growth += 20;
-  growth = Math.min(100, growth);
-
-  let risk = 20;
-  if (food / income > 0.2) risk += 20;
-  if (shows / income > 0.1) risk += 20;
-  if (saved === 0) risk += 30;
-  risk = Math.min(100, risk);
-
-  document.getElementById('wealth-score').textContent = wealth;
-  document.getElementById('freedom-score').textContent = freedom;
-  document.getElementById('growth-score').textContent = growth;
-  document.getElementById('risk-score').textContent = risk;
-
-  const wealthEval = getScoreEvaluation(wealth);
-  const freedomEval = getScoreEvaluation(freedom);
-  const growthEval = getScoreEvaluation(growth);
-  const riskEval = getScoreEvaluation(risk, true);
-
-  const ws = document.getElementById('wealth-status');
-  const fs = document.getElementById('freedom-status');
-  const gs = document.getElementById('growth-status');
-  const rs = document.getElementById('risk-status');
-
-  if (ws) { ws.textContent = wealthEval.label; ws.style.color = wealthEval.color; }
-  if (fs) { fs.textContent = freedomEval.label; fs.style.color = freedomEval.color; }
-  if (gs) { gs.textContent = growthEval.label; gs.style.color = growthEval.color; }
-  if (rs) { rs.textContent = riskEval.label; rs.style.color = riskEval.color; }
-
-
-
-  const insight = document.getElementById('wealth-insight');
-  if (!insight) return;
-
-  if (wealth >= 80) {
-    insight.innerHTML = '<strong>Wealth Intelligence:</strong> Your current financial behavior resembles wealth builders rather than consumers.';
-  } else if (wealth >= 60) {
-    insight.innerHTML = '<strong>Wealth Intelligence:</strong> You are disciplined, but your system still needs stronger wealth acceleration.';
-  } else {
-    insight.innerHTML = '<strong>Wealth Intelligence:</strong> Your current structure is helping you survive, not become wealthy. Consumption is limiting long-term growth.';
-  }
+function judgeMonth(){
+  savePermanent();
+  const inc=collectIncome();
+  const cats=collectCategories();
+  const debt=parseFloat(document.getElementById('debt')?.value)||0;
+  if(!inc.total&&!cats.actual){alert('Enter income or actual spending first.');return}
+  const g=gradeMonth(inc.total,cats.actual,debt,cats.kept,cats.count);
+  const entry={
+    key:key(),month:MONTHS[curMonth],year:curYear,
+    income:inc.data,totalIncome:inc.total,
+    categories:cats.data,totalPlanned:cats.planned,totalActual:cats.actual,
+    kept:cats.kept,totalCats:cats.count,
+    debt,comment:document.getElementById('comment')?.value||'',
+    ...g,judgedAt:Date.now(),updatedAt:Date.now()
+  };
+  const idx=history.findIndex(h=>h.key===entry.key);
+  if(idx>=0)history[idx]=entry; else history.unshift(entry);
+  saveHistory();
+  renderVerdict(entry);
+  renderHistory();
+  recalc();
+  showSection('savings',document.querySelector('.tab:nth-child(3)'));
 }
 
-
-// DASHBOARD + SECTION CONTROLS
-function showSection(id, btn) {
-  document.querySelectorAll('.app-section').forEach(s => s.classList.remove('show'));
-  const target = document.getElementById(id);
-  if (target) target.classList.add('show');
-
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  if (btn) btn.classList.add('active');
+function renderVerdict(entry){
+  const grade=document.getElementById('verdict-grade'),msg=document.getElementById('verdict-msg');
+  grade.textContent=entry.grade||'—';
+  grade.style.color=entry.grade==='A+'||entry.grade==='A'?'var(--green)':entry.grade==='B+'||entry.grade==='B'?'var(--blue)':entry.grade==='C'?'var(--amber)':'var(--red)';
+  msg.innerHTML=`<strong>${entry.title||''}</strong><br>${entry.msg||'Enter your data and judge the month.'}<br><br>Savings rate: <strong>${entry.savingsRate??0}%</strong>. Monthly savings: <strong>${fmt(monthlySavings(entry.totalIncome,entry.totalActual,entry.debt||0))}</strong>.`;
 }
 
-function showAllSections(btn) {
-  document.querySelectorAll('.app-section').forEach(s => s.classList.add('show'));
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  if (btn) btn.classList.add('active');
+function renderHistory(){
+  const list=document.getElementById('history-list');
+  if(!history.length){list.innerHTML='<div class="small">No history yet.</div>';return}
+  list.innerHTML=history.slice().sort((a,b)=>(b.year*100+MONTHS.indexOf(b.month))-(a.year*100+MONTHS.indexOf(a.month))).map(h=>`
+    <div class="hist-row" onclick="openEntry('${h.key}')">
+      <div><div class="strong">${h.month} ${h.year}</div><div class="small">${h.grade||'Draft'}</div></div>
+      <div><div class="small">Income</div><div>${fmt(h.totalIncome)}</div></div>
+      <div><div class="small">Actual</div><div>${fmt(h.totalActual)}</div></div>
+      <div><div class="small">Savings</div><div>${fmt(monthlySavings(h.totalIncome,h.totalActual,h.debt||0))}</div></div>
+      <div><div class="small">Score</div><div>${h.score??'—'}</div></div>
+      <button class="x" onclick="event.stopPropagation();deleteEntry('${h.key}')">✕</button>
+    </div>`).join('');
 }
 
-function updateDashboard() {
-  let income = 0;
-  document.querySelectorAll('.income-input').forEach(inp => income += parseFloat(inp.value) || 0);
-
-  let planned = 0, actual = 0;
-  cats.forEach(cat => {
-    if (cat.subcategories) {
-      cat.subcategories.forEach(sub => {
-        planned += parseFloat(document.getElementById('p-' + cat.id + '_' + sub.id)?.value) || 0;
-        actual += parseFloat(document.getElementById('a-' + cat.id + '_' + sub.id)?.value) || 0;
-      });
-    } else {
-      planned += parseFloat(document.getElementById('p-' + cat.id)?.value) || 0;
-      actual += parseFloat(document.getElementById('a-' + cat.id)?.value) || 0;
-    }
-  });
-
-  const saved = parseFloat(document.getElementById('inp-saved')?.value) || 0;
-  const srate = income > 0 ? Math.round((saved / income) * 100) : null;
-
-  document.getElementById('dash-income').textContent = fmtG(income);
-  document.getElementById('dash-planned').textContent = fmtG(planned);
-  document.getElementById('dash-actual').textContent = fmtG(actual);
-  document.getElementById('dash-srate').textContent = srate !== null ? srate + '%' : '—';
-
-  const warn = document.getElementById('dash-warning');
-  if (!warn) return;
-
-  if (!income) {
-    warn.innerHTML = '<strong>Start here:</strong> add your income sources first.';
-  } else if (saved / income < 0.1) {
-    warn.innerHTML = '<strong>Warning:</strong> your planned savings rate is below 10%. This budget may be weak financially.';
-  } else if (planned > income) {
-    warn.innerHTML = '<strong>Warning:</strong> planned budget is higher than total income.';
-  } else {
-    warn.innerHTML = '<strong>Good:</strong> your dashboard is balanced so far. Open the details or run the verdict.';
-  }
-  calculateWealthMetrics();
+function openEntry(k){
+  const e=history.find(h=>h.key===k); if(!e)return;
+  curYear=e.year; curMonth=MONTHS.indexOf(e.month);
+  updateMonthLabel(); loadMonth(); showAll(document.querySelector('.tab:nth-child(5)'));
 }
 
+function deleteEntry(k){history=history.filter(h=>h.key!==k); saveHistory(); renderHistory(); recalc()}
+function clearCurrentMonth(){
+  categories.forEach(c=>{const el=document.getElementById('ac-'+c.id);if(el)el.value=''});
+  document.getElementById('debt').value='';
+  document.getElementById('comment').value='';
+  saveDraft(); recalc();
+}
+function clearAllData(){if(confirm('Delete all local data?')){localStorage.removeItem(S);localStorage.removeItem(P);history=[];getProfileDefaults();loadMonth();renderHistory()}}
 
-window.addEventListener('beforeunload', saveCurrentMonthDraft);
-
-
-function toggleScoreGuide() {
-  const el = document.getElementById('score-guide');
-  if (el) el.classList.toggle('show');
+function loadMonth(){
+  getProfileDefaults();
+  renderIncome();
+  renderCategories();
+  const entry=getEntry();
+  document.getElementById('debt').value=entry?.debt||'';
+  document.getElementById('comment').value=entry?.comment||'';
+  if(entry?.score!=null)renderVerdict(entry); else renderVerdict({});
+  recalc();
 }
 
-
-
-function historyDataForCloud() {
-  return history;
+function changeMonth(d){
+  saveDraft();
+  curMonth+=d;
+  if(curMonth>11){curMonth=0;curYear++}
+  if(curMonth<0){curMonth=11;curYear--}
+  updateMonthLabel(); loadMonth();
 }
-window.historyDataForCloud = historyDataForCloud;
+function showSection(id,btn){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('show'));
+  document.getElementById(id).classList.add('show');
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+}
+function showAll(btn){
+  document.querySelectorAll('.section').forEach(s=>s.classList.add('show'));
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+}
 
-// INIT
+loadHistory();
+updateMonthLabel();
 loadMonth();
 renderHistory();
-updateIncomeTotal();
-updateDashboard();
-updateSavingsBalanceDisplay();
 </script>
-
-</div>
-
-<!--
-FIREBASE SETUP NOTES
-
-Firestore Database Rules:
-
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
-    }
-  }
-}
-
-Firebase Console steps:
-1. Create a Firebase project.
-2. Enable Authentication → Email/Password.
-3. Create Firestore Database.
-4. Paste the rules above.
-5. Add a Web App and copy the firebaseConfig into this HTML file.
--->
-
-
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-analytics.js";
-import {
-  getAuth,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signOut,
-  onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
-import {
-  getFirestore,
-  doc,
-  setDoc,
-  getDoc,
-  serverTimestamp
-} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
-
-/*
-  Replace the values below with your Firebase project config:
-  Firebase Console → Project Settings → General → Your apps → Web app → Config
-*/
-const firebaseConfig = {
-  apiKey: "AIzaSyCietweZ9SPvSp1ivw0vZzZEXezKo7-zPQ",
-  authDomain: "my-finance-2027b.firebaseapp.com",
-  projectId: "my-finance-2027b",
-  storageBucket: "my-finance-2027b.firebasestorage.app",
-  messagingSenderId: "653434895978",
-  appId: "1:653434895978:web:65ed0f851c7c590a541413",
-  measurementId: "G-QM6XV0HJK1"
-};
-
-let firebaseReady = false;
-let app;
-let auth;
-let db;
-let currentUser = null;
-let analytics = null;
-
-function fbStatus(msg) {
-  const el = document.getElementById("firebase-status");
-  if (el) el.textContent = msg;
-}
-
-function authError(msg) {
-  const el = document.getElementById("auth-error");
-  if (el) el.textContent = msg;
-}
-
-function unlockApp() {
-  const gate = document.getElementById("auth-gate");
-  const appEl = document.getElementById("auth-app");
-  if (gate) gate.style.display = "none";
-  if (appEl) appEl.classList.add("unlocked");
-}
-
-function lockApp() {
-  const gate = document.getElementById("auth-gate");
-  const appEl = document.getElementById("auth-app");
-  if (gate) gate.style.display = "flex";
-  if (appEl) appEl.classList.remove("unlocked");
-}
-
-function configLooksValid() {
-  return firebaseConfig.apiKey &&
-    !firebaseConfig.apiKey.includes("PASTE_") &&
-    firebaseConfig.projectId &&
-    !firebaseConfig.projectId.includes("PASTE_");
-}
-
-try {
-  if (configLooksValid()) {
-    app = initializeApp(firebaseConfig);
-    analytics = getAnalytics(app);
-    auth = getAuth(app);
-    db = getFirestore(app);
-    firebaseReady = true;
-
-    onAuthStateChanged(auth, async (user) => {
-      currentUser = user;
-      if (user) {
-        unlockApp();
-        fbStatus("Logged in as " + user.email + ". Cloud sync ready.");
-        await window.loadCloudNow();
-      } else {
-        lockApp();
-        fbStatus("Not logged in.");
-      }
-    });
-  } else {
-    fbStatus("Firebase config missing. Add your config inside the HTML file."); authError("Firebase config missing. Add config inside the HTML file.");
-  }
-} catch (e) {
-  fbStatus("Firebase error: " + e.message);
-}
-
-function collectAppStateForCloud() {
-  return {
-    history: window.historyDataForCloud ? window.historyDataForCloud() : JSON.parse(localStorage.getItem("wis_h") || "[]"),
-    permanentProfile: JSON.parse(localStorage.getItem("wis_permanent_financial_profile") || "{}"),
-    savingsBalance: localStorage.getItem("wis_accumulated_savings_balance") || "0",
-    version: "wealth-discipline-firebase-v1",
-    updatedAt: serverTimestamp()
-  };
-}
-
-async function saveUserCloudData() {
-  if (!firebaseReady || !currentUser) {
-    fbStatus("Login first, or add Firebase config. Data is still saved locally.");
-    return;
-  }
-
-  const state = collectAppStateForCloud();
-  await setDoc(doc(db, "users", currentUser.uid), state, { merge: true });
-  fbStatus("Cloud saved successfully for " + currentUser.email);
-}
-
-async function loadUserCloudData() {
-  if (!firebaseReady || !currentUser) {
-    fbStatus("Login first, or add Firebase config. Local data loaded.");
-    return;
-  }
-
-  const snap = await getDoc(doc(db, "users", currentUser.uid));
-  if (!snap.exists()) {
-    fbStatus("No cloud data found yet. Save once to create it.");
-    return;
-  }
-
-  const data = snap.data();
-
-  if (data.history) localStorage.setItem("wis_h", JSON.stringify(data.history));
-  if (data.permanentProfile) localStorage.setItem("wis_permanent_financial_profile", JSON.stringify(data.permanentProfile));
-  if (data.savingsBalance !== undefined) localStorage.setItem("wis_accumulated_savings_balance", String(data.savingsBalance));
-
-  fbStatus("Cloud data loaded. Refreshing dashboard...");
-
-  setTimeout(() => {
-    if (typeof loadStorage === "function") loadStorage();
-    if (typeof loadMonth === "function") loadMonth();
-    if (typeof renderHistory === "function") renderHistory();
-    if (typeof updateSavingsBalanceDisplay === "function") updateSavingsBalanceDisplay();
-    if (typeof updateDashboard === "function") updateDashboard();
-  }, 100);
-}
-
-window.firebaseRegister = async function() {
-  try {
-    if (!firebaseReady) return fbStatus("Add Firebase config first.");
-    const email = document.getElementById("fb-email").value.trim();
-    const password = document.getElementById("fb-password").value;
-    await createUserWithEmailAndPassword(auth, email, password);
-    await saveUserCloudData();
-  } catch (e) {
-    fbStatus("Register error: " + e.message);
-  }
-};
-
-window.firebaseLogin = async function() {
-  try {
-    if (!firebaseReady) return fbStatus("Add Firebase config first.");
-    const email = document.getElementById("fb-email").value.trim();
-    const password = document.getElementById("fb-password").value;
-    await signInWithEmailAndPassword(auth, email, password);
-  } catch (e) {
-    fbStatus("Login error: " + e.message);
-  }
-};
-
-
-window.firebaseLoginFromGate = async function() {
-  try {
-    if (!firebaseReady) return authError("Firebase is not ready. Check your config.");
-    const email = document.getElementById("gate-email").value.trim();
-    const password = document.getElementById("gate-password").value;
-    if (!email || !password) return authError("Enter email and password.");
-    await signInWithEmailAndPassword(auth, email, password);
-    authError("");
-  } catch (e) {
-    authError("Login error: " + e.message);
-  }
-};
-
-window.firebaseRegisterFromGate = async function() {
-  try {
-    if (!firebaseReady) return authError("Firebase is not ready. Check your config.");
-    const email = document.getElementById("gate-email").value.trim();
-    const password = document.getElementById("gate-password").value;
-    if (!email || !password) return authError("Enter email and password.");
-    await createUserWithEmailAndPassword(auth, email, password);
-    authError("");
-  } catch (e) {
-    authError("Register error: " + e.message);
-  }
-};
-
-window.firebaseLogout = async function() {
-  try {
-    if (!firebaseReady) return fbStatus("Firebase config missing.");
-    await signOut(auth);
-    lockApp();
-  } catch (e) {
-    fbStatus("Logout error: " + e.message);
-  }
-};
-
-window.saveCloudNow = async function() {
-  try {
-    await saveUserCloudData();
-  } catch (e) {
-    fbStatus("Save error: " + e.message);
-  }
-};
-
-window.loadCloudNow = async function() {
-  try {
-    await loadUserCloudData();
-  } catch (e) {
-    fbStatus("Load error: " + e.message);
-  }
-};
-
-let cloudTimer = null;
-window.scheduleCloudSave = function() {
-  if (!firebaseReady || !currentUser) return;
-  clearTimeout(cloudTimer);
-  cloudTimer = setTimeout(() => {
-    saveUserCloudData().catch(e => fbStatus("Autosave error: " + e.message));
-  }, 1500);
-};
-</script>
-
 </body>
 </html>
