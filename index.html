@@ -180,6 +180,12 @@ body{font-family:var(--f);background:var(--bg);color:var(--text);min-height:100v
 .quick-warning{margin-top:14px;background:rgba(255,170,0,.06);border:1px solid rgba(255,170,0,.18);border-radius:14px;padding:14px;font-size:13px;color:var(--muted);line-height:1.6}
 .quick-warning strong{color:var(--text)}
 
+
+.sub-row .cname{background:#0d0d10;border-color:#1f1f28}
+.sub-row .cname-inp{font-size:12px;color:var(--muted)}
+.parent-row .cname{border-color:rgba(0,255,136,.18)}
+.parent-total{font-size:14px;font-weight:800;color:var(--text);padding-top:5px;font-family:monospace}
+
 </style>
 </head>
 <body>
@@ -426,17 +432,30 @@ function updateIncomeTotal() {
 
 // YOUR PERSONAL CATEGORIES — edit these anytime
 const MY_CATS = [
-  {id:'housing',   name:'Housing',         emoji:'🏠'},
-  {id:'fiancee',   name:'Fiancée',          emoji:'💍'},
-  {id:'food',      name:'Food',             emoji:'🍔'},
-  {id:'gym',       name:'Gym',              emoji:'🏋️'},
-  {id:'transport', name:'Transport',        emoji:'🚌'},
-  {id:'tithes',    name:'Tithes',           emoji:'🙏'},
-  {id:'data',      name:'Data & Airtime',   emoji:'📱'},
-  {id:'haircut',   name:'Haircut',          emoji:'💈'},
-  {id:'family',    name:'Daughter & Mum',   emoji:'👨‍👩‍👧'},
-  {id:'medical',   name:'Medical',          emoji:'💊'},
-  {id:'shows',     name:'Shows',            emoji:'🎬'},
+  {
+    id:'housing',
+    name:'Housing',
+    emoji:'🏠',
+    subcategories:[
+      {id:'maintenance', name:'Maintenance Fee'},
+      {id:'gas', name:'Gas'},
+      {id:'light', name:'Light'},
+      {id:'generator', name:'Generator'},
+      {id:'trash', name:'Trash'},
+      {id:'internet', name:'Internet'},
+      {id:'soap', name:'Washing Soap'}
+    ]
+  },
+  {id:'fiancee',   name:'Fiancée', emoji:'💍'},
+  {id:'food',      name:'Food', emoji:'🍔'},
+  {id:'gym',       name:'Gym', emoji:'🏋️'},
+  {id:'transport', name:'Transport', emoji:'🚌'},
+  {id:'tithes',    name:'Tithes', emoji:'🙏'},
+  {id:'data',      name:'Personal Data & Airtime', emoji:'📱'},
+  {id:'haircut',   name:'Haircut', emoji:'💈'},
+  {id:'family',    name:'Daughter & Mum', emoji:'👨‍👩‍👧'},
+  {id:'medical',   name:'Medical', emoji:'💊'},
+  {id:'shows',     name:'Shows', emoji:'🎬'},
 ];
 
 let curYear = new Date().getFullYear();
@@ -446,7 +465,7 @@ let history = [];
 let openPicker = null;
 
 // STORAGE
-const S_HIS = 'wis_h', S_CATS = 'wis_c', S_VER = 'wis_v', VER = 'v5';
+const S_HIS = 'wis_h', S_CATS = 'wis_c', S_VER = 'wis_v', VER = 'v8-dashboard-income-housing';
 function loadStorage() {
   try {
     history = JSON.parse(localStorage.getItem(S_HIS) || '[]');
@@ -487,6 +506,57 @@ function renderRows() {
   container.innerHTML = '';
 
   cats.forEach(cat => {
+    if (cat.subcategories && cat.subcategories.length) {
+      const parent = document.createElement('div');
+      parent.className = 'cat-row parent-row';
+      parent.innerHTML = `
+        <div class="cname">
+          <span class="cemoji">${cat.emoji}</span>
+          <div style="min-width:0">
+            <div style="font-weight:800">${cat.name}</div>
+            <div style="font-size:11px;color:var(--muted)">Total from ${cat.subcategories.length} sub-categories</div>
+          </div>
+        </div>
+        <div class="cnum">
+          <div class="cnum-lbl" style="color:var(--amber)">Planned Total</div>
+          <div class="parent-total" id="pt-${cat.id}">—</div>
+        </div>
+        <div class="cnum actual">
+          <div class="cnum-lbl" style="color:var(--blue)">Actual Total</div>
+          <div class="parent-total" id="at-${cat.id}">—</div>
+        </div>
+        <div class="vpill none" id="vp-${cat.id}">—</div>
+        <div></div>`;
+      container.appendChild(parent);
+
+      cat.subcategories.forEach(sub => {
+        const key = cat.id + '_' + sub.id;
+        const saved = entry && entry.catData && entry.catData[key];
+        const planned = saved ? (saved.planned || 0) : 0;
+        const actual  = saved ? (saved.actual  || 0) : 0;
+
+        const row = document.createElement('div');
+        row.className = 'cat-row sub-row';
+        row.innerHTML = `
+          <div class="cname" style="margin-left:18px">
+            <span style="font-size:13px;color:var(--muted)">└</span>
+            <input class="cname-inp" value="${sub.name}" readonly>
+          </div>
+          <div class="cnum">
+            <div class="cnum-lbl" style="color:var(--amber)">Planned</div>
+            <input class="cnum-inp" id="p-${key}" type="number" placeholder="0" min="0" value="${planned||''}" oninput="recalc()">
+          </div>
+          <div class="cnum actual">
+            <div class="cnum-lbl" style="color:var(--blue)">Actual</div>
+            <input class="cnum-inp" id="a-${key}" type="number" placeholder="0" min="0" value="${actual||''}" oninput="recalc()">
+          </div>
+          <div class="vpill none" id="vp-${key}">—</div>
+          <div></div>`;
+        container.appendChild(row);
+      });
+      return;
+    }
+
     const saved = entry && entry.catData && entry.catData[cat.id];
     const planned = saved ? (saved.planned || 0) : 0;
     const actual  = saved ? (saved.actual  || 0) : 0;
@@ -519,7 +589,49 @@ function renderRows() {
 // RECALC VARIANCE + TOTALS
 function recalc() {
   let tP = 0, tA = 0;
+
   cats.forEach(cat => {
+    if (cat.subcategories && cat.subcategories.length) {
+      let parentP = 0, parentA = 0;
+
+      cat.subcategories.forEach(sub => {
+        const key = cat.id + '_' + sub.id;
+        const p = parseFloat(document.getElementById('p-' + key)?.value) || 0;
+        const a = parseFloat(document.getElementById('a-' + key)?.value) || 0;
+        parentP += p; parentA += a;
+
+        const pill = document.getElementById('vp-' + key);
+        if (pill) {
+          if (!p && !a) { pill.className = 'vpill none'; pill.textContent = '—'; }
+          else if (!p) { pill.className = 'vpill none'; pill.textContent = 'no plan'; }
+          else {
+            const d = a - p;
+            if (Math.abs(d) < 1) { pill.className = 'vpill even'; pill.textContent = '✓ on'; }
+            else { pill.className = 'vpill ' + (d > 0 ? 'over' : 'under'); pill.textContent = (d > 0 ? '+' : '') + fmtK(d); }
+          }
+        }
+      });
+
+      tP += parentP; tA += parentA;
+
+      const pt = document.getElementById('pt-' + cat.id);
+      const at = document.getElementById('at-' + cat.id);
+      if (pt) pt.textContent = parentP ? fmtG(parentP) : '—';
+      if (at) at.textContent = parentA ? fmtG(parentA) : '—';
+
+      const ppill = document.getElementById('vp-' + cat.id);
+      if (ppill) {
+        if (!parentP && !parentA) { ppill.className = 'vpill none'; ppill.textContent = '—'; }
+        else if (!parentP) { ppill.className = 'vpill none'; ppill.textContent = 'no plan'; }
+        else {
+          const d = parentA - parentP;
+          if (Math.abs(d) < 1) { ppill.className = 'vpill even'; ppill.textContent = '✓ on'; }
+          else { ppill.className = 'vpill ' + (d > 0 ? 'over' : 'under'); ppill.textContent = (d > 0 ? '+' : '') + fmtK(d); }
+        }
+      }
+      return;
+    }
+
     const p = parseFloat(document.getElementById('p-' + cat.id)?.value) || 0;
     const a = parseFloat(document.getElementById('a-' + cat.id)?.value) || 0;
     tP += p; tA += a;
@@ -532,6 +644,7 @@ function recalc() {
     pill.className = 'vpill ' + (d > 0 ? 'over' : 'under');
     pill.textContent = (d > 0 ? '+' : '') + fmtK(d);
   });
+
   document.getElementById('tot-planned').textContent = tP ? fmtG(tP) : '—';
   document.getElementById('tot-actual').textContent  = tA ? fmtG(tA) : '—';
   const diff = tA - tP;
@@ -539,6 +652,7 @@ function recalc() {
   if (!tP && !tA) { el.textContent = '—'; el.style.color = 'var(--muted)'; }
   else if (!tP)   { el.textContent = '—'; el.style.color = 'var(--muted)'; }
   else { el.textContent = (diff > 0 ? '+' : '') + fmtK(diff); el.style.color = diff > 0 ? 'var(--red)' : diff < 0 ? 'var(--green)' : 'var(--muted)'; }
+
   updateDashboard();
 }
 
@@ -670,8 +784,9 @@ function analyzeBudgetStructure(income, saved, debt, catData) {
   const percent = v => Math.round((v / income) * 100);
 
   // HOUSING
-  const housingKeys = Object.keys(catData).filter(k => k.includes('housing'));
-  const housingTotal = housingKeys.reduce((s,k)=>s+(catData[k].planned||0),0);
+  const housingTotal = catData['housing']?.planned || Object.keys(catData)
+    .filter(k => k.startsWith('housing_'))
+    .reduce((s,k)=>s+(catData[k].planned||0),0);
 
   if (housingTotal > 0) {
     const hp = percent(housingTotal);
@@ -794,6 +909,20 @@ function judge() {
   let totalPlanned = 0, totalActual = 0;
   const catData = {};
   cats.forEach(cat => {
+    if (cat.subcategories && cat.subcategories.length) {
+      let pTotal = 0, aTotal = 0;
+      cat.subcategories.forEach(sub => {
+        const key = cat.id + '_' + sub.id;
+        const p = parseFloat(document.getElementById('p-' + key)?.value) || 0;
+        const a = parseFloat(document.getElementById('a-' + key)?.value) || 0;
+        catData[key] = { planned: p, actual: a, name: sub.name, emoji: cat.emoji, parent: cat.name };
+        pTotal += p; aTotal += a;
+      });
+      catData[cat.id] = { planned: pTotal, actual: aTotal, name: cat.name, emoji: cat.emoji, isParent:true };
+      totalPlanned += pTotal; totalActual += aTotal;
+      return;
+    }
+
     const p = parseFloat(document.getElementById('p-' + cat.id)?.value) || 0;
     const a = parseFloat(document.getElementById('a-' + cat.id)?.value) || 0;
     catData[cat.id] = { planned: p, actual: a, name: cat.name, emoji: cat.emoji };
