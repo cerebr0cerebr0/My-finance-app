@@ -252,7 +252,7 @@ body{font-family:var(--f);background:var(--bg);color:var(--text);min-height:100v
         <div class="wealth-metric-title">Emergency Runway</div>
         <div class="wealth-metric-value" id="runway-score">—</div>
         <div class="wealth-metric-status" id="runway-status">—</div>
-        <div class="wealth-metric-desc">How many months you could survive if income stopped, based on your Emergency Fund category.</div>
+        <div class="wealth-metric-desc">Estimated survival time if income stopped today, based on your accumulated Emergency Fund.</div>
       </div>
 
       <div class="wealth-metric">
@@ -747,7 +747,20 @@ function renderWealthEngine(){
   document.getElementById('freedom-status').textContent=freeLabel;
   document.getElementById('freedom-status').style.color=freeColor;
 
-  document.getElementById('runway-score').textContent=runwayMonths.toFixed(1)+' mo';
+  
+  let runwayDisplay = '0.0 MO';
+
+  if(runwayMonths > 0 && runwayMonths < 0.1){
+    const days = Math.max(1, Math.round(runwayMonths * 30));
+    runwayDisplay = `< ${days} day${days>1?'s':''}`;
+  }else if(runwayMonths > 0 && runwayMonths < 1){
+    runwayDisplay = runwayMonths.toFixed(2)+' MO';
+  }else{
+    runwayDisplay = runwayMonths.toFixed(1)+' MO';
+  }
+
+  document.getElementById('runway-score').innerHTML=runwayDisplay;
+
   document.getElementById('runway-status').textContent=runwayLabel;
   document.getElementById('runway-status').style.color=runwayColor;
 
