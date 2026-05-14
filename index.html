@@ -249,6 +249,17 @@ body{padding-bottom:35px}
 .compact-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 @media(max-width:640px){.compact-row{grid-template-columns:1fr}}
 
+
+.firebase-panel{margin-top:16px;background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px}
+.firebase-title{font-size:10px;letter-spacing:1.7px;color:var(--muted);text-transform:uppercase;margin-bottom:12px}
+.firebase-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:640px){.firebase-grid{grid-template-columns:1fr}}
+.firebase-input{width:100%;background:#0c0c10;border:1px solid var(--border);border-radius:10px;padding:12px;color:var(--text);outline:none;font-family:var(--f)}
+.firebase-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.firebase-btn{border:1px solid var(--border);background:#0c0c10;color:var(--text);border-radius:10px;padding:10px 12px;cursor:pointer;font-family:var(--f);font-weight:700;font-size:12px}
+.firebase-btn:hover{border-color:var(--green);color:var(--green)}
+.firebase-status{margin-top:10px;font-size:12px;color:var(--muted);line-height:1.5}
+
 </style>
 </head>
 <body>
@@ -265,6 +276,28 @@ body{padding-bottom:35px}
   <div class="mlabel" id="mlabel">MAY 2026</div>
   <button class="mbtn" onclick="changeMonth(1)">›</button>
 </div>
+
+
+<div class="wrap">
+  <div class="firebase-panel">
+    <div class="firebase-title">Cloud Sync / Firebase</div>
+    <div class="firebase-grid">
+      <input class="firebase-input" id="fb-email" type="email" placeholder="Email">
+      <input class="firebase-input" id="fb-password" type="password" placeholder="Password">
+    </div>
+    <div class="firebase-actions">
+      <button class="firebase-btn" onclick="firebaseRegister()">Create Account</button>
+      <button class="firebase-btn" onclick="firebaseLogin()">Login</button>
+      <button class="firebase-btn" onclick="firebaseLogout()">Logout</button>
+      <button class="firebase-btn" onclick="saveCloudNow()">Save Cloud</button>
+      <button class="firebase-btn" onclick="loadCloudNow()">Load Cloud</button>
+    </div>
+    <div class="firebase-status" id="firebase-status">
+      Firebase not connected yet. Add your Firebase config inside the HTML file.
+    </div>
+  </div>
+</div>
+
 
 <div class="wrap">
 
@@ -637,7 +670,8 @@ function loadStorage() {
     const v = localStorage.getItem(S_VER);
     const sc = localStorage.getItem(S_CATS);
     if (sc && v === VER) cats = JSON.parse(sc);
-    else { cats = MY_CATS.map(c => ({...c})); localStorage.setItem(S_VER, VER); }
+    else { cats = MY_CATS.map(c => ({...c})); localStorage.setItem(S_VER, VER);
+    if (typeof window.scheduleCloudSave === 'function') window.scheduleCloudSave(); }
   } catch(e) {}
 }
 
@@ -1891,6 +1925,12 @@ function toggleScoreGuide() {
 }
 
 
+
+function historyDataForCloud() {
+  return history;
+}
+window.historyDataForCloud = historyDataForCloud;
+
 // INIT
 loadMonth();
 renderHistory();
@@ -1898,5 +1938,214 @@ updateIncomeTotal();
 updateDashboard();
 updateSavingsBalanceDisplay();
 </script>
+
+<!--
+FIREBASE SETUP NOTES
+
+Firestore Database Rules:
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+  }
+}
+
+Firebase Console steps:
+1. Create a Firebase project.
+2. Enable Authentication → Email/Password.
+3. Create Firestore Database.
+4. Paste the rules above.
+5. Add a Web App and copy the firebaseConfig into this HTML file.
+-->
+
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-analytics.js";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+import {
+  getFirestore,
+  doc,
+  setDoc,
+  getDoc,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+/*
+  Replace the values below with your Firebase project config:
+  Firebase Console → Project Settings → General → Your apps → Web app → Config
+*/
+const firebaseConfig = {
+  apiKey: "AIzaSyCietweZ9SPvSp1ivw0vZzZEXezKo7-zPQ",
+  authDomain: "my-finance-2027b.firebaseapp.com",
+  projectId: "my-finance-2027b",
+  storageBucket: "my-finance-2027b.firebasestorage.app",
+  messagingSenderId: "653434895978",
+  appId: "1:653434895978:web:65ed0f851c7c590a541413",
+  measurementId: "G-QM6XV0HJK1"
+};
+
+let firebaseReady = false;
+let app;
+let auth;
+let db;
+let currentUser = null;
+let analytics = null;
+
+function fbStatus(msg) {
+  const el = document.getElementById("firebase-status");
+  if (el) el.textContent = msg;
+}
+
+function configLooksValid() {
+  return firebaseConfig.apiKey &&
+    !firebaseConfig.apiKey.includes("PASTE_") &&
+    firebaseConfig.projectId &&
+    !firebaseConfig.projectId.includes("PASTE_");
+}
+
+try {
+  if (configLooksValid()) {
+    app = initializeApp(firebaseConfig);
+    analytics = getAnalytics(app);
+    auth = getAuth(app);
+    db = getFirestore(app);
+    firebaseReady = true;
+
+    onAuthStateChanged(auth, async (user) => {
+      currentUser = user;
+      if (user) {
+        fbStatus("Logged in as " + user.email + ". Cloud sync ready.");
+        await window.loadCloudNow();
+      } else {
+        fbStatus("Not logged in. Local mode active.");
+      }
+    });
+  } else {
+    fbStatus("Firebase config missing. Local mode active. Add your config inside the HTML file.");
+  }
+} catch (e) {
+  fbStatus("Firebase error: " + e.message);
+}
+
+function collectAppStateForCloud() {
+  return {
+    history: window.historyDataForCloud ? window.historyDataForCloud() : JSON.parse(localStorage.getItem("wis_h") || "[]"),
+    permanentProfile: JSON.parse(localStorage.getItem("wis_permanent_financial_profile") || "{}"),
+    savingsBalance: localStorage.getItem("wis_accumulated_savings_balance") || "0",
+    version: "wealth-discipline-firebase-v1",
+    updatedAt: serverTimestamp()
+  };
+}
+
+async function saveUserCloudData() {
+  if (!firebaseReady || !currentUser) {
+    fbStatus("Login first, or add Firebase config. Data is still saved locally.");
+    return;
+  }
+
+  if (typeof saveCurrentMonthDraft === "function") saveCurrentMonthDraft();
+
+  const state = collectAppStateForCloud();
+  await setDoc(doc(db, "users", currentUser.uid), state, { merge: true });
+  fbStatus("Cloud saved successfully for " + currentUser.email);
+}
+
+async function loadUserCloudData() {
+  if (!firebaseReady || !currentUser) {
+    fbStatus("Login first, or add Firebase config. Local data loaded.");
+    return;
+  }
+
+  const snap = await getDoc(doc(db, "users", currentUser.uid));
+  if (!snap.exists()) {
+    fbStatus("No cloud data found yet. Save once to create it.");
+    return;
+  }
+
+  const data = snap.data();
+
+  if (data.history) localStorage.setItem("wis_h", JSON.stringify(data.history));
+  if (data.permanentProfile) localStorage.setItem("wis_permanent_financial_profile", JSON.stringify(data.permanentProfile));
+  if (data.savingsBalance !== undefined) localStorage.setItem("wis_accumulated_savings_balance", String(data.savingsBalance));
+
+  fbStatus("Cloud data loaded. Refreshing dashboard...");
+
+  setTimeout(() => {
+    if (typeof loadStorage === "function") loadStorage();
+    if (typeof loadMonth === "function") loadMonth();
+    if (typeof renderHistory === "function") renderHistory();
+    if (typeof updateSavingsBalanceDisplay === "function") updateSavingsBalanceDisplay();
+    if (typeof updateDashboard === "function") updateDashboard();
+  }, 100);
+}
+
+window.firebaseRegister = async function() {
+  try {
+    if (!firebaseReady) return fbStatus("Add Firebase config first.");
+    const email = document.getElementById("fb-email").value.trim();
+    const password = document.getElementById("fb-password").value;
+    await createUserWithEmailAndPassword(auth, email, password);
+    await saveUserCloudData();
+  } catch (e) {
+    fbStatus("Register error: " + e.message);
+  }
+};
+
+window.firebaseLogin = async function() {
+  try {
+    if (!firebaseReady) return fbStatus("Add Firebase config first.");
+    const email = document.getElementById("fb-email").value.trim();
+    const password = document.getElementById("fb-password").value;
+    await signInWithEmailAndPassword(auth, email, password);
+  } catch (e) {
+    fbStatus("Login error: " + e.message);
+  }
+};
+
+window.firebaseLogout = async function() {
+  try {
+    if (!firebaseReady) return fbStatus("Firebase config missing.");
+    await signOut(auth);
+  } catch (e) {
+    fbStatus("Logout error: " + e.message);
+  }
+};
+
+window.saveCloudNow = async function() {
+  try {
+    await saveUserCloudData();
+  } catch (e) {
+    fbStatus("Save error: " + e.message);
+  }
+};
+
+window.loadCloudNow = async function() {
+  try {
+    await loadUserCloudData();
+  } catch (e) {
+    fbStatus("Load error: " + e.message);
+  }
+};
+
+let cloudTimer = null;
+window.scheduleCloudSave = function() {
+  if (!firebaseReady || !currentUser) return;
+  clearTimeout(cloudTimer);
+  cloudTimer = setTimeout(() => {
+    saveUserCloudData().catch(e => fbStatus("Autosave error: " + e.message));
+  }, 1500);
+};
+</script>
+
 </body>
 </html>
