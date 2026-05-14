@@ -218,6 +218,14 @@ body{font-family:var(--f);background:var(--bg);color:var(--text);min-height:100v
 .score-item p{font-size:13px;line-height:1.7;color:var(--muted)}
 .score-item strong{color:var(--text)}
 
+
+.score-status{
+  margin-top:8px;
+  font-size:12px;
+  font-weight:700;
+  letter-spacing:.5px
+}
+
 </style>
 </head>
 <body>
@@ -266,22 +274,22 @@ body{font-family:var(--f);background:var(--bg);color:var(--text);min-height:100v
   <div class="wealth-card">
     <div class="wealth-title">Wealth Score</div>
     <div class="wealth-score" id="wealth-score" style="color:var(--green)">—</div>
-    <div class="wealth-desc">How much your behavior builds long-term wealth</div>
+    <div class="wealth-desc">How much your behavior builds long-term wealth</div><div class="score-status" id="wealth-status">—</div>
   </div>
   <div class="wealth-card">
     <div class="wealth-title">Freedom Score</div>
     <div class="wealth-score" id="freedom-score" style="color:var(--blue)">—</div>
-    <div class="wealth-desc">Dependence on one income source</div>
+    <div class="wealth-desc">Dependence on one income source</div><div class="score-status" id="freedom-status">—</div>
   </div>
   <div class="wealth-card">
     <div class="wealth-title">Growth Score</div>
     <div class="wealth-score" id="growth-score" style="color:var(--amber)">—</div>
-    <div class="wealth-desc">Income expansion & future trajectory</div>
+    <div class="wealth-desc">Income expansion & future trajectory</div><div class="score-status" id="growth-status">—</div>
   </div>
   <div class="wealth-card">
     <div class="wealth-title">Lifestyle Risk</div>
     <div class="wealth-score" id="risk-score" style="color:var(--red)">—</div>
-    <div class="wealth-desc">How dangerous your lifestyle is financially</div>
+    <div class="wealth-desc">How dangerous your lifestyle is financially</div><div class="score-status" id="risk-status">—</div>
   </div>
 </div>
 
@@ -1617,6 +1625,23 @@ function saveCurrentMonthDraft() {
 
 
 
+
+function getScoreEvaluation(score, reverse=false) {
+  if (reverse) {
+    if (score <= 25) return {label:'Low Risk', color:'var(--green)'};
+    if (score <= 50) return {label:'Moderate Risk', color:'var(--amber)'};
+    if (score <= 75) return {label:'High Risk', color:'#ff884d'};
+    return {label:'Dangerously High', color:'var(--red)'};
+  }
+
+  if (score >= 85) return {label:'Excellent', color:'var(--green)'};
+  if (score >= 70) return {label:'Strong', color:'#7dffb3'};
+  if (score >= 55) return {label:'Average', color:'var(--amber)'};
+  if (score >= 40) return {label:'Weak', color:'#ff884d'};
+  return {label:'Critical', color:'var(--red)'};
+}
+
+
 // WEALTH INTELLIGENCE ENGINE
 function calculateWealthMetrics() {
   let income = 0;
@@ -1688,6 +1713,23 @@ function calculateWealthMetrics() {
   document.getElementById('freedom-score').textContent = freedom;
   document.getElementById('growth-score').textContent = growth;
   document.getElementById('risk-score').textContent = risk;
+
+  const wealthEval = getScoreEvaluation(wealth);
+  const freedomEval = getScoreEvaluation(freedom);
+  const growthEval = getScoreEvaluation(growth);
+  const riskEval = getScoreEvaluation(risk, true);
+
+  const ws = document.getElementById('wealth-status');
+  const fs = document.getElementById('freedom-status');
+  const gs = document.getElementById('growth-status');
+  const rs = document.getElementById('risk-status');
+
+  if (ws) { ws.textContent = wealthEval.label; ws.style.color = wealthEval.color; }
+  if (fs) { fs.textContent = freedomEval.label; fs.style.color = freedomEval.color; }
+  if (gs) { gs.textContent = growthEval.label; gs.style.color = growthEval.color; }
+  if (rs) { rs.textContent = riskEval.label; rs.style.color = riskEval.color; }
+
+
 
   const insight = document.getElementById('wealth-insight');
   if (!insight) return;
