@@ -474,10 +474,10 @@ body{padding-bottom:35px}
 
 <div class="top-grid" style="grid-template-columns:1fr 1fr;">
   <div class="icard">
-    <div class="icard-label">🏦 Saved</div>
+    <div class="icard-label">🏦 This Month Saved</div>
     <input class="icard-input" id="inp-saved" type="number" placeholder="0" min="0" oninput="updateDashboard();
 updateSavingsBalanceDisplay(); saveCurrentMonthDraft()">
-    <div class="icard-sub">GH₵ put aside</div>
+    <div class="icard-sub">GH₵ intentionally put aside this month</div>
   </div>
 
   <div class="icard">
@@ -488,13 +488,11 @@ updateSavingsBalanceDisplay(); saveCurrentMonthDraft()">
 </div>
 
 <div class="savings-balance-card">
-  <div class="savings-balance-title">Accumulated Savings Balance</div>
+  <div class="savings-balance-title">Total Savings Balance</div>
   <div class="savings-balance-value" id="savings-balance-display">GH₵0</div>
-  <div class="savings-balance-note">
-    This grows when you click Judge Me. The app adds money left after actual spending and debt.
-  </div>
-  <button class="add-btn" style="margin-top:10px" onclick="addCurrentMonthSavingsManually()">＋ Add This Month Savings</button> <button class="add-btn" style="margin-top:10px" onclick="manualSetSavingsBalance()">Edit Balance</button>
-</div>
+  <div class="savings-balance-note" id="savings-balance-note">
+    This is calculated automatically after you click Judge Me. Formula: Income − Actual Spending − Debt.
+  </div></div>
 
 <div class="icard" style="margin-top:14px">
   <div class="icard-label">📝 Monthly Comments</div>
@@ -1245,11 +1243,7 @@ function analyzeBudgetStructure(income, saved, debt, catData) {
 
 
 
-function applySavingsGrowthAfterJudgment(record) {
-  if (typeof applyMonthlySavingsGrowth === 'function') {
-    applyMonthlySavingsGrowth(record);
-  }
-}
+
 
 // JUDGE
 function judgeCore() {
@@ -1603,108 +1597,77 @@ function clearAll() { if (confirm('Delete all saved data?')) { history = []; sav
 
 
 
-function buildCurrentRecordFromScreenForSavings() {
-  const incomeSources = {};
-  let income = 0;
-  document.querySelectorAll('.income-input').forEach(inp => {
-    const val = parseFloat(inp.value) || 0;
-    incomeSources[inp.dataset.income] = val;
-    income += val;
-  });
 
-  let totalActual = 0;
-  cats.forEach(cat => {
-    if (cat.subcategories && cat.subcategories.length) {
-      cat.subcategories.forEach(sub => {
-        const key = cat.id + '_' + sub.id;
-        totalActual += parseFloat(document.getElementById('a-' + key)?.value) || 0;
-      });
-    } else {
-      totalActual += parseFloat(document.getElementById('a-' + cat.id)?.value) || 0;
-    }
-  });
 
-  return {
-    key: mkKey(),
-    month: MONTHS[curMonth],
-    year: curYear,
-    income,
-    incomeSources,
-    totalActual,
-    debt: parseFloat(document.getElementById('inp-debt')?.value) || 0,
-    saved: parseFloat(document.getElementById('inp-saved')?.value) || 0
-  };
-}
 
-function addCurrentMonthSavingsManually() {
-  const record = buildCurrentRecordFromScreenForSavings();
-  applyMonthlySavingsGrowth(record);
-}
 
 // ACCUMULATED SAVINGS ENGINE - SIMPLE VERSION
-function getSavingsBalance() {
-  return parseFloat(localStorage.getItem('wis_accumulated_savings_balance') || '0') || 0;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// ACCUMULATED SAVINGS ENGINE - AUTOMATIC DERIVED VERSION
+function getMonthlySavingsAmount(record) {
+  if (!record) return 0;
+
+  const income = record.income || 0;
+  const actual = record.totalActual || 0;
+  const debt = record.debt || 0;
+
+  // Money left after real spending and debt.
+  return Math.max(0, Math.round(income - actual - debt));
 }
 
-function setSavingsBalance(v) {
-  const clean = Math.max(0, Math.round(parseFloat(v || 0)));
-  localStorage.setItem('wis_accumulated_savings_balance', String(clean));
-  updateSavingsBalanceDisplay();
+function getSavingsBalance() {
+  const seen = new Set();
+  return history.reduce((sum, record) => {
+    if (!record || !record.key || seen.has(record.key)) return sum;
+    seen.add(record.key);
+
+    // Only judged months count toward accumulated savings.
+    if (record.score == null) return sum;
+
+    return sum + getMonthlySavingsAmount(record);
+  }, 0);
 }
 
 function updateSavingsBalanceDisplay() {
   const el = document.getElementById('savings-balance-display');
   if (el) el.textContent = fmtG(getSavingsBalance());
-}
 
-function getCurrentMonthSavingsToAdd(record) {
-  const income = record?.income || 0;
-  const actual = record?.totalActual || 0;
-  const debt = record?.debt || 0;
-  const intentionalSaved = record?.saved || 0;
-
-  const leftover = Math.max(0, income - actual - debt);
-
-  // If user intentionally saved more than leftover, respect the intentional saving.
-  return Math.max(leftover, intentionalSaved);
+  const note = document.getElementById('savings-balance-note');
+  if (note) {
+    const current = history.find(h => h.key === mkKey() && h.score != null);
+    const added = current ? getMonthlySavingsAmount(current) : 0;
+    note.innerHTML = current
+      ? `This is calculated automatically from judged months. This month added: <strong>${fmtG(added)}</strong>.`
+      : `This is calculated automatically after you click Judge Me. Formula: Income − Actual Spending − Debt.`;
+  }
 }
 
 function applyMonthlySavingsGrowth(record) {
-  if (!record) return;
-
-  const appliedKey = 'wis_savings_applied_' + record.key;
-  const amountToAdd = getCurrentMonthSavingsToAdd(record);
-
-  if (localStorage.getItem(appliedKey) === 'yes') {
-    alert('Savings already added for this month. To change it, use Edit Balance.');
-    updateSavingsBalanceDisplay();
-    return;
+  // No manual addition anymore. Balance is derived from saved monthly history.
+  if (record) {
+    record.rolloverAdded = getMonthlySavingsAmount(record);
+    const idx = history.findIndex(h => h.key === record.key);
+    if (idx >= 0) history[idx] = record;
+    saveStorage();
   }
-
-  if (amountToAdd <= 0) {
-    alert('No positive savings to add this month. Income minus Actual spending minus Debt is 0 or less.');
-    updateSavingsBalanceDisplay();
-    return;
-  }
-
-  setSavingsBalance(getSavingsBalance() + amountToAdd);
-  localStorage.setItem(appliedKey, 'yes');
-
-  record.rolloverApplied = true;
-  record.rolloverAdded = amountToAdd;
-
-  const idx = history.findIndex(h => h.key === record.key);
-  if (idx >= 0) history[idx] = record;
-
-  saveStorage();
   updateSavingsBalanceDisplay();
 }
 
-function manualSetSavingsBalance() {
-  const current = getSavingsBalance();
-  const val = prompt('Enter your current accumulated savings balance:', current);
-  if (val === null) return;
-  setSavingsBalance(parseFloat(val) || 0);
+function applySavingsGrowthAfterJudgment(record) {
+  applyMonthlySavingsGrowth(record);
 }
 
 
