@@ -226,6 +226,29 @@ body{font-family:var(--f);background:var(--bg);color:var(--text);min-height:100v
   letter-spacing:.5px
 }
 
+
+/* COMPACT MODE */
+body{padding-bottom:35px}
+.hdr{padding:22px 20px 0}
+.hdr-title{font-size:clamp(42px,9vw,70px)}
+.hdr-sub{font-size:12px}
+.month-nav{margin-top:18px}
+.wrap{max-width:980px}
+.dashboard,.wealth-grid{gap:8px;margin-top:14px}
+.dash-card,.wealth-card,.icard{padding:13px 14px;border-radius:14px}
+.dash-val,.wealth-score{font-size:30px}
+.sec-title{margin-top:18px;margin-bottom:8px}
+.section-tabs{position:sticky;top:0;z-index:50;background:var(--bg);padding:8px 0;margin-top:12px}
+.tab-btn{padding:10px 8px;font-size:12px;border-radius:10px}
+.cat-row{margin-bottom:6px}
+.cname,.cnum{padding:7px 9px}
+.judge-wrap{margin-top:18px}
+.judge-btn{padding:16px;font-size:30px}
+.score-guide{display:none}
+.score-guide.show{display:block}
+.compact-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:640px){.compact-row{grid-template-columns:1fr}}
+
 </style>
 </head>
 <body>
@@ -294,7 +317,8 @@ body{font-family:var(--f);background:var(--bg);color:var(--text);min-height:100v
 </div>
 
 
-<div class="score-guide">
+<button class="add-btn" style="margin-top:14px" onclick="toggleScoreGuide()">ℹ️ Explain Scores</button>
+<div class="score-guide" id="score-guide">
   <div class="score-guide-title">Understanding Your Wealth Metrics</div>
 
   <div class="score-guide-grid">
@@ -413,7 +437,7 @@ updateSavingsBalanceDisplay(); saveCurrentMonthDraft()">
   <div class="savings-balance-note">
     This grows when you click Judge Me. The app adds money left after actual spending and debt.
   </div>
-  <button class="add-btn" style="margin-top:10px" onclick="manualSetSavingsBalance()">Edit Balance</button>
+  <button class="add-btn" style="margin-top:10px" onclick="addCurrentMonthSavingsManually()">＋ Add This Month Savings</button> <button class="add-btn" style="margin-top:10px" onclick="manualSetSavingsBalance()">Edit Balance</button>
 </div>
 
 <div class="icard" style="margin-top:14px">
@@ -1490,9 +1514,60 @@ function clearAll() { if (confirm('Delete all saved data?')) { history = []; sav
 
 
 // ACCUMULATED SAVINGS ENGINE - RELIABLE VERSION
+
+
+
+
+
+
+
+
+
+
+
+
+
+function buildCurrentRecordFromScreenForSavings() {
+  const incomeSources = {};
+  let income = 0;
+  document.querySelectorAll('.income-input').forEach(inp => {
+    const val = parseFloat(inp.value) || 0;
+    incomeSources[inp.dataset.income] = val;
+    income += val;
+  });
+
+  let totalActual = 0;
+  cats.forEach(cat => {
+    if (cat.subcategories && cat.subcategories.length) {
+      cat.subcategories.forEach(sub => {
+        const key = cat.id + '_' + sub.id;
+        totalActual += parseFloat(document.getElementById('a-' + key)?.value) || 0;
+      });
+    } else {
+      totalActual += parseFloat(document.getElementById('a-' + cat.id)?.value) || 0;
+    }
+  });
+
+  return {
+    key: mkKey(),
+    month: MONTHS[curMonth],
+    year: curYear,
+    income,
+    incomeSources,
+    totalActual,
+    debt: parseFloat(document.getElementById('inp-debt')?.value) || 0,
+    saved: parseFloat(document.getElementById('inp-saved')?.value) || 0
+  };
+}
+
+function addCurrentMonthSavingsManually() {
+  const record = buildCurrentRecordFromScreenForSavings();
+  applyMonthlySavingsGrowth(record);
+}
+
+// ACCUMULATED SAVINGS ENGINE - SIMPLE VERSION
 function getSavingsBalance() {
-  const raw = localStorage.getItem('wis_accumulated_savings_balance');
-  return parseFloat(raw || '0') || 0;
+  return parseFloat(localStorage.getItem('wis_accumulated_savings_balance') || '0') || 0;
 }
 
 function setSavingsBalance(v) {
@@ -1506,41 +1581,46 @@ function updateSavingsBalanceDisplay() {
   if (el) el.textContent = fmtG(getSavingsBalance());
 }
 
+function getCurrentMonthSavingsToAdd(record) {
+  const income = record?.income || 0;
+  const actual = record?.totalActual || 0;
+  const debt = record?.debt || 0;
+  const intentionalSaved = record?.saved || 0;
+
+  const leftover = Math.max(0, income - actual - debt);
+
+  // If user intentionally saved more than leftover, respect the intentional saving.
+  return Math.max(leftover, intentionalSaved);
+}
+
 function applyMonthlySavingsGrowth(record) {
   if (!record) return;
 
   const appliedKey = 'wis_savings_applied_' + record.key;
+  const amountToAdd = getCurrentMonthSavingsToAdd(record);
 
-  // prevent double adding for the same month
   if (localStorage.getItem(appliedKey) === 'yes') {
+    alert('Savings already added for this month. To change it, use Edit Balance.');
     updateSavingsBalanceDisplay();
     return;
   }
 
-  const income = record.income || 0;
-  const actual = record.totalActual || 0;
-  const debt = record.debt || 0;
-  const intentionalSaved = record.saved || 0;
-
-  // money not spent this month
-  const leftover = Math.max(0, income - actual - debt);
-
-  // Add unspent money. If user entered an intentional saved amount higher than leftover,
-  // use that amount instead.
-  const amountToAdd = Math.max(leftover, intentionalSaved);
-
-  if (amountToAdd > 0) {
-    setSavingsBalance(getSavingsBalance() + amountToAdd);
-    localStorage.setItem(appliedKey, 'yes');
-
-    record.rolloverApplied = true;
-    record.rolloverAdded = amountToAdd;
-
-    const idx = history.findIndex(h => h.key === record.key);
-    if (idx >= 0) history[idx] = record;
-    saveStorage();
+  if (amountToAdd <= 0) {
+    alert('No positive savings to add this month. Income minus Actual spending minus Debt is 0 or less.');
+    updateSavingsBalanceDisplay();
+    return;
   }
 
+  setSavingsBalance(getSavingsBalance() + amountToAdd);
+  localStorage.setItem(appliedKey, 'yes');
+
+  record.rolloverApplied = true;
+  record.rolloverAdded = amountToAdd;
+
+  const idx = history.findIndex(h => h.key === record.key);
+  if (idx >= 0) history[idx] = record;
+
+  saveStorage();
   updateSavingsBalanceDisplay();
 }
 
@@ -1803,6 +1883,13 @@ function updateDashboard() {
 
 
 window.addEventListener('beforeunload', saveCurrentMonthDraft);
+
+
+function toggleScoreGuide() {
+  const el = document.getElementById('score-guide');
+  if (el) el.classList.toggle('show');
+}
+
 
 // INIT
 loadMonth();
