@@ -1244,6 +1244,13 @@ function analyzeBudgetStructure(income, saved, debt, catData) {
 
 
 
+
+function applySavingsGrowthAfterJudgment(record) {
+  if (typeof applyMonthlySavingsGrowth === 'function') {
+    applyMonthlySavingsGrowth(record);
+  }
+}
+
 // JUDGE
 function judgeCore() {
 
@@ -1287,7 +1294,7 @@ function judgeCore() {
   const idx = history.findIndex(h => h.key === record.key);
   if (idx >= 0) history[idx] = record; else history.unshift(record);
   saveStorage(); collectPermanentProfile(); collectPermanentProfile();
-  applySavingsGrowthAfterJudgment(record);
+  applyMonthlySavingsGrowth(record);
   applyMonthlySavingsGrowth(record);
   renderVerdict(record);
   document.getElementById('verdict').classList.add('show');
@@ -1426,7 +1433,7 @@ function judge() {
     if (typeof updateDashboard === 'function') updateDashboard();
   } catch (e) {
     console.error(e);
-    alert('Judge error: ' + e.message);
+    alert('Judge error: ' + e.message + '\n\nThe verdict was calculated, but one function failed. This version fixes the savings function reference.');
   }
 }
 
