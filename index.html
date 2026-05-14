@@ -208,6 +208,16 @@ body{font-family:var(--f);background:var(--bg);color:var(--text);min-height:100v
 .savings-balance-value{font-family:var(--d);font-size:38px;color:var(--green)}
 .savings-balance-note{font-size:12px;color:var(--muted);line-height:1.6;margin-top:6px}
 
+
+.score-guide{margin-top:22px;background:var(--card);border:1px solid var(--border);border-radius:18px;padding:20px}
+.score-guide-title{font-size:11px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:16px}
+.score-guide-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:700px){.score-guide-grid{grid-template-columns:1fr}}
+.score-item{background:#0f0f15;border:1px solid #232330;border-radius:14px;padding:16px}
+.score-item h3{font-size:16px;margin-bottom:8px}
+.score-item p{font-size:13px;line-height:1.7;color:var(--muted)}
+.score-item strong{color:var(--text)}
+
 </style>
 </head>
 <body>
@@ -275,6 +285,64 @@ body{font-family:var(--f);background:var(--bg);color:var(--text);min-height:100v
   </div>
 </div>
 
+
+<div class="score-guide">
+  <div class="score-guide-title">Understanding Your Wealth Metrics</div>
+
+  <div class="score-guide-grid">
+
+    <div class="score-item">
+      <h3 style="color:var(--green)">💰 Wealth Score</h3>
+      <p>
+        Measures whether your overall financial behavior is helping you
+        <strong>build long-term wealth</strong> or simply survive month to month.
+        <br><br>
+        It analyzes:
+        savings behavior, spending discipline, lifestyle inflation,
+        and how much money you keep versus consume.
+      </p>
+    </div>
+
+    <div class="score-item">
+      <h3 style="color:var(--blue)">🕊 Freedom Score</h3>
+      <p>
+        Measures your level of <strong>financial dependence</strong>.
+        <br><br>
+        If most of your money comes from only one source,
+        your score becomes lower.
+        <br><br>
+        Multiple income streams increase financial freedom and resilience.
+      </p>
+    </div>
+
+    <div class="score-item">
+      <h3 style="color:var(--amber)">📈 Growth Score</h3>
+      <p>
+        Measures your <strong>future financial trajectory</strong>.
+        <br><br>
+        It evaluates:
+        income diversification, savings growth,
+        and whether your financial system is expanding over time.
+      </p>
+    </div>
+
+    <div class="score-item">
+      <h3 style="color:var(--red)">⚠️ Lifestyle Risk</h3>
+      <p>
+        Measures how dangerous your current lifestyle is financially.
+        <br><br>
+        High consumption, weak savings,
+        and expensive habits increase this score.
+        <br><br>
+        A high risk score means your lifestyle could become unstable
+        if income drops or emergencies happen.
+      </p>
+    </div>
+
+  </div>
+</div>
+
+
 <div class="wealth-insight" id="wealth-insight">
   <strong>Wealth Intelligence:</strong> Add your income and spending to see whether your decisions are moving you toward wealth.
 </div>
@@ -335,7 +403,7 @@ updateSavingsBalanceDisplay(); saveCurrentMonthDraft()">
   <div class="savings-balance-title">Accumulated Savings Balance</div>
   <div class="savings-balance-value" id="savings-balance-display">GH₵0</div>
   <div class="savings-balance-note">
-    This grows over time. Each month, money not spent can be added to your savings balance.
+    This grows when you click Judge Me. The app adds money left after actual spending and debt.
   </div>
   <button class="add-btn" style="margin-top:10px" onclick="manualSetSavingsBalance()">Edit Balance</button>
 </div>
@@ -589,7 +657,7 @@ function getSavingsBalance() {
 
 function setSavingsBalance(v) {
   const profile = getPermanentProfile();
-  profile.savingsBalance = Math.max(0, Math.round(v));
+  profile.savingsBalance = Math.max(0, Math.round(v || 0));
   savePermanentProfile(profile);
   updateSavingsBalanceDisplay();
 }
@@ -1107,6 +1175,44 @@ function analyzeBudgetStructure(income, saved, debt, catData) {
 }
 
 
+
+function applySavingsGrowthAfterJudgment(record) {
+  if (!record) return;
+
+  // Prevent double-counting the same month
+  if (record.rolloverApplied) {
+    updateSavingsBalanceDisplay();
+    return;
+  }
+
+  const income = record.income || 0;
+  const actual = record.totalActual || 0;
+  const debt = record.debt || 0;
+  const intentionalSaved = record.saved || 0;
+
+  // Money left after actual spending and debt
+  const leftover = Math.max(0, income - actual - debt);
+
+  // Add intentional saving + remaining unspent money that was not already counted
+  // If intentional saving is already part of leftover, this still protects the savings habit.
+  const amountToAdd = Math.max(leftover, intentionalSaved);
+
+  if (amountToAdd > 0) {
+    const current = getSavingsBalance();
+    setSavingsBalance(current + amountToAdd);
+
+    record.rolloverApplied = true;
+    record.rolloverAdded = amountToAdd;
+
+    const idx = history.findIndex(h => h.key === record.key);
+    if (idx >= 0) history[idx] = record;
+
+    saveStorage();
+    updateSavingsBalanceDisplay();
+  }
+}
+
+
 // JUDGE
 function judge() {
 
@@ -1149,7 +1255,9 @@ function judge() {
   const record = { key: mkKey(), month: MONTHS[curMonth], year: curYear, income, incomeSources, saved, debt, comments, totalPlanned, totalActual, catData, catDefs: cats.map(c=>({...c})), score: sc, ts: Date.now() };
   const idx = history.findIndex(h => h.key === record.key);
   if (idx >= 0) history[idx] = record; else history.unshift(record);
-  saveStorage(); collectPermanentProfile(); rolloverUnusedMoneyToSavings(record); renderVerdict(record);
+  saveStorage(); collectPermanentProfile(); collectPermanentProfile();
+  applySavingsGrowthAfterJudgment(record);
+  renderVerdict(record);
   document.getElementById('verdict').classList.add('show');
   setTimeout(() => document.getElementById('verdict').scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
   renderHistory();
