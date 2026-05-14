@@ -260,9 +260,35 @@ body{padding-bottom:35px}
 .firebase-btn:hover{border-color:var(--green);color:var(--green)}
 .firebase-status{margin-top:10px;font-size:12px;color:var(--muted);line-height:1.5}
 
+
+/* AUTH GATE */
+.auth-gate{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:var(--bg)}
+.auth-box{width:100%;max-width:430px;background:var(--card);border:1px solid var(--border);border-radius:22px;padding:26px;box-shadow:0 20px 50px rgba(0,0,0,.35)}
+.auth-logo{font-family:var(--d);font-size:48px;line-height:.95;margin-bottom:8px}
+.auth-logo em{color:var(--green);font-style:normal}
+.auth-sub{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:18px}
+.auth-main{display:grid;gap:10px}
+.auth-app{display:none}
+.auth-app.unlocked{display:block}
+.auth-error{font-size:12px;color:var(--red);margin-top:10px;line-height:1.5}
+
 </style>
 </head>
 <body>
+<div id="auth-gate" class="auth-gate">
+  <div class="auth-box">
+    <div class="auth-logo">WEALTH<br><em>DISCIPLINE</em></div>
+    <div class="auth-sub">Login before accessing your financial dashboard. Your data will sync with Firebase.</div>
+    <div class="auth-main">
+      <input class="firebase-input" id="gate-email" type="email" placeholder="Email">
+      <input class="firebase-input" id="gate-password" type="password" placeholder="Password">
+      <button class="firebase-btn" onclick="firebaseLoginFromGate()">Login</button>
+      <button class="firebase-btn" onclick="firebaseRegisterFromGate()">Create Account</button>
+    </div>
+    <div id="auth-error" class="auth-error"></div>
+  </div>
+</div>
+<div id="auth-app" class="auth-app">
 
 <div class="hdr">
   <div class="hdr-eye">Monthly Finance Verdict</div>
@@ -281,13 +307,10 @@ body{padding-bottom:35px}
 <div class="wrap">
   <div class="firebase-panel">
     <div class="firebase-title">Cloud Sync / Firebase</div>
-    <div class="firebase-grid">
-      <input class="firebase-input" id="fb-email" type="email" placeholder="Email">
-      <input class="firebase-input" id="fb-password" type="password" placeholder="Password">
-    </div>
+    <div style="font-size:12px;color:var(--muted)">Cloud account controls.</div>
     <div class="firebase-actions">
-      <button class="firebase-btn" onclick="firebaseRegister()">Create Account</button>
-      <button class="firebase-btn" onclick="firebaseLogin()">Login</button>
+      
+      
       <button class="firebase-btn" onclick="firebaseLogout()">Logout</button>
       <button class="firebase-btn" onclick="saveCloudNow()">Save Cloud</button>
       <button class="firebase-btn" onclick="loadCloudNow()">Load Cloud</button>
@@ -1222,7 +1245,7 @@ function analyzeBudgetStructure(income, saved, debt, catData) {
 
 
 // JUDGE
-function judge() {
+function judgeCore() {
 
   const incomeSources = {};
   let income = 0;
@@ -1394,6 +1417,18 @@ function buildActionAdvice(r, cd) {
   return advice;
 }
 
+
+
+function judge() {
+  try {
+    judgeCore();
+    if (typeof updateSavingsBalanceDisplay === 'function') updateSavingsBalanceDisplay();
+    if (typeof updateDashboard === 'function') updateDashboard();
+  } catch (e) {
+    console.error(e);
+    alert('Judge error: ' + e.message);
+  }
+}
 
 // RENDER VERDICT
 function renderVerdict(r) {
@@ -1939,6 +1974,8 @@ updateDashboard();
 updateSavingsBalanceDisplay();
 </script>
 
+</div>
+
 <!--
 FIREBASE SETUP NOTES
 
@@ -2006,6 +2043,25 @@ function fbStatus(msg) {
   if (el) el.textContent = msg;
 }
 
+function authError(msg) {
+  const el = document.getElementById("auth-error");
+  if (el) el.textContent = msg;
+}
+
+function unlockApp() {
+  const gate = document.getElementById("auth-gate");
+  const appEl = document.getElementById("auth-app");
+  if (gate) gate.style.display = "none";
+  if (appEl) appEl.classList.add("unlocked");
+}
+
+function lockApp() {
+  const gate = document.getElementById("auth-gate");
+  const appEl = document.getElementById("auth-app");
+  if (gate) gate.style.display = "flex";
+  if (appEl) appEl.classList.remove("unlocked");
+}
+
 function configLooksValid() {
   return firebaseConfig.apiKey &&
     !firebaseConfig.apiKey.includes("PASTE_") &&
@@ -2024,14 +2080,16 @@ try {
     onAuthStateChanged(auth, async (user) => {
       currentUser = user;
       if (user) {
+        unlockApp();
         fbStatus("Logged in as " + user.email + ". Cloud sync ready.");
         await window.loadCloudNow();
       } else {
-        fbStatus("Not logged in. Local mode active.");
+        lockApp();
+        fbStatus("Not logged in.");
       }
     });
   } else {
-    fbStatus("Firebase config missing. Local mode active. Add your config inside the HTML file.");
+    fbStatus("Firebase config missing. Add your config inside the HTML file."); authError("Firebase config missing. Add config inside the HTML file.");
   }
 } catch (e) {
   fbStatus("Firebase error: " + e.message);
@@ -2052,8 +2110,6 @@ async function saveUserCloudData() {
     fbStatus("Login first, or add Firebase config. Data is still saved locally.");
     return;
   }
-
-  if (typeof saveCurrentMonthDraft === "function") saveCurrentMonthDraft();
 
   const state = collectAppStateForCloud();
   await setDoc(doc(db, "users", currentUser.uid), state, { merge: true });
@@ -2112,10 +2168,38 @@ window.firebaseLogin = async function() {
   }
 };
 
+
+window.firebaseLoginFromGate = async function() {
+  try {
+    if (!firebaseReady) return authError("Firebase is not ready. Check your config.");
+    const email = document.getElementById("gate-email").value.trim();
+    const password = document.getElementById("gate-password").value;
+    if (!email || !password) return authError("Enter email and password.");
+    await signInWithEmailAndPassword(auth, email, password);
+    authError("");
+  } catch (e) {
+    authError("Login error: " + e.message);
+  }
+};
+
+window.firebaseRegisterFromGate = async function() {
+  try {
+    if (!firebaseReady) return authError("Firebase is not ready. Check your config.");
+    const email = document.getElementById("gate-email").value.trim();
+    const password = document.getElementById("gate-password").value;
+    if (!email || !password) return authError("Enter email and password.");
+    await createUserWithEmailAndPassword(auth, email, password);
+    authError("");
+  } catch (e) {
+    authError("Register error: " + e.message);
+  }
+};
+
 window.firebaseLogout = async function() {
   try {
     if (!firebaseReady) return fbStatus("Firebase config missing.");
     await signOut(auth);
+    lockApp();
   } catch (e) {
     fbStatus("Logout error: " + e.message);
   }
