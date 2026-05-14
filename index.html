@@ -83,6 +83,13 @@ body{font-family:var(--f);background:var(--bg);color:var(--text);min-height:100v
 .xbtn:hover{color:var(--red);border-color:var(--red);background:rgba(255,59,59,.08)}
 .xbtn:disabled{opacity:.2;pointer-events:none}
 
+.cat-row.parent-row .cname{background:linear-gradient(180deg,var(--card2),var(--card));border-color:rgba(0,255,136,.18)}
+.sub-row{margin-left:18px}
+.sub-row .cname{background:#0d0d10;border-color:var(--dim)}
+.subname{font-size:12px;color:var(--muted);font-weight:600}
+.parent-title{display:flex;align-items:center;gap:8px}
+.parent-meta{font-size:11px;color:var(--muted);margin-top:2px}
+
 /* TOTALS */
 .totals{display:grid;grid-template-columns:1fr 105px 105px 72px 34px;gap:8px;align-items:center;border-top:1px solid var(--border);padding-top:12px;margin-top:4px}
 @media(max-width:480px){.totals{grid-template-columns:1fr 82px 82px 58px 28px}}
@@ -171,7 +178,7 @@ body{font-family:var(--f);background:var(--bg);color:var(--text);min-height:100v
   <div class="hdr-eye">Monthly Finance Verdict</div>
   <div class="hdr-title">WAS I<br><em>STUPID?</em></div>
   <div class="hdr-sub">Plan your spending. Track what actually happened.<br>Get an honest verdict — no excuses.</div>
-  <div class="hdr-note">🏠 Housing = Maintenance + Gas + Light + Generator + Trash + Internet + Washing Soap</div>
+  <div class="hdr-note">🏠 Housing includes: Maintenance Fee + Gas + Light + Generator + Trash + Internet + Washing Soap</div>
 </div>
 
 <div class="month-nav">
@@ -273,17 +280,30 @@ const EMOJIS=['🏠','💍','🍔','🏋️','🚌','🙏','📱','💈','👨�
 
 // YOUR PERSONAL CATEGORIES — edit these anytime
 const MY_CATS = [
-  {id:'housing',   name:'Housing',         emoji:'🏠'},
-  {id:'fiancee',   name:'Fiancée',          emoji:'💍'},
-  {id:'food',      name:'Food',             emoji:'🍔'},
-  {id:'gym',       name:'Gym',              emoji:'🏋️'},
-  {id:'transport', name:'Transport',        emoji:'🚌'},
-  {id:'tithes',    name:'Tithes',           emoji:'🙏'},
-  {id:'data',      name:'Data & Airtime',   emoji:'📱'},
-  {id:'haircut',   name:'Haircut',          emoji:'💈'},
-  {id:'family',    name:'Daughter & Mum',   emoji:'👨‍👩‍👧'},
-  {id:'medical',   name:'Medical',          emoji:'💊'},
-  {id:'shows',     name:'Shows',            emoji:'🎬'},
+  {
+    id:'housing',
+    name:'Housing',
+    emoji:'🏠',
+    subcategories:[
+      {id:'maintenance', name:'Maintenance Fee'},
+      {id:'gas',         name:'Gas'},
+      {id:'light',       name:'Light'},
+      {id:'generator',   name:'Generator'},
+      {id:'trash',       name:'Trash'},
+      {id:'internet',    name:'Internet'},
+      {id:'soap',        name:'Washing Soap'}
+    ]
+  },
+  {id:'fiancee',   name:'Fiancée',                  emoji:'💍'},
+  {id:'food',      name:'Food',                     emoji:'🍔'},
+  {id:'gym',       name:'Gym',                      emoji:'🏋️'},
+  {id:'transport', name:'Transport',                emoji:'🚌'},
+  {id:'tithes',    name:'Tithes',                   emoji:'🙏'},
+  {id:'data',      name:'Personal Data & Airtime',  emoji:'📱'},
+  {id:'haircut',   name:'Haircut',                  emoji:'💈'},
+  {id:'family',    name:'Daughter & Mum',           emoji:'👨‍👩‍👧'},
+  {id:'medical',   name:'Medical',                  emoji:'💊'},
+  {id:'shows',     name:'Shows',                    emoji:'🎬'}
 ];
 
 let curYear = new Date().getFullYear();
@@ -293,7 +313,7 @@ let history = [];
 let openPicker = null;
 
 // STORAGE
-const S_HIS = 'wis_h', S_CATS = 'wis_c', S_VER = 'wis_v', VER = 'v5';
+const S_HIS = 'wis_h', S_CATS = 'wis_c', S_VER = 'wis_v', VER = 'v6';
 function loadStorage() {
   try {
     history = JSON.parse(localStorage.getItem(S_HIS) || '[]');
@@ -334,6 +354,67 @@ function renderRows() {
   container.innerHTML = '';
 
   cats.forEach(cat => {
+    if (cat.subcategories && cat.subcategories.length) {
+      let parentPlanned = 0;
+      let parentActual = 0;
+
+      cat.subcategories.forEach(sub => {
+        const key = cat.id + '_' + sub.id;
+        const saved = entry && entry.catData && entry.catData[key];
+        parentPlanned += saved ? (saved.planned || 0) : 0;
+        parentActual  += saved ? (saved.actual  || 0) : 0;
+      });
+
+      const parentRow = document.createElement('div');
+      parentRow.className = 'cat-row parent-row';
+      parentRow.id = 'row-' + cat.id;
+      parentRow.innerHTML = `
+        <div class="cname">
+          <div>
+            <div class="parent-title"><span style="font-size:18px">${cat.emoji}</span><strong>${cat.name}</strong></div>
+            <div class="parent-meta">${cat.subcategories.length} sub-categories</div>
+          </div>
+        </div>
+        <div class="cnum">
+          <div class="cnum-lbl" style="color:var(--amber)">Total Planned</div>
+          <div class="cnum-inp" id="p-${cat.id}" style="padding-top:2px">${parentPlanned ? fmtG(parentPlanned) : '—'}</div>
+        </div>
+        <div class="cnum actual">
+          <div class="cnum-lbl" style="color:var(--blue)">Total Actual</div>
+          <div class="cnum-inp" id="a-${cat.id}" style="padding-top:2px">${parentActual ? fmtG(parentActual) : '—'}</div>
+        </div>
+        <div class="vpill none" id="vp-${cat.id}">—</div>
+        <div></div>`;
+      container.appendChild(parentRow);
+
+      cat.subcategories.forEach(sub => {
+        const key = cat.id + '_' + sub.id;
+        const saved = entry && entry.catData && entry.catData[key];
+        const planned = saved ? (saved.planned || 0) : 0;
+        const actual  = saved ? (saved.actual  || 0) : 0;
+
+        const row = document.createElement('div');
+        row.className = 'cat-row sub-row';
+        row.id = 'row-' + key;
+        row.innerHTML = `
+          <div class="cname">
+            <div class="subname">└ ${sub.name}</div>
+          </div>
+          <div class="cnum">
+            <div class="cnum-lbl" style="color:var(--amber)">Planned</div>
+            <input class="cnum-inp" id="p-${key}" type="number" placeholder="0" min="0" value="${planned||''}" oninput="recalc()">
+          </div>
+          <div class="cnum actual">
+            <div class="cnum-lbl" style="color:var(--blue)">Actual</div>
+            <input class="cnum-inp" id="a-${key}" type="number" placeholder="0" min="0" value="${actual||''}" oninput="recalc()">
+          </div>
+          <div class="vpill none" id="vp-${key}">—</div>
+          <div></div>`;
+        container.appendChild(row);
+      });
+      return;
+    }
+
     const saved = entry && entry.catData && entry.catData[cat.id];
     const planned = saved ? (saved.planned || 0) : 0;
     const actual  = saved ? (saved.actual  || 0) : 0;
@@ -366,11 +447,9 @@ function renderRows() {
 // RECALC VARIANCE + TOTALS
 function recalc() {
   let tP = 0, tA = 0;
-  cats.forEach(cat => {
-    const p = parseFloat(document.getElementById('p-' + cat.id)?.value) || 0;
-    const a = parseFloat(document.getElementById('a-' + cat.id)?.value) || 0;
-    tP += p; tA += a;
-    const pill = document.getElementById('vp-' + cat.id);
+
+  function updatePill(id, p, a) {
+    const pill = document.getElementById('vp-' + id);
     if (!pill) return;
     if (!p && !a) { pill.className = 'vpill none'; pill.textContent = '—'; return; }
     if (!p)       { pill.className = 'vpill none'; pill.textContent = 'no plan'; return; }
@@ -378,7 +457,36 @@ function recalc() {
     if (Math.abs(d) < 1) { pill.className = 'vpill even'; pill.textContent = '✓ on'; return; }
     pill.className = 'vpill ' + (d > 0 ? 'over' : 'under');
     pill.textContent = (d > 0 ? '+' : '') + fmtK(d);
+  }
+
+  cats.forEach(cat => {
+    if (cat.subcategories && cat.subcategories.length) {
+      let parentP = 0, parentA = 0;
+
+      cat.subcategories.forEach(sub => {
+        const key = cat.id + '_' + sub.id;
+        const p = parseFloat(document.getElementById('p-' + key)?.value) || 0;
+        const a = parseFloat(document.getElementById('a-' + key)?.value) || 0;
+        parentP += p; parentA += a;
+        updatePill(key, p, a);
+      });
+
+      tP += parentP; tA += parentA;
+
+      const pBox = document.getElementById('p-' + cat.id);
+      const aBox = document.getElementById('a-' + cat.id);
+      if (pBox) pBox.textContent = parentP ? fmtG(parentP) : '—';
+      if (aBox) aBox.textContent = parentA ? fmtG(parentA) : '—';
+      updatePill(cat.id, parentP, parentA);
+      return;
+    }
+
+    const p = parseFloat(document.getElementById('p-' + cat.id)?.value) || 0;
+    const a = parseFloat(document.getElementById('a-' + cat.id)?.value) || 0;
+    tP += p; tA += a;
+    updatePill(cat.id, p, a);
   });
+
   document.getElementById('tot-planned').textContent = tP ? fmtG(tP) : '—';
   document.getElementById('tot-actual').textContent  = tA ? fmtG(tA) : '—';
   const diff = tA - tP;
@@ -499,12 +607,25 @@ function judge() {
   const debt   = parseFloat(document.getElementById('inp-debt').value)   || 0;
   let totalPlanned = 0, totalActual = 0;
   const catData = {};
+
   cats.forEach(cat => {
+    if (cat.subcategories && cat.subcategories.length) {
+      cat.subcategories.forEach(sub => {
+        const key = cat.id + '_' + sub.id;
+        const p = parseFloat(document.getElementById('p-' + key)?.value) || 0;
+        const a = parseFloat(document.getElementById('a-' + key)?.value) || 0;
+        catData[key] = { planned: p, actual: a, name: cat.name + ' / ' + sub.name, emoji: cat.emoji };
+        totalPlanned += p; totalActual += a;
+      });
+      return;
+    }
+
     const p = parseFloat(document.getElementById('p-' + cat.id)?.value) || 0;
     const a = parseFloat(document.getElementById('a-' + cat.id)?.value) || 0;
     catData[cat.id] = { planned: p, actual: a, name: cat.name, emoji: cat.emoji };
     totalPlanned += p; totalActual += a;
   });
+
   if (!income && !totalActual) { alert('Enter at least your income or some spending.'); return; }
   const sc = score(income, totalActual, saved, debt, totalPlanned, catData);
   const record = { key: mkKey(), month: MONTHS[curMonth], year: curYear, income, saved, debt, totalPlanned, totalActual, catData, catDefs: cats.map(c=>({...c})), score: sc, ts: Date.now() };
