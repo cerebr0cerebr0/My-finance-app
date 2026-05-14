@@ -391,6 +391,8 @@ function renderIncomeSources() {
   const entry = history.find(h => h.key === mkKey());
   const container = document.getElementById('income-sources');
 
+  if (!container) return;
+
   let total = 0;
 
   container.innerHTML = INCOME_SOURCES.map(src => {
@@ -414,8 +416,6 @@ function renderIncomeSources() {
   }).join('');
 
   document.getElementById('total-income-display').textContent = fmtG(total);
-  updateDashboard();
-  updateDashboard();
 }
 
 function updateIncomeTotal() {
@@ -426,7 +426,10 @@ function updateIncomeTotal() {
   });
 
   document.getElementById('total-income-display').textContent = fmtG(total);
-  updateDashboard();
+
+  if (typeof updateDashboard === 'function') {
+    updateDashboard();
+  }
 }
 
 
@@ -1135,8 +1138,14 @@ function updateDashboard() {
 
 
 // INIT
-renderRows();
+loadMonth();
 renderHistory();
+setTimeout(() => {
+  renderIncomeSources();
+  renderRows();
+  updateIncomeTotal();
+  updateDashboard();
+}, 50);
 </script>
 </body>
 </html>
