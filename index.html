@@ -137,7 +137,7 @@ body{font-family:var(--f);background:var(--bg);color:var(--text);min-height:100v
       <div class="card">
         <div class="label">🏦 Calculated Monthly Savings</div>
         <div class="input" id="monthly-savings-display">GH₵0</div>
-        <div class="sub">Income − Actual Spending − Debt</div>
+        <div class="sub">Savings Category + Positive Budget Difference</div>
       </div>
       <div class="card">
         <div class="label">💰 Total Savings Balance</div>
@@ -292,7 +292,23 @@ function collectCategories(){
   return {data,planned,actual,kept,count};
 }
 
-function monthlySavings(income,actual,debt){return Math.max(0,income-actual-debt)}
+function getSavingsCategoryAmount(categoriesData){
+  if(!categoriesData) return 0;
+
+  const entry = Object.values(categoriesData).find(c =>
+    (c.name || '').trim().toLowerCase() === 'savings'
+  );
+
+  return entry ? (parseFloat(entry.actual)||0) : 0;
+}
+
+function monthlySavings(income,actual,debt){
+  const cats = collectCategories();
+  const totalDiff = Math.max(0, cats.planned - cats.actual);
+  const savingsCategory = getSavingsCategoryAmount(cats.data);
+
+  return Math.max(0, savingsCategory + totalDiff);
+}
 function totalSavingsBalance(){
   const seen=new Set();
   return history.reduce((sum,h)=>{
@@ -401,7 +417,7 @@ function renderVerdict(entry){
   const grade=document.getElementById('verdict-grade'),msg=document.getElementById('verdict-msg');
   grade.textContent=entry.grade||'—';
   grade.style.color=entry.grade==='A+'||entry.grade==='A'?'var(--green)':entry.grade==='B+'||entry.grade==='B'?'var(--blue)':entry.grade==='C'?'var(--amber)':'var(--red)';
-  msg.innerHTML=`<strong>${entry.title||''}</strong><br>${entry.msg||'Enter your data and judge the month.'}<br><br>Savings rate: <strong>${entry.savingsRate??0}%</strong>. Monthly savings: <strong>${fmt(monthlySavings(entry.totalIncome,entry.totalActual,entry.debt||0))}</strong>.`;
+  msg.innerHTML=`<strong>${entry.title||''}</strong><br>${entry.msg||'Enter your data and judge the month.'}<br><br>Savings rate: <strong>${entry.savingsRate??0}%</strong>.<br>Calculated Monthly Savings: <strong>${fmt(monthlySavings(entry.totalIncome,entry.totalActual,entry.debt||0))}</strong>.<br><span style='color:var(--muted)'>Formula: Savings category + positive budget difference.</span>`;
 }
 
 function renderHistory(){
