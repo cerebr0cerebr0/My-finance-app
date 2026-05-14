@@ -246,19 +246,16 @@ body{font-family:var(--f);background:var(--bg);color:var(--text);min-height:100v
     <div class="wealth-score" id="wealth-score" style="color:var(--green)">—</div>
     <div class="wealth-desc">How much your behavior builds long-term wealth</div>
   </div>
-
   <div class="wealth-card">
     <div class="wealth-title">Freedom Score</div>
     <div class="wealth-score" id="freedom-score" style="color:var(--blue)">—</div>
     <div class="wealth-desc">Dependence on one income source</div>
   </div>
-
   <div class="wealth-card">
     <div class="wealth-title">Growth Score</div>
     <div class="wealth-score" id="growth-score" style="color:var(--amber)">—</div>
     <div class="wealth-desc">Income expansion & future trajectory</div>
   </div>
-
   <div class="wealth-card">
     <div class="wealth-title">Lifestyle Risk</div>
     <div class="wealth-score" id="risk-score" style="color:var(--red)">—</div>
@@ -267,7 +264,7 @@ body{font-family:var(--f);background:var(--bg);color:var(--text);min-height:100v
 </div>
 
 <div class="wealth-insight" id="wealth-insight">
-  <strong>Wealth Intelligence:</strong> The app will analyze whether your behavior is helping you become richer or simply survive better.
+  <strong>Wealth Intelligence:</strong> Add your income and spending to see whether your decisions are moving you toward wealth.
 </div>
 
 <div class="quick-warning" id="dash-warning">
@@ -326,7 +323,6 @@ body{font-family:var(--f);background:var(--bg);color:var(--text);min-height:100v
   <textarea id="monthly-comments"
     style="width:100%;min-height:120px;background:none;border:none;outline:none;color:var(--text);font-family:var(--f);font-size:14px;resize:vertical"
     placeholder="What happened this month? Why did you overspend? Any major event, emergency or achievement?" oninput="saveCurrentMonthDraft()"></textarea>
-  <button class="add-btn" style="margin-top:12px" onclick="saveCurrentMonthDraft()">💾 Save Now</button>
 </div>
 
 </div>
@@ -433,8 +429,6 @@ function renderIncomeSources() {
   const entry = history.find(h => h.key === mkKey());
   const container = document.getElementById('income-sources');
 
-  if (!container) return;
-
   let total = 0;
 
   container.innerHTML = INCOME_SOURCES.map(src => {
@@ -458,6 +452,8 @@ function renderIncomeSources() {
   }).join('');
 
   document.getElementById('total-income-display').textContent = fmtG(total);
+  updateDashboard();
+  updateDashboard();
 }
 
 function updateIncomeTotal() {
@@ -468,12 +464,7 @@ function updateIncomeTotal() {
   });
 
   document.getElementById('total-income-display').textContent = fmtG(total);
-
-  if (typeof updateDashboard === 'function') {
-    updateDashboard();
-  }
-
-  calculateWealthMetrics();
+  updateDashboard();
 }
 
 
@@ -512,7 +503,7 @@ let history = [];
 let openPicker = null;
 
 // STORAGE
-const S_HIS = 'wis_h', S_CATS = 'wis_c', S_VER = 'wis_v', VER = 'v8-dashboard-income-housing';
+const S_HIS = 'wis_h', S_CATS = 'wis_c', S_VER = 'v9-wealth-fixed-housing';
 function loadStorage() {
   try {
     history = JSON.parse(localStorage.getItem(S_HIS) || '[]');
@@ -1201,7 +1192,6 @@ function saveCurrentMonthDraft() {
 
 // WEALTH INTELLIGENCE ENGINE
 function calculateWealthMetrics() {
-
   let income = 0;
   const incomes = [];
 
@@ -1216,7 +1206,6 @@ function calculateWealthMetrics() {
   let shows = 0;
 
   cats.forEach(cat => {
-
     if (cat.subcategories && cat.subcategories.length) {
       cat.subcategories.forEach(sub => {
         actual += parseFloat(document.getElementById('a-' + cat.id + '_' + sub.id)?.value) || 0;
@@ -1233,36 +1222,35 @@ function calculateWealthMetrics() {
 
   const saved = parseFloat(document.getElementById('inp-saved')?.value) || 0;
 
-  if (!income) return;
+  if (!income) {
+    ['wealth-score','freedom-score','growth-score','risk-score'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = '—';
+    });
+    return;
+  }
 
-  // Wealth score
   let wealth = 50;
+  const savingsPotentialRate = ((income - actual) / income) * 100;
 
-  const savingsRate = ((income - actual) / income) * 100;
-
-  if (savingsRate >= 40) wealth += 35;
-  else if (savingsRate >= 25) wealth += 25;
-  else if (savingsRate >= 15) wealth += 10;
+  if (savingsPotentialRate >= 40) wealth += 35;
+  else if (savingsPotentialRate >= 25) wealth += 25;
+  else if (savingsPotentialRate >= 15) wealth += 10;
   else wealth -= 15;
 
   if (saved > 0) wealth += 10;
-
   if ((food + shows) / income > 0.35) wealth -= 15;
-
   wealth = Math.max(0, Math.min(100, Math.round(wealth)));
 
-  // Freedom score
   const largestIncome = Math.max(...incomes, 0);
   const dependency = income ? largestIncome / income : 1;
-  const freedom = Math.round((1 - dependency) * 100);
+  const freedom = Math.max(0, Math.round((1 - dependency) * 100));
 
-  // Growth score
   let growth = 40;
   if (incomes.filter(v => v > 0).length >= 3) growth += 30;
   if (saved > income * 0.2) growth += 20;
   growth = Math.min(100, growth);
 
-  // Risk score
   let risk = 20;
   if (food / income > 0.2) risk += 20;
   if (shows / income > 0.1) risk += 20;
@@ -1275,14 +1263,13 @@ function calculateWealthMetrics() {
   document.getElementById('risk-score').textContent = risk;
 
   const insight = document.getElementById('wealth-insight');
+  if (!insight) return;
 
   if (wealth >= 80) {
     insight.innerHTML = '<strong>Wealth Intelligence:</strong> Your current financial behavior resembles wealth builders rather than consumers.';
-  }
-  else if (wealth >= 60) {
-    insight.innerHTML = '<strong>Wealth Intelligence:</strong> You are financially disciplined, but your system still needs stronger wealth acceleration.';
-  }
-  else {
+  } else if (wealth >= 60) {
+    insight.innerHTML = '<strong>Wealth Intelligence:</strong> You are disciplined, but your system still needs stronger wealth acceleration.';
+  } else {
     insight.innerHTML = '<strong>Wealth Intelligence:</strong> Your current structure is helping you survive, not become wealthy. Consumption is limiting long-term growth.';
   }
 }
@@ -1341,20 +1328,15 @@ function updateDashboard() {
   } else {
     warn.innerHTML = '<strong>Good:</strong> your dashboard is balanced so far. Open the details or run the verdict.';
   }
+  calculateWealthMetrics();
 }
 
 
 window.addEventListener('beforeunload', saveCurrentMonthDraft);
 
 // INIT
-loadMonth();
+renderRows();
 renderHistory();
-setTimeout(() => {
-  renderIncomeSources();
-  renderRows();
-  updateIncomeTotal();
-  updateDashboard();
-}, 50);
 </script>
 </body>
 </html>
