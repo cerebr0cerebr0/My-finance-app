@@ -83,13 +83,6 @@ body{font-family:var(--f);background:var(--bg);color:var(--text);min-height:100v
 .xbtn:hover{color:var(--red);border-color:var(--red);background:rgba(255,59,59,.08)}
 .xbtn:disabled{opacity:.2;pointer-events:none}
 
-.cat-row.parent-row .cname{background:linear-gradient(180deg,var(--card2),var(--card));border-color:rgba(0,255,136,.18)}
-.sub-row{margin-left:18px}
-.sub-row .cname{background:#0d0d10;border-color:var(--dim)}
-.subname{font-size:12px;color:var(--muted);font-weight:600}
-.parent-title{display:flex;align-items:center;gap:8px}
-.parent-meta{font-size:11px;color:var(--muted);margin-top:2px}
-
 /* TOTALS */
 .totals{display:grid;grid-template-columns:1fr 105px 105px 72px 34px;gap:8px;align-items:center;border-top:1px solid var(--border);padding-top:12px;margin-top:4px}
 @media(max-width:480px){.totals{grid-template-columns:1fr 82px 82px 58px 28px}}
@@ -170,6 +163,23 @@ body{font-family:var(--f);background:var(--bg);color:var(--text);min-height:100v
 @keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
 .pop{animation:pop .4s ease forwards}
 .up{animation:up .35s ease forwards}
+
+/* DASHBOARD + SECTIONS */
+.dashboard{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:24px}
+@media(max-width:760px){.dashboard{grid-template-columns:repeat(2,1fr)}}
+.dash-card{background:var(--card);border:1.5px solid var(--border);border-radius:18px;padding:18px}
+.dash-lbl{font-size:10px;letter-spacing:1.6px;color:var(--muted);text-transform:uppercase;margin-bottom:8px}
+.dash-val{font-family:var(--d);font-size:34px;letter-spacing:1px}
+.dash-sub{font-size:11px;color:var(--muted);margin-top:5px;line-height:1.5}
+.section-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:20px}
+@media(max-width:640px){.section-tabs{grid-template-columns:repeat(2,1fr)}}
+.tab-btn{border:1.5px solid var(--border);background:var(--card);color:var(--text);border-radius:14px;padding:14px 10px;font-family:var(--f);font-size:13px;font-weight:700;cursor:pointer;transition:.2s}
+.tab-btn:hover,.tab-btn.active{border-color:var(--green);background:rgba(0,255,136,.06);color:var(--green)}
+.app-section{display:none}
+.app-section.show{display:block}
+.quick-warning{margin-top:14px;background:rgba(255,170,0,.06);border:1px solid rgba(255,170,0,.18);border-radius:14px;padding:14px;font-size:13px;color:var(--muted);line-height:1.6}
+.quick-warning strong{color:var(--text)}
+
 </style>
 </head>
 <body>
@@ -177,8 +187,8 @@ body{font-family:var(--f);background:var(--bg);color:var(--text);min-height:100v
 <div class="hdr">
   <div class="hdr-eye">Monthly Finance Verdict</div>
   <div class="hdr-title">WAS I<br><em>STUPID?</em></div>
-  <div class="hdr-sub">Plan your spending. Track what actually happened.<br>Get an honest verdict — no excuses.</div>
-  <div class="hdr-note">🏠 Housing includes: Maintenance Fee + Gas + Light + Generator + Trash + Internet + Washing Soap</div>
+  <div class="hdr-sub">Plan your spending. Track what actually happened.<br>Get an honest verdict — and find out if your budget even makes sense financially.</div>
+  <div class="hdr-note">🏠 Housing = Maintenance + Gas + Light + Generator + Trash + Internet + Washing Soap</div>
 </div>
 
 <div class="month-nav">
@@ -189,26 +199,94 @@ body{font-family:var(--f);background:var(--bg);color:var(--text);min-height:100v
 
 <div class="wrap">
 
-  <!-- TOP INPUTS -->
-  <div class="top-grid">
-    <div class="icard">
-      <div class="icard-label">💼 Income</div>
-      <input class="icard-input" id="inp-income" type="number" placeholder="0" min="0">
-      <div class="icard-sub">GH₵ earned</div>
+  <!-- DASHBOARD -->
+  <div class="dashboard">
+    <div class="dash-card">
+      <div class="dash-lbl">Total Income</div>
+      <div class="dash-val" id="dash-income" style="color:var(--green)">GH₵0</div>
+      <div class="dash-sub">All income sources combined</div>
     </div>
-    <div class="icard">
-      <div class="icard-label">🏦 Saved</div>
-      <input class="icard-input" id="inp-saved" type="number" placeholder="0" min="0">
-      <div class="icard-sub">GH₵ put aside</div>
+    <div class="dash-card">
+      <div class="dash-lbl">Planned Budget</div>
+      <div class="dash-val" id="dash-planned" style="color:var(--amber)">GH₵0</div>
+      <div class="dash-sub">What you planned to spend</div>
     </div>
-    <div class="icard">
-      <div class="icard-label">💳 Debt Payments</div>
-      <input class="icard-input" id="inp-debt" type="number" placeholder="0" min="0">
-      <div class="icard-sub">GH₵ to loans</div>
+    <div class="dash-card">
+      <div class="dash-lbl">Actual Spend</div>
+      <div class="dash-val" id="dash-actual" style="color:var(--blue)">GH₵0</div>
+      <div class="dash-sub">What actually happened</div>
+    </div>
+    <div class="dash-card">
+      <div class="dash-lbl">Savings Rate</div>
+      <div class="dash-val" id="dash-srate">—</div>
+      <div class="dash-sub">Based on actual spending</div>
     </div>
   </div>
 
+  <div class="quick-warning" id="dash-warning">
+    <strong>Dashboard view:</strong> enter your details below, then use “Judge Me” to generate the full financial verdict.
+  </div>
+
+  <!-- NAVIGATION BUTTONS -->
+  <div class="section-tabs">
+    <button class="tab-btn active" onclick="showSection('income', this)">💼 Income</button>
+    <button class="tab-btn" onclick="showSection('budget', this)">📊 Budget</button>
+    <button class="tab-btn" onclick="showSection('comments', this)">📝 Comments</button>
+    <button class="tab-btn" onclick="showSection('verdictSec', this)">⚖️ Verdict</button>
+    <button class="tab-btn" onclick="showSection('historySec', this)">🕒 History</button>
+    <button class="tab-btn" onclick="showAllSections(this)">👁 Show All</button>
+  </div>
+
+  <div id="income" class="app-section show">
+
+  
+<!-- TOP INPUTS -->
+
+<div class="sec-title" style="margin-top:24px">
+  <div class="sec-label">Income Sources</div>
+</div>
+
+<div id="income-sources" class="top-grid"></div>
+
+<div class="totals" style="margin-top:10px">
+  <div class="tlabel">Total Income</div>
+  <div class="tval" id="total-income-display" style="color:var(--green)">GH₵0</div>
+  <div></div>
+  <div></div>
+  <div></div>
+</div>
+
+<div class="sec-title">
+  <div class="sec-label">Savings, Debt & Notes</div>
+</div>
+
+<div class="top-grid" style="grid-template-columns:1fr 1fr;">
+  <div class="icard">
+    <div class="icard-label">🏦 Saved</div>
+    <input class="icard-input" id="inp-saved" type="number" placeholder="0" min="0" oninput="updateDashboard()">
+    <div class="icard-sub">GH₵ put aside</div>
+  </div>
+
+  <div class="icard">
+    <div class="icard-label">💳 Debt Payments</div>
+    <input class="icard-input" id="inp-debt" type="number" placeholder="0" min="0" oninput="updateDashboard()">
+    <div class="icard-sub">GH₵ to loans</div>
+  </div>
+</div>
+
+<div class="icard" style="margin-top:14px">
+  <div class="icard-label">📝 Monthly Comments</div>
+  <textarea id="monthly-comments"
+    style="width:100%;min-height:120px;background:none;border:none;outline:none;color:var(--text);font-family:var(--f);font-size:14px;resize:vertical"
+    placeholder="What happened this month? Why did you overspend? Any major event, emergency or achievement?"></textarea>
+</div>
+
+</div>
+
+  <div id="budget" class="app-section">
+
   <!-- CATEGORIES -->
+
   <div class="sec-title">
     <div class="sec-label">Spending by Category</div>
     <button class="add-btn" onclick="addCat()">＋ Add Category</button>
@@ -232,10 +310,20 @@ body{font-family:var(--f);background:var(--bg);color:var(--text);min-height:100v
     <div></div>
   </div>
 
+  </div>
+
+  <div id="comments" class="app-section">
+
+
+
   <!-- JUDGE -->
   <div class="judge-wrap">
     <button class="judge-btn" onclick="judge()">JUDGE ME</button>
   </div>
+
+  </div>
+
+  <div id="verdictSec" class="app-section">
 
   <!-- VERDICT -->
   <div class="verdict" id="verdict">
@@ -264,6 +352,10 @@ body{font-family:var(--f);background:var(--bg);color:var(--text);min-height:100v
     <div class="insights up" id="insights"></div>
   </div>
 
+  </div>
+
+  <div id="historySec" class="app-section">
+
   <!-- HISTORY -->
   <div class="hist">
     <div class="hist-lbl">Past Verdicts</div>
@@ -271,39 +363,80 @@ body{font-family:var(--f);background:var(--bg);color:var(--text);min-height:100v
     <button class="clear-all" onclick="clearAll()">Clear all data</button>
   </div>
 
+</div>
+
 </div><!-- /wrap -->
 
 <script>
 const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
 const MS=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
 const EMOJIS=['🏠','💍','🍔','🏋️','🚌','🙏','📱','💈','👨‍👩‍👧','💊','🎬','☕','🛍','✈️','🎮','👔','💅','🎁','🛒','🍕','📚','🔧','💰','🎵','🏖','🐾','🧴','🍺','💡','🎯'];
+const INCOME_SOURCES = [
+  {id:'salary', name:'Salary'},
+  {id:'training', name:'Training'},
+  {id:'consulting', name:'Consulting'},
+  {id:'bonus', name:'Bonus'},
+  {id:'gift', name:'Gift'},
+  {id:'business', name:'Business'},
+  {id:'other', name:'Other'}
+];
+
+function renderIncomeSources() {
+  const entry = history.find(h => h.key === mkKey());
+  const container = document.getElementById('income-sources');
+
+  let total = 0;
+
+  container.innerHTML = INCOME_SOURCES.map(src => {
+    const val = entry?.incomeSources?.[src.id] || 0;
+    total += val;
+
+    return `
+      <div class="icard">
+        <div class="icard-label">💼 ${src.name}</div>
+        <input
+          class="icard-input income-input"
+          data-income="${src.id}"
+          type="number"
+          value="${val || ''}"
+          placeholder="0"
+          min="0"
+          oninput="updateIncomeTotal()">
+        <div class="icard-sub">GH₵ ${src.name.toLowerCase()} income</div>
+      </div>
+    `;
+  }).join('');
+
+  document.getElementById('total-income-display').textContent = fmtG(total);
+  updateDashboard();
+  updateDashboard();
+}
+
+function updateIncomeTotal() {
+  let total = 0;
+
+  document.querySelectorAll('.income-input').forEach(inp => {
+    total += parseFloat(inp.value) || 0;
+  });
+
+  document.getElementById('total-income-display').textContent = fmtG(total);
+  updateDashboard();
+}
+
 
 // YOUR PERSONAL CATEGORIES — edit these anytime
 const MY_CATS = [
-  {
-    id:'housing',
-    name:'Housing',
-    emoji:'🏠',
-    subcategories:[
-      {id:'maintenance', name:'Maintenance Fee'},
-      {id:'gas',         name:'Gas'},
-      {id:'light',       name:'Light'},
-      {id:'generator',   name:'Generator'},
-      {id:'trash',       name:'Trash'},
-      {id:'internet',    name:'Internet'},
-      {id:'soap',        name:'Washing Soap'}
-    ]
-  },
-  {id:'fiancee',   name:'Fiancée',                  emoji:'💍'},
-  {id:'food',      name:'Food',                     emoji:'🍔'},
-  {id:'gym',       name:'Gym',                      emoji:'🏋️'},
-  {id:'transport', name:'Transport',                emoji:'🚌'},
-  {id:'tithes',    name:'Tithes',                   emoji:'🙏'},
-  {id:'data',      name:'Personal Data & Airtime',  emoji:'📱'},
-  {id:'haircut',   name:'Haircut',                  emoji:'💈'},
-  {id:'family',    name:'Daughter & Mum',           emoji:'👨‍👩‍👧'},
-  {id:'medical',   name:'Medical',                  emoji:'💊'},
-  {id:'shows',     name:'Shows',                    emoji:'🎬'}
+  {id:'housing',   name:'Housing',         emoji:'🏠'},
+  {id:'fiancee',   name:'Fiancée',          emoji:'💍'},
+  {id:'food',      name:'Food',             emoji:'🍔'},
+  {id:'gym',       name:'Gym',              emoji:'🏋️'},
+  {id:'transport', name:'Transport',        emoji:'🚌'},
+  {id:'tithes',    name:'Tithes',           emoji:'🙏'},
+  {id:'data',      name:'Data & Airtime',   emoji:'📱'},
+  {id:'haircut',   name:'Haircut',          emoji:'💈'},
+  {id:'family',    name:'Daughter & Mum',   emoji:'👨‍👩‍👧'},
+  {id:'medical',   name:'Medical',          emoji:'💊'},
+  {id:'shows',     name:'Shows',            emoji:'🎬'},
 ];
 
 let curYear = new Date().getFullYear();
@@ -313,7 +446,7 @@ let history = [];
 let openPicker = null;
 
 // STORAGE
-const S_HIS = 'wis_h', S_CATS = 'wis_c', S_VER = 'wis_v', VER = 'v6';
+const S_HIS = 'wis_h', S_CATS = 'wis_c', S_VER = 'wis_v', VER = 'v5';
 function loadStorage() {
   try {
     history = JSON.parse(localStorage.getItem(S_HIS) || '[]');
@@ -354,67 +487,6 @@ function renderRows() {
   container.innerHTML = '';
 
   cats.forEach(cat => {
-    if (cat.subcategories && cat.subcategories.length) {
-      let parentPlanned = 0;
-      let parentActual = 0;
-
-      cat.subcategories.forEach(sub => {
-        const key = cat.id + '_' + sub.id;
-        const saved = entry && entry.catData && entry.catData[key];
-        parentPlanned += saved ? (saved.planned || 0) : 0;
-        parentActual  += saved ? (saved.actual  || 0) : 0;
-      });
-
-      const parentRow = document.createElement('div');
-      parentRow.className = 'cat-row parent-row';
-      parentRow.id = 'row-' + cat.id;
-      parentRow.innerHTML = `
-        <div class="cname">
-          <div>
-            <div class="parent-title"><span style="font-size:18px">${cat.emoji}</span><strong>${cat.name}</strong></div>
-            <div class="parent-meta">${cat.subcategories.length} sub-categories</div>
-          </div>
-        </div>
-        <div class="cnum">
-          <div class="cnum-lbl" style="color:var(--amber)">Total Planned</div>
-          <div class="cnum-inp" id="p-${cat.id}" style="padding-top:2px">${parentPlanned ? fmtG(parentPlanned) : '—'}</div>
-        </div>
-        <div class="cnum actual">
-          <div class="cnum-lbl" style="color:var(--blue)">Total Actual</div>
-          <div class="cnum-inp" id="a-${cat.id}" style="padding-top:2px">${parentActual ? fmtG(parentActual) : '—'}</div>
-        </div>
-        <div class="vpill none" id="vp-${cat.id}">—</div>
-        <div></div>`;
-      container.appendChild(parentRow);
-
-      cat.subcategories.forEach(sub => {
-        const key = cat.id + '_' + sub.id;
-        const saved = entry && entry.catData && entry.catData[key];
-        const planned = saved ? (saved.planned || 0) : 0;
-        const actual  = saved ? (saved.actual  || 0) : 0;
-
-        const row = document.createElement('div');
-        row.className = 'cat-row sub-row';
-        row.id = 'row-' + key;
-        row.innerHTML = `
-          <div class="cname">
-            <div class="subname">└ ${sub.name}</div>
-          </div>
-          <div class="cnum">
-            <div class="cnum-lbl" style="color:var(--amber)">Planned</div>
-            <input class="cnum-inp" id="p-${key}" type="number" placeholder="0" min="0" value="${planned||''}" oninput="recalc()">
-          </div>
-          <div class="cnum actual">
-            <div class="cnum-lbl" style="color:var(--blue)">Actual</div>
-            <input class="cnum-inp" id="a-${key}" type="number" placeholder="0" min="0" value="${actual||''}" oninput="recalc()">
-          </div>
-          <div class="vpill none" id="vp-${key}">—</div>
-          <div></div>`;
-        container.appendChild(row);
-      });
-      return;
-    }
-
     const saved = entry && entry.catData && entry.catData[cat.id];
     const planned = saved ? (saved.planned || 0) : 0;
     const actual  = saved ? (saved.actual  || 0) : 0;
@@ -447,9 +519,11 @@ function renderRows() {
 // RECALC VARIANCE + TOTALS
 function recalc() {
   let tP = 0, tA = 0;
-
-  function updatePill(id, p, a) {
-    const pill = document.getElementById('vp-' + id);
+  cats.forEach(cat => {
+    const p = parseFloat(document.getElementById('p-' + cat.id)?.value) || 0;
+    const a = parseFloat(document.getElementById('a-' + cat.id)?.value) || 0;
+    tP += p; tA += a;
+    const pill = document.getElementById('vp-' + cat.id);
     if (!pill) return;
     if (!p && !a) { pill.className = 'vpill none'; pill.textContent = '—'; return; }
     if (!p)       { pill.className = 'vpill none'; pill.textContent = 'no plan'; return; }
@@ -457,36 +531,7 @@ function recalc() {
     if (Math.abs(d) < 1) { pill.className = 'vpill even'; pill.textContent = '✓ on'; return; }
     pill.className = 'vpill ' + (d > 0 ? 'over' : 'under');
     pill.textContent = (d > 0 ? '+' : '') + fmtK(d);
-  }
-
-  cats.forEach(cat => {
-    if (cat.subcategories && cat.subcategories.length) {
-      let parentP = 0, parentA = 0;
-
-      cat.subcategories.forEach(sub => {
-        const key = cat.id + '_' + sub.id;
-        const p = parseFloat(document.getElementById('p-' + key)?.value) || 0;
-        const a = parseFloat(document.getElementById('a-' + key)?.value) || 0;
-        parentP += p; parentA += a;
-        updatePill(key, p, a);
-      });
-
-      tP += parentP; tA += parentA;
-
-      const pBox = document.getElementById('p-' + cat.id);
-      const aBox = document.getElementById('a-' + cat.id);
-      if (pBox) pBox.textContent = parentP ? fmtG(parentP) : '—';
-      if (aBox) aBox.textContent = parentA ? fmtG(parentA) : '—';
-      updatePill(cat.id, parentP, parentA);
-      return;
-    }
-
-    const p = parseFloat(document.getElementById('p-' + cat.id)?.value) || 0;
-    const a = parseFloat(document.getElementById('a-' + cat.id)?.value) || 0;
-    tP += p; tA += a;
-    updatePill(cat.id, p, a);
   });
-
   document.getElementById('tot-planned').textContent = tP ? fmtG(tP) : '—';
   document.getElementById('tot-actual').textContent  = tA ? fmtG(tA) : '—';
   const diff = tA - tP;
@@ -494,6 +539,7 @@ function recalc() {
   if (!tP && !tA) { el.textContent = '—'; el.style.color = 'var(--muted)'; }
   else if (!tP)   { el.textContent = '—'; el.style.color = 'var(--muted)'; }
   else { el.textContent = (diff > 0 ? '+' : '') + fmtK(diff); el.style.color = diff > 0 ? 'var(--red)' : diff < 0 ? 'var(--green)' : 'var(--muted)'; }
+  updateDashboard();
 }
 
 // CAT OPERATIONS
@@ -501,7 +547,8 @@ function addCat() {
   const id = 'c' + Date.now();
   const emoji = EMOJIS[Math.floor(Math.random() * EMOJIS.length)];
   cats.push({ id, name: 'New Category', emoji });
-  saveStorage(); renderRows();
+  saveStorage(); renderIncomeSources();
+renderRows();
   setTimeout(() => { const el = document.querySelector('#row-' + id + ' .cname-inp'); if (el) { el.focus(); el.select(); } }, 60);
 }
 function delCat(id) {
@@ -544,9 +591,10 @@ document.addEventListener('click', () => {
 // LOAD MONTH DATA INTO INPUTS
 function loadMonth() {
   const entry = history.find(h => h.key === mkKey());
-  document.getElementById('inp-income').value = entry ? entry.income || '' : '';
+  renderIncomeSources();
   document.getElementById('inp-saved').value  = entry ? entry.saved  || '' : '';
   document.getElementById('inp-debt').value   = entry ? entry.debt   || '' : '';
+  document.getElementById('monthly-comments').value = entry ? entry.comments || '' : '';
   if (entry && entry.catDefs) cats = entry.catDefs.map(c => ({...c}));
   renderRows();
   if (entry) { renderVerdict(entry); document.getElementById('verdict').classList.add('show'); }
@@ -600,41 +648,167 @@ function score(income, totalActual, saved, debt, totalPlanned, catData) {
   return Math.max(0, Math.min(100, Math.round(s)));
 }
 
+
+// =========================
+// FINANCIAL INTELLIGENCE
+// =========================
+const FINANCIAL_RULES = {
+  housing: 35,
+  food: 15,
+  transport: 10,
+  shows: 10,
+  savings: 20,
+  debt: 30
+};
+
+function analyzeBudgetStructure(income, saved, debt, catData) {
+
+  if (!income) return [];
+
+  const insights = [];
+
+  const percent = v => Math.round((v / income) * 100);
+
+  // HOUSING
+  const housingKeys = Object.keys(catData).filter(k => k.includes('housing'));
+  const housingTotal = housingKeys.reduce((s,k)=>s+(catData[k].planned||0),0);
+
+  if (housingTotal > 0) {
+    const hp = percent(housingTotal);
+
+    if (hp > 45) {
+      insights.push({
+        level:'bad',
+        icon:'🔴',
+        text:`Housing consumes ${hp}% of your income. This is financially dangerous and leaves little room for savings or emergencies.`
+      });
+    }
+    else if (hp > 35) {
+      insights.push({
+        level:'warn',
+        icon:'⚠️',
+        text:`Housing is ${hp}% of your income. Recommended maximum is 35%.`
+      });
+    }
+    else {
+      insights.push({
+        level:'good',
+        icon:'🏠',
+        text:`Housing allocation (${hp}%) is within a healthy financial range.`
+      });
+    }
+  }
+
+  // FOOD
+  const food = catData['food']?.planned || 0;
+  if (food) {
+    const fp = percent(food);
+
+    if (fp > 20) {
+      insights.push({
+        level:'warn',
+        icon:'🍔',
+        text:`Food spending is ${fp}% of your income. You may be overspending on lifestyle consumption.`
+      });
+    }
+  }
+
+  // ENTERTAINMENT
+  const shows = catData['shows']?.planned || 0;
+  if (shows) {
+    const sp = percent(shows);
+
+    if (sp > 10) {
+      insights.push({
+        level:'bad',
+        icon:'🎬',
+        text:`Entertainment exceeds 10% of income. This may slow wealth building significantly over time.`
+      });
+    }
+  }
+
+  // SAVINGS
+  const savingsRate = percent(saved);
+
+  if (saved === 0) {
+    insights.push({
+      level:'bad',
+      icon:'💸',
+      text:`Your budget does not prioritize savings. You are one emergency away from financial instability.`
+    });
+  }
+  else if (savingsRate < 10) {
+    insights.push({
+      level:'warn',
+      icon:'🟡',
+      text:`Savings rate is only ${savingsRate}%. Long-term wealth accumulation will be slow at this pace.`
+    });
+  }
+  else if (savingsRate >= 20) {
+    insights.push({
+      level:'good',
+      icon:'🟢',
+      text:`Savings rate of ${savingsRate}% is strong. Your budget supports future financial growth.`
+    });
+  }
+
+  // DEBT
+  if (debt > 0) {
+    const dp = percent(debt);
+
+    if (dp > 40) {
+      insights.push({
+        level:'bad',
+        icon:'⛓️',
+        text:`Debt payments consume ${dp}% of your income. Your financial flexibility is critically reduced.`
+      });
+    }
+    else if (dp > 25) {
+      insights.push({
+        level:'warn',
+        icon:'⚠️',
+        text:`Debt payments are relatively high (${dp}% of income).`
+      });
+    }
+  }
+
+  return insights;
+}
+
+
 // JUDGE
 function judge() {
-  const income = parseFloat(document.getElementById('inp-income').value) || 0;
+
+  const incomeSources = {};
+  let income = 0;
+
+  document.querySelectorAll('.income-input').forEach(inp => {
+    const val = parseFloat(inp.value) || 0;
+    incomeSources[inp.dataset.income] = val;
+    income += val;
+  });
+
   const saved  = parseFloat(document.getElementById('inp-saved').value)  || 0;
   const debt   = parseFloat(document.getElementById('inp-debt').value)   || 0;
+  const comments = document.getElementById('monthly-comments').value || '';
   let totalPlanned = 0, totalActual = 0;
   const catData = {};
-
   cats.forEach(cat => {
-    if (cat.subcategories && cat.subcategories.length) {
-      cat.subcategories.forEach(sub => {
-        const key = cat.id + '_' + sub.id;
-        const p = parseFloat(document.getElementById('p-' + key)?.value) || 0;
-        const a = parseFloat(document.getElementById('a-' + key)?.value) || 0;
-        catData[key] = { planned: p, actual: a, name: cat.name + ' / ' + sub.name, emoji: cat.emoji };
-        totalPlanned += p; totalActual += a;
-      });
-      return;
-    }
-
     const p = parseFloat(document.getElementById('p-' + cat.id)?.value) || 0;
     const a = parseFloat(document.getElementById('a-' + cat.id)?.value) || 0;
     catData[cat.id] = { planned: p, actual: a, name: cat.name, emoji: cat.emoji };
     totalPlanned += p; totalActual += a;
   });
-
   if (!income && !totalActual) { alert('Enter at least your income or some spending.'); return; }
   const sc = score(income, totalActual, saved, debt, totalPlanned, catData);
-  const record = { key: mkKey(), month: MONTHS[curMonth], year: curYear, income, saved, debt, totalPlanned, totalActual, catData, catDefs: cats.map(c=>({...c})), score: sc, ts: Date.now() };
+  const record = { key: mkKey(), month: MONTHS[curMonth], year: curYear, income, incomeSources, saved, debt, comments, totalPlanned, totalActual, catData, catDefs: cats.map(c=>({...c})), score: sc, ts: Date.now() };
   const idx = history.findIndex(h => h.key === record.key);
   if (idx >= 0) history[idx] = record; else history.unshift(record);
   saveStorage(); renderVerdict(record);
   document.getElementById('verdict').classList.add('show');
   setTimeout(() => document.getElementById('verdict').scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
   renderHistory();
+updateDashboard();
 }
 
 // RENDER VERDICT
@@ -737,6 +911,16 @@ function renderVerdict(r) {
     }
   }
 
+  // FINANCIAL STRUCTURE ANALYSIS
+  const budgetInsights = analyzeBudgetStructure(r.income, r.saved, r.debt, cd);
+
+  budgetInsights.forEach(b => {
+    ins.push({
+      i:b.icon,
+      t:`<strong>Budget Structure Analysis:</strong> ${b.text}`
+    });
+  });
+
   document.getElementById('insights').innerHTML = ins.map(i => `<div class="ins"><div class="ins-ico">${i.i}</div><div class="ins-txt">${i.t}</div></div>`).join('');
 }
 
@@ -763,6 +947,63 @@ function loadEntry(key) {
 }
 function delEntry(key) { history = history.filter(h => h.key !== key); saveStorage(); renderHistory(); }
 function clearAll() { if (confirm('Delete all saved data?')) { history = []; saveStorage(); renderHistory(); document.getElementById('verdict').classList.remove('show'); } }
+
+
+// DASHBOARD + SECTION CONTROLS
+function showSection(id, btn) {
+  document.querySelectorAll('.app-section').forEach(s => s.classList.remove('show'));
+  const target = document.getElementById(id);
+  if (target) target.classList.add('show');
+
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+}
+
+function showAllSections(btn) {
+  document.querySelectorAll('.app-section').forEach(s => s.classList.add('show'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+}
+
+function updateDashboard() {
+  let income = 0;
+  document.querySelectorAll('.income-input').forEach(inp => income += parseFloat(inp.value) || 0);
+
+  let planned = 0, actual = 0;
+  cats.forEach(cat => {
+    if (cat.subcategories) {
+      cat.subcategories.forEach(sub => {
+        planned += parseFloat(document.getElementById('p-' + cat.id + '_' + sub.id)?.value) || 0;
+        actual += parseFloat(document.getElementById('a-' + cat.id + '_' + sub.id)?.value) || 0;
+      });
+    } else {
+      planned += parseFloat(document.getElementById('p-' + cat.id)?.value) || 0;
+      actual += parseFloat(document.getElementById('a-' + cat.id)?.value) || 0;
+    }
+  });
+
+  const saved = parseFloat(document.getElementById('inp-saved')?.value) || 0;
+  const srate = income > 0 ? Math.round((saved / income) * 100) : null;
+
+  document.getElementById('dash-income').textContent = fmtG(income);
+  document.getElementById('dash-planned').textContent = fmtG(planned);
+  document.getElementById('dash-actual').textContent = fmtG(actual);
+  document.getElementById('dash-srate').textContent = srate !== null ? srate + '%' : '—';
+
+  const warn = document.getElementById('dash-warning');
+  if (!warn) return;
+
+  if (!income) {
+    warn.innerHTML = '<strong>Start here:</strong> add your income sources first.';
+  } else if (saved / income < 0.1) {
+    warn.innerHTML = '<strong>Warning:</strong> your planned savings rate is below 10%. This budget may be weak financially.';
+  } else if (planned > income) {
+    warn.innerHTML = '<strong>Warning:</strong> planned budget is higher than total income.';
+  } else {
+    warn.innerHTML = '<strong>Good:</strong> your dashboard is balanced so far. Open the details or run the verdict.';
+  }
+}
+
 
 // INIT
 renderRows();
