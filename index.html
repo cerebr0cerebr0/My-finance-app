@@ -30,7 +30,7 @@ body{font-family:var(--f);background:var(--bg);color:var(--text);min-height:100v
 .dlbl{font-size:9px;letter-spacing:1.6px;color:var(--muted);text-transform:uppercase;margin-bottom:6px}
 .dval{font-family:var(--d);font-size:34px;line-height:1}
 .dsub{font-size:11px;color:var(--muted);margin-top:5px}
-.tabs{position:sticky;top:0;z-index:50;background:var(--bg);display:grid;grid-template-columns:repeat(6,1fr);gap:8px;padding:10px 0;margin-bottom:10px}
+.tabs{position:sticky;top:0;z-index:50;background:var(--bg);display:grid;grid-template-columns:repeat(7,1fr);gap:8px;padding:10px 0;margin-bottom:10px}
 @media(max-width:760px){.tabs{grid-template-columns:repeat(3,1fr)}}
 .tab{border:1px solid var(--border);background:var(--card);color:var(--text);padding:11px 8px;border-radius:12px;font-weight:800;font-size:12px;cursor:pointer}
 .tab.active,.tab:hover{border-color:var(--green);color:var(--green);background:rgba(0,255,136,.06)}
@@ -84,6 +84,21 @@ body{font-family:var(--f);background:var(--bg);color:var(--text);min-height:100v
 .behavior-warn{border-color:rgba(255,170,0,.22)}
 .behavior-bad{border-color:rgba(255,59,59,.24)}
 
+
+.wealth-engine-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px}
+@media(max-width:900px){.wealth-engine-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:620px){.wealth-engine-grid{grid-template-columns:1fr}}
+.wealth-metric{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:15px}
+.wealth-metric-title{font-size:10px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;margin-bottom:8px}
+.wealth-metric-value{font-family:var(--d);font-size:38px;line-height:1}
+.wealth-metric-status{font-size:12px;font-weight:900;margin-top:6px}
+.wealth-metric-desc{font-size:12px;color:var(--muted);line-height:1.6;margin-top:6px}
+.wealth-question{background:linear-gradient(180deg,#111119,#0b0b10);border:1px solid rgba(0,255,136,.18);border-radius:18px;padding:18px;margin-top:10px}
+.wealth-question-title{font-family:var(--d);font-size:40px;line-height:1;color:var(--green)}
+.wealth-question-text{font-size:14px;color:var(--muted);line-height:1.7;margin-top:8px}
+.asset-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:10px}
+@media(max-width:620px){.asset-grid{grid-template-columns:1fr}}
+
 </style>
 </head>
 <body>
@@ -113,6 +128,7 @@ body{font-family:var(--f);background:var(--bg);color:var(--text);min-height:100v
     <button class="tab" onclick="showSection('budget',this)">📊 Budget</button>
     <button class="tab" onclick="showSection('savings',this)">🏦 Savings</button>
     <button class="tab" onclick="showSection('behavior',this)">🧠 Behavior</button>
+    <button class="tab" onclick="showSection('wealth',this)">💰 Wealth</button>
     <button class="tab" onclick="showSection('history',this)">🕒 History</button>
     <button class="tab" onclick="showAll(this)">👁 All</button>
   </div>
@@ -187,6 +203,92 @@ body{font-family:var(--f);background:var(--bg);color:var(--text);min-height:100v
     </div>
 
     <div class="behavior-grid" id="behavior-list"></div>
+  </section>
+
+
+  <section id="wealth" class="section">
+    <div class="sec-title">
+      <div class="sec-label">Wealth Building Engine</div>
+      <button class="btn" onclick="renderWealthEngine()">Refresh Wealth Analysis</button>
+    </div>
+
+    <div class="wealth-question">
+      <div class="wealth-question-title">IS THIS MAKING YOU WEALTHIER?</div>
+      <div class="wealth-question-text" id="wealth-main-answer">
+        Judge the month first, then the app will evaluate whether your behavior is building wealth.
+      </div>
+    </div>
+
+    <div class="wealth-engine-grid">
+      <div class="wealth-metric">
+        <div class="wealth-metric-title">Investment Ratio</div>
+        <div class="wealth-metric-value" id="investment-ratio">—</div>
+        <div class="wealth-metric-status" id="investment-status">—</div>
+        <div class="wealth-metric-desc">How much of your income is directed toward assets, investments, business or wealth-building activities.</div>
+      </div>
+
+      <div class="wealth-metric">
+        <div class="wealth-metric-title">Income Diversification</div>
+        <div class="wealth-metric-value" id="diversification-score">—</div>
+        <div class="wealth-metric-status" id="diversification-status">—</div>
+        <div class="wealth-metric-desc">Measures how dependent you are on one income source.</div>
+      </div>
+
+      <div class="wealth-metric">
+        <div class="wealth-metric-title">Capital Accumulation</div>
+        <div class="wealth-metric-value" id="capital-accumulation">—</div>
+        <div class="wealth-metric-status" id="capital-status">—</div>
+        <div class="wealth-metric-desc">How much capital you are retaining this month.</div>
+      </div>
+
+      <div class="wealth-metric">
+        <div class="wealth-metric-title">Freedom Score</div>
+        <div class="wealth-metric-value" id="freedom-score">—</div>
+        <div class="wealth-metric-status" id="freedom-status">—</div>
+        <div class="wealth-metric-desc">How financially free you are from one income stream and high monthly consumption.</div>
+      </div>
+
+      <div class="wealth-metric">
+        <div class="wealth-metric-title">Emergency Runway</div>
+        <div class="wealth-metric-value" id="runway-score">—</div>
+        <div class="wealth-metric-status" id="runway-status">—</div>
+        <div class="wealth-metric-desc">How many months you could survive if income stopped.</div>
+      </div>
+
+      <div class="wealth-metric">
+        <div class="wealth-metric-title">Asset Allocation</div>
+        <div class="wealth-metric-value" id="asset-allocation">—</div>
+        <div class="wealth-metric-status" id="asset-status">—</div>
+        <div class="wealth-metric-desc">Checks whether your money is going to assets or being consumed.</div>
+      </div>
+    </div>
+
+    <div class="sec-title"><div class="sec-label">Wealth Inputs</div></div>
+    <div class="asset-grid">
+      <div class="card">
+        <div class="label">📈 Investments / Assets This Month</div>
+        <input class="input" id="wealth-investments" type="number" min="0" placeholder="0" oninput="saveWealthInputs(); renderWealthEngine()">
+        <div class="sub">Stocks, funds, crypto, land, business assets, etc.</div>
+      </div>
+      <div class="card">
+        <div class="label">🛡️ Emergency Fund Balance</div>
+        <input class="input" id="emergency-fund" type="number" min="0" placeholder="0" oninput="saveWealthInputs(); renderWealthEngine()">
+        <div class="sub">Cash reserved for emergencies only.</div>
+      </div>
+      <div class="card">
+        <div class="label">🏢 Business Reinvestment</div>
+        <input class="input" id="business-reinvestment" type="number" min="0" placeholder="0" oninput="saveWealthInputs(); renderWealthEngine()">
+        <div class="sub">Money reinvested to grow income capacity.</div>
+      </div>
+      <div class="card">
+        <div class="label">🎯 Wealth Goal</div>
+        <input class="input" id="wealth-goal" type="number" min="0" placeholder="100000" oninput="saveWealthInputs(); renderWealthEngine()">
+        <div class="sub">Target capital milestone.</div>
+      </div>
+    </div>
+
+    <div class="sec-title"><div class="sec-label">Wealth Advice</div></div>
+    <div class="behavior-grid" id="wealth-advice-list"></div>
   </section>
 
   <section id="history" class="section">
@@ -402,6 +504,7 @@ function saveDraft(){
   saveHistory();
   renderHistory();
 renderBehavior();
+renderWealthEngine();
   recalc();
 }
 
@@ -439,6 +542,7 @@ function judgeMonth(){
   renderVerdict(entry);
   renderHistory();
   renderBehavior();
+  renderWealthEngine();
   recalc();
   showSection('savings',document.querySelector('.tab:nth-child(3)'));
 }
@@ -450,6 +554,186 @@ function renderVerdict(entry){
   msg.innerHTML=`<strong>${entry.title||''}</strong><br>${entry.msg||'Enter your data and judge the month.'}<br><br>Savings rate: <strong>${entry.savingsRate??0}%</strong>.<br>Calculated Monthly Savings: <strong>${fmt(monthlySavings(entry.totalIncome,entry.totalActual,entry.debt||0))}</strong>.<br><span style='color:var(--muted)'>Formula: Savings category + positive budget difference.</span>`;
 }
 
+
+
+function wealthProfileKey(){
+  return 'wd_phase1_wealth_profile';
+}
+
+function loadWealthProfile(){
+  try{return JSON.parse(localStorage.getItem(wealthProfileKey())||'{}')}catch(e){return {}}
+}
+
+function saveWealthInputs(){
+  const p=loadWealthProfile();
+  p.investments=parseFloat(document.getElementById('wealth-investments')?.value)||0;
+  p.emergencyFund=parseFloat(document.getElementById('emergency-fund')?.value)||0;
+  p.businessReinvestment=parseFloat(document.getElementById('business-reinvestment')?.value)||0;
+  p.wealthGoal=parseFloat(document.getElementById('wealth-goal')?.value)||0;
+  localStorage.setItem(wealthProfileKey(),JSON.stringify(p));
+}
+
+function loadWealthInputs(){
+  const p=loadWealthProfile();
+  const i=document.getElementById('wealth-investments');
+  const e=document.getElementById('emergency-fund');
+  const b=document.getElementById('business-reinvestment');
+  const g=document.getElementById('wealth-goal');
+  if(i)i.value=p.investments||'';
+  if(e)e.value=p.emergencyFund||'';
+  if(b)b.value=p.businessReinvestment||'';
+  if(g)g.value=p.wealthGoal||'';
+}
+
+function setMetric(id,value,status,statusColor){
+  const v=document.getElementById(id);
+  const s=document.getElementById(id.replace(/ratio|score|accumulation|allocation/,'status'));
+  if(v)v.textContent=value;
+  if(s){s.textContent=status;s.style.color=statusColor}
+}
+
+function scoreStatus(score, reverse=false){
+  if(reverse){
+    if(score<=25)return ['Low Risk','var(--green)'];
+    if(score<=50)return ['Moderate','var(--amber)'];
+    if(score<=75)return ['High','var(--red)'];
+    return ['Dangerous','var(--red)'];
+  }
+  if(score>=80)return ['Excellent','var(--green)'];
+  if(score>=65)return ['Strong','#7dffb3'];
+  if(score>=50)return ['Average','var(--amber)'];
+  if(score>=35)return ['Weak','#ff884d'];
+  return ['Critical','var(--red)'];
+}
+
+function latestJudgedEntry(){
+  const data=history.filter(h=>h&&h.score!=null);
+  if(!data.length)return null;
+  return data.sort((a,b)=>(b.year*100+MONTHS.indexOf(b.month))-(a.year*100+MONTHS.indexOf(a.month)))[0];
+}
+
+function renderWealthEngine(){
+  loadWealthInputs();
+
+  const entry=latestJudgedEntry();
+  const advice=[];
+  const main=document.getElementById('wealth-main-answer');
+
+  if(!entry){
+    if(main)main.innerHTML='Judge at least one month first. Wealth analysis needs monthly data.';
+    return;
+  }
+
+  const p=loadWealthProfile();
+  const income=entry.totalIncome||0;
+  const actual=entry.totalActual||0;
+  const monthlySave=monthlySavings(entry.totalIncome,entry.totalActual,entry.debt||0);
+  const totalSavings=totalSavingsBalance();
+  const investments=parseFloat(p.investments)||0;
+  const emergencyFund=parseFloat(p.emergencyFund)||0;
+  const businessReinvestment=parseFloat(p.businessReinvestment)||0;
+  const wealthGoal=parseFloat(p.wealthGoal)||100000;
+
+  const wealthBuildingMoney=monthlySave+investments+businessReinvestment;
+  const investmentRatio=income?Math.round(((investments+businessReinvestment)/income)*100):0;
+  const capitalRate=income?Math.round((wealthBuildingMoney/income)*100):0;
+
+  const incomeValues=Object.values(entry.income||{}).map(v=>parseFloat(v)||0).filter(v=>v>0);
+  const largestIncome=Math.max(...incomeValues,0);
+  const incomeDependency=income?largestIncome/income:1;
+  const diversificationScore=Math.round((1-incomeDependency)*100);
+
+  const essentialMonthlySpend=actual || 1;
+  const runwayMonths=essentialMonthlySpend?emergencyFund/essentialMonthlySpend:0;
+
+  const freedomScore=Math.max(0,Math.min(100,Math.round(
+    (diversificationScore*.45)+(Math.min(runwayMonths,12)/12*35)+(Math.min(capitalRate,40)/40*20)
+  )));
+
+  const assetAllocationRate=income?Math.round(((investments+businessReinvestment+monthlySave)/income)*100):0;
+
+  const [invLabel,invColor]=scoreStatus(investmentRatio*4);
+  const [divLabel,divColor]=scoreStatus(diversificationScore);
+  const [capLabel,capColor]=scoreStatus(capitalRate*2);
+  const [freeLabel,freeColor]=scoreStatus(freedomScore);
+  const runwayLabel=runwayMonths>=6?'Strong':runwayMonths>=3?'Acceptable':runwayMonths>=1?'Weak':'Critical';
+  const runwayColor=runwayMonths>=6?'var(--green)':runwayMonths>=3?'var(--amber)':'var(--red)';
+  const assetLabel=assetAllocationRate>=35?'Wealth Builder':assetAllocationRate>=20?'Good':assetAllocationRate>=10?'Weak':'Consumption Heavy';
+  const assetColor=assetAllocationRate>=35?'var(--green)':assetAllocationRate>=20?'#7dffb3':assetAllocationRate>=10?'var(--amber)':'var(--red)';
+
+  document.getElementById('investment-ratio').textContent=investmentRatio+'%';
+  document.getElementById('investment-status').textContent=invLabel;
+  document.getElementById('investment-status').style.color=invColor;
+
+  document.getElementById('diversification-score').textContent=diversificationScore;
+  document.getElementById('diversification-status').textContent=divLabel;
+  document.getElementById('diversification-status').style.color=divColor;
+
+  document.getElementById('capital-accumulation').textContent=capitalRate+'%';
+  document.getElementById('capital-status').textContent=capLabel;
+  document.getElementById('capital-status').style.color=capColor;
+
+  document.getElementById('freedom-score').textContent=freedomScore;
+  document.getElementById('freedom-status').textContent=freeLabel;
+  document.getElementById('freedom-status').style.color=freeColor;
+
+  document.getElementById('runway-score').textContent=runwayMonths.toFixed(1)+' mo';
+  document.getElementById('runway-status').textContent=runwayLabel;
+  document.getElementById('runway-status').style.color=runwayColor;
+
+  document.getElementById('asset-allocation').textContent=assetAllocationRate+'%';
+  document.getElementById('asset-status').textContent=assetLabel;
+  document.getElementById('asset-status').style.color=assetColor;
+
+  const makingWealthier = capitalRate>=25 && freedomScore>=50 && runwayMonths>=2;
+
+  if(main){
+    main.innerHTML = makingWealthier
+      ? `Yes — this behavior is moving you toward wealth. You are retaining or allocating <strong>${capitalRate}%</strong> of income toward capital, savings or assets.`
+      : `Not enough yet. You are tracking money, but your behavior is not aggressively building wealth. Capital allocation is <strong>${capitalRate}%</strong> and freedom score is <strong>${freedomScore}</strong>.`;
+  }
+
+  function push(type,title,text){
+    const cls=type==='good'?'behavior-good':type==='bad'?'behavior-bad':'behavior-warn';
+    const icon=type==='good'?'🟢':type==='bad'?'🔴':'🟡';
+    advice.push(`<div class="behavior-card ${cls}">
+      <div class="behavior-title">${icon} ${title}</div>
+      <div class="behavior-text">${text}</div>
+    </div>`);
+  }
+
+  if(investmentRatio<10){
+    push('bad','Investment Ratio Too Low',`Only <strong>${investmentRatio}%</strong> of income is going to investments or business reinvestment. A serious wealth-building target should start around <strong>10–20%</strong>.`);
+  }else if(investmentRatio<20){
+    push('warn','Investment Ratio Improving',`You are investing/reinvesting <strong>${investmentRatio}%</strong>. Good start. Push toward <strong>20%</strong> for stronger wealth acceleration.`);
+  }else{
+    push('good','Investment Ratio Strong',`You are allocating <strong>${investmentRatio}%</strong> to investments/business reinvestment. This is wealth-building behavior.`);
+  }
+
+  if(diversificationScore<25){
+    push('bad','Income Concentration Risk',`Most of your income depends on one source. If that source stops, your financial system becomes vulnerable. Add or grow a second income stream.`);
+  }else if(diversificationScore<50){
+    push('warn','Income Diversification Moderate',`You have some diversification, but one income source still dominates. Keep growing scalable income.`);
+  }else{
+    push('good','Income Diversification Strong',`Your income is spread across multiple sources. This improves resilience and freedom.`);
+  }
+
+  if(runwayMonths<1){
+    push('bad','Emergency Runway Critical',`Your emergency fund covers less than <strong>1 month</strong> of expenses. Build this before increasing lifestyle spending.`);
+  }else if(runwayMonths<3){
+    push('warn','Emergency Runway Weak',`You can survive about <strong>${runwayMonths.toFixed(1)} months</strong>. Aim for at least <strong>3–6 months</strong>.`);
+  }else{
+    push('good','Emergency Runway Healthy',`You can survive about <strong>${runwayMonths.toFixed(1)} months</strong> without income. This gives you financial breathing room.`);
+  }
+
+  if(wealthGoal>0 && wealthBuildingMoney>0){
+    const months=Math.ceil(Math.max(0,wealthGoal-totalSavings)/wealthBuildingMoney);
+    push('warn','Capital Milestone Projection',`At the current monthly wealth-building pace of <strong>${fmt(wealthBuildingMoney)}</strong>, your <strong>${fmt(wealthGoal)}</strong> milestone could take about <strong>${months}</strong> months.`);
+  }
+
+  const list=document.getElementById('wealth-advice-list');
+  if(list)list.innerHTML=advice.join('');
+}
 
 function sumCatFromEntry(entry, nameIncludes){
   if(!entry || !entry.categories) return 0;
@@ -653,7 +937,9 @@ function showAll(btn){
 loadHistory();
 updateMonthLabel();
 loadMonth();
+loadWealthInputs();
 renderHistory();
+renderWealthEngine();
 </script>
 </body>
 </html>
