@@ -3,583 +3,648 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Was I Stupid? – Monthly Finance Verdict</title>
+<title>Was I Stupid?</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#08080a;--card:#111114;--card2:#18181c;--border:#2a2a30;
-  --text:#f0f0f5;--muted:#6b6b78;--dim:#2e2e36;
-  --green:#00ff88;--red:#ff3b3b;--amber:#ffaa00;--blue:#4488ff;--purple:#aa66ff;
-  --font:'Inter',sans-serif;--display:'Bebas Neue',sans-serif;
+  --bg:#08080a;--card:#111114;--card2:#1a1a1f;--border:#252530;
+  --text:#f0f0f5;--muted:#666672;--dim:#2a2a34;
+  --green:#00ff88;--red:#ff3b3b;--amber:#ffaa00;--blue:#4d9fff;--purple:#bb77ff;
+  --f:'Inter',sans-serif;--d:'Bebas Neue',sans-serif;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
-body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:80px}
+body{font-family:var(--f);background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:80px}
 
 /* HEADER */
-.header{padding:32px 24px 0;text-align:center}
-.header-eyebrow{font-size:11px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-bottom:10px}
-.header-title{font-family:var(--display);font-size:clamp(52px,12vw,88px);line-height:.95;letter-spacing:1px}
-.header-title span{color:var(--red)}
-.header-sub{font-size:14px;color:var(--muted);margin-top:12px;line-height:1.5}
+.hdr{text-align:center;padding:36px 20px 0}
+.hdr-eye{font-size:10px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-bottom:8px}
+.hdr-title{font-family:var(--d);font-size:clamp(56px,14vw,96px);line-height:.9;letter-spacing:1px}
+.hdr-title em{color:var(--red);font-style:normal}
+.hdr-sub{font-size:13px;color:var(--muted);margin-top:10px;line-height:1.6}
+.hdr-note{font-size:11px;color:var(--muted);opacity:.6;margin-top:6px}
 
-/* MONTH */
-.month-bar{display:flex;align-items:center;justify-content:center;gap:12px;margin:28px 24px 0}
-.month-btn{width:40px;height:40px;border-radius:50%;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:border-color .2s,background .2s;flex-shrink:0}
-.month-btn:hover{border-color:var(--green);background:var(--card2)}
-.month-label{font-family:var(--display);font-size:28px;letter-spacing:1px;min-width:180px;text-align:center}
+/* MONTH NAV */
+.month-nav{display:flex;align-items:center;justify-content:center;gap:14px;margin:28px 20px 0}
+.mbtn{width:42px;height:42px;border-radius:50%;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.2s;flex-shrink:0}
+.mbtn:hover{border-color:var(--green);background:var(--card2)}
+.mlabel{font-family:var(--d);font-size:30px;letter-spacing:2px;min-width:200px;text-align:center}
 
-/* TOP INPUTS */
-.top-inputs{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:24px 24px 0}
-@media(min-width:640px){.top-inputs{grid-template-columns:repeat(3,1fr);max-width:860px;margin:24px auto 0}}
-.input-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;transition:border-color .2s}
-.input-card:focus-within{border-color:var(--green)}
-.input-label{font-size:10px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px}
-.input-field{width:100%;background:none;border:none;outline:none;font-family:var(--font);font-size:22px;font-weight:700;color:var(--text);caret-color:var(--green)}
-.input-field::placeholder{color:var(--dim)}
-.input-hint{font-size:11px;color:var(--muted);margin-top:4px}
+/* WRAP */
+.wrap{max-width:860px;margin:0 auto;padding:0 20px}
 
-/* CATEGORY SECTION */
-.cat-section{margin:24px 24px 0}
-@media(min-width:640px){.cat-section{max-width:860px;margin:24px auto 0}}
+/* TOP CARDS */
+.top-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:24px}
+@media(max-width:500px){.top-grid{grid-template-columns:1fr 1fr}}
+.icard{background:var(--card);border:1.5px solid var(--border);border-radius:16px;padding:16px 18px;transition:border-color .2s}
+.icard:focus-within{border-color:var(--green)}
+.icard-label{font-size:10px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;margin-bottom:10px}
+.icard-input{width:100%;background:none;border:none;outline:none;font-family:var(--f);font-size:24px;font-weight:700;color:var(--text);caret-color:var(--green)}
+.icard-input::placeholder{color:var(--dim)}
+.icard-sub{font-size:11px;color:var(--muted);margin-top:5px}
 
-.cat-section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
-.cat-section-title{font-size:11px;letter-spacing:2px;color:var(--muted);text-transform:uppercase}
-.add-cat-btn{display:flex;align-items:center;gap:6px;background:none;border:1px solid var(--border);border-radius:8px;padding:6px 12px;color:var(--green);font-family:var(--font);font-size:12px;font-weight:600;cursor:pointer;transition:border-color .2s,background .2s}
-.add-cat-btn:hover{border-color:var(--green);background:rgba(0,255,136,0.06)}
+/* SECTION TITLE */
+.sec-title{display:flex;align-items:center;justify-content:space-between;margin-top:28px;margin-bottom:12px}
+.sec-label{font-size:11px;letter-spacing:2px;color:var(--muted);text-transform:uppercase}
+.add-btn{display:flex;align-items:center;gap:5px;background:none;border:1px solid var(--border);border-radius:8px;padding:7px 13px;color:var(--green);font-family:var(--f);font-size:12px;font-weight:600;cursor:pointer;transition:.2s}
+.add-btn:hover{border-color:var(--green);background:rgba(0,255,136,.06)}
 
-/* COLUMN HEADERS */
-.cat-col-headers{display:grid;grid-template-columns:1fr 110px 110px 80px 32px;gap:8px;padding:0 2px;margin-bottom:8px;align-items:center}
-@media(max-width:500px){.cat-col-headers{grid-template-columns:1fr 90px 90px 60px 28px}}
-.col-hdr{font-size:10px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;text-align:right}
-.col-hdr:first-child{text-align:left}
+/* COL HEADERS */
+.col-hdrs{display:grid;grid-template-columns:1fr 105px 105px 72px 34px;gap:8px;margin-bottom:6px;padding:0 2px}
+@media(max-width:480px){.col-hdrs{grid-template-columns:1fr 82px 82px 58px 28px}}
+.ch{font-size:9px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;text-align:right}
+.ch:first-child{text-align:left}
 
 /* CATEGORY ROW */
-.cat-row{display:grid;grid-template-columns:1fr 110px 110px 80px 32px;gap:8px;align-items:center;margin-bottom:8px}
-@media(max-width:500px){.cat-row{grid-template-columns:1fr 90px 90px 60px 28px}}
+.cat-row{display:grid;grid-template-columns:1fr 105px 105px 72px 34px;gap:8px;align-items:center;margin-bottom:8px}
+@media(max-width:480px){.cat-row{grid-template-columns:1fr 82px 82px 58px 28px}}
 
-.cat-name-wrap{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 12px;min-width:0}
-.cat-emoji-btn{font-size:16px;background:none;border:none;cursor:pointer;flex-shrink:0;line-height:1;padding:0}
-.cat-name-input{background:none;border:none;outline:none;font-family:var(--font);font-size:13px;font-weight:600;color:var(--text);width:100%;min-width:0}
-.cat-name-input::placeholder{color:var(--dim)}
+.cname{background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;display:flex;align-items:center;gap:8px;min-width:0;transition:border-color .2s;position:relative}
+.cname:focus-within{border-color:rgba(255,170,0,.5)}
+.cemoji{font-size:17px;background:none;border:none;cursor:pointer;flex-shrink:0;line-height:1;padding:0;transition:transform .1s}
+.cemoji:hover{transform:scale(1.2)}
+.cname-inp{background:none;border:none;outline:none;font-family:var(--f);font-size:13px;font-weight:600;color:var(--text);width:100%;min-width:0}
+.cname-inp::placeholder{color:var(--dim)}
 
-.cat-num-wrap{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 12px;transition:border-color .2s;position:relative}
-.cat-num-wrap:focus-within{border-color:var(--amber)}
-.cat-num-wrap.actual-wrap:focus-within{border-color:var(--blue)}
-.cat-num-label{font-size:9px;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-bottom:3px}
-.cat-num-input{width:100%;background:none;border:none;outline:none;font-family:var(--font);font-size:15px;font-weight:700;color:var(--text);caret-color:var(--green)}
-.cat-num-input::placeholder{color:var(--dim)}
+.cnum{background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:8px 10px;transition:border-color .2s}
+.cnum:focus-within{border-color:var(--amber)}
+.cnum.actual:focus-within{border-color:var(--blue)}
+.cnum-lbl{font-size:8px;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-bottom:3px}
+.cnum-inp{width:100%;background:none;border:none;outline:none;font-family:var(--f);font-size:15px;font-weight:700;color:var(--text);caret-color:var(--green)}
+.cnum-inp::placeholder{color:var(--dim)}
 
-.variance-pill{border-radius:8px;padding:6px 8px;text-align:center;font-size:12px;font-weight:700;font-family:'Courier New',monospace}
-.variance-pill.over{background:rgba(255,59,59,0.12);color:var(--red)}
-.variance-pill.under{background:rgba(0,255,136,0.1);color:var(--green)}
-.variance-pill.even{background:var(--dim);color:var(--muted)}
-.variance-pill.noplan{background:var(--dim);color:var(--muted);font-size:10px}
+.vpill{border-radius:8px;padding:7px 6px;text-align:center;font-size:11px;font-weight:700;font-family:monospace;line-height:1.2}
+.vpill.none{background:var(--dim);color:var(--muted);font-size:9px}
+.vpill.even{background:rgba(0,255,136,.08);color:var(--green)}
+.vpill.over{background:rgba(255,59,59,.1);color:var(--red)}
+.vpill.under{background:rgba(0,255,136,.08);color:var(--green)}
 
-.del-cat-btn{width:28px;height:28px;border-radius:8px;border:1px solid var(--border);background:none;color:var(--muted);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:color .2s,border-color .2s,background .2s;flex-shrink:0}
-.del-cat-btn:hover{color:var(--red);border-color:var(--red);background:rgba(255,59,59,0.08)}
-.del-cat-btn:disabled{opacity:.2;cursor:default;pointer-events:none}
+.xbtn{width:30px;height:30px;border-radius:8px;border:1px solid var(--border);background:none;color:var(--muted);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.2s;flex-shrink:0}
+.xbtn:hover{color:var(--red);border-color:var(--red);background:rgba(255,59,59,.08)}
+.xbtn:disabled{opacity:.2;pointer-events:none}
 
-/* TOTALS ROW */
-.cat-totals{display:grid;grid-template-columns:1fr 110px 110px 80px 32px;gap:8px;align-items:center;margin-top:4px;border-top:1px solid var(--border);padding-top:12px}
-@media(max-width:500px){.cat-totals{grid-template-columns:1fr 90px 90px 60px 28px}}
-.totals-label{font-size:11px;color:var(--muted);font-weight:600;letter-spacing:1px;text-transform:uppercase;padding-left:4px}
-.totals-val{text-align:right;font-size:14px;font-weight:700;font-family:'Courier New',monospace;padding-right:4px}
+/* TOTALS */
+.totals{display:grid;grid-template-columns:1fr 105px 105px 72px 34px;gap:8px;align-items:center;border-top:1px solid var(--border);padding-top:12px;margin-top:4px}
+@media(max-width:480px){.totals{grid-template-columns:1fr 82px 82px 58px 28px}}
+.tlabel{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+.tval{font-size:13px;font-weight:700;font-family:monospace;text-align:right;padding-right:2px}
 
 /* EMOJI PICKER */
-.emoji-picker{position:absolute;background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:10px;display:flex;flex-wrap:wrap;gap:6px;width:220px;z-index:200;margin-top:4px;box-shadow:0 8px 24px rgba(0,0,0,0.5)}
-.emoji-opt{font-size:20px;cursor:pointer;padding:4px;border-radius:6px;transition:background .15s;background:none;border:none}
-.emoji-opt:hover{background:var(--dim)}
+.epicker{position:absolute;top:calc(100% + 6px);left:0;z-index:999;background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:10px;display:flex;flex-wrap:wrap;gap:4px;width:230px;box-shadow:0 10px 30px rgba(0,0,0,.6);display:none}
+.epicker.show{display:flex}
+.eopt{font-size:20px;background:none;border:none;cursor:pointer;padding:5px;border-radius:6px;transition:.15s}
+.eopt:hover{background:var(--dim)}
 
 /* JUDGE */
-.judge-wrap{margin:28px 24px 0}
-@media(min-width:640px){.judge-wrap{max-width:860px;margin:28px auto 0}}
-.judge-btn{width:100%;padding:20px;background:var(--text);border:none;border-radius:16px;font-family:var(--display);font-size:32px;letter-spacing:2px;color:var(--bg);cursor:pointer;transition:transform .1s,background .2s}
-.judge-btn:hover{background:#e0e0ea}
+.judge-wrap{margin-top:28px}
+.judge-btn{width:100%;padding:22px;background:var(--text);border:none;border-radius:16px;font-family:var(--d);font-size:36px;letter-spacing:3px;color:var(--bg);cursor:pointer;transition:.15s}
+.judge-btn:hover{background:#d8d8e8}
 .judge-btn:active{transform:scale(.98)}
 
 /* VERDICT */
-.verdict{margin:32px 24px 0;display:none}
-@media(min-width:640px){.verdict{max-width:860px;margin:32px auto 0}}
+.verdict{margin-top:36px;display:none}
 .verdict.show{display:block}
-.verdict-hero{border-radius:20px;padding:32px 28px;margin-bottom:14px;border:1px solid;position:relative;overflow:hidden}
-.verdict-hero::before{content:'';position:absolute;inset:0;opacity:.04;background:repeating-linear-gradient(45deg,currentColor 0,currentColor 1px,transparent 0,transparent 50%);background-size:8px 8px}
-.grade-big{font-family:var(--display);font-size:clamp(80px,20vw,140px);line-height:1;position:relative;z-index:1}
-.grade-label{font-size:clamp(16px,4vw,24px);font-weight:700;position:relative;z-index:1;margin-bottom:10px}
-.grade-verdict{font-size:14px;line-height:1.7;position:relative;z-index:1;opacity:.85;max-width:560px}
-.score-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
-.score-tile{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;text-align:center}
-.score-tile-label{font-size:9px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;margin-bottom:6px}
-.score-tile-val{font-family:var(--display);font-size:30px;letter-spacing:1px}
-.numbers-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
-@media(min-width:500px){.numbers-grid{grid-template-columns:repeat(3,1fr)}}
-.num-tile{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center}
-.num-tile-label{font-size:9px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;margin-bottom:5px}
-.num-tile-val{font-family:var(--display);font-size:22px;letter-spacing:1px}
 
-/* VERDICT BREAKDOWN TABLE */
+.vhero{border-radius:20px;padding:32px 28px;margin-bottom:14px;border:1.5px solid;position:relative;overflow:hidden}
+.vhero::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(45deg,currentColor 0,currentColor 1px,transparent 0,transparent 50%);background-size:8px 8px;opacity:.04;pointer-events:none}
+.vgrade{font-family:var(--d);font-size:clamp(88px,20vw,148px);line-height:1;position:relative;z-index:1}
+.vlabel{font-size:clamp(18px,4vw,26px);font-weight:700;margin-bottom:10px;position:relative;z-index:1}
+.vtext{font-size:14px;line-height:1.75;opacity:.85;max-width:580px;position:relative;z-index:1}
+
+.stiles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.stile{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;text-align:center}
+.stile-lbl{font-size:9px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;margin-bottom:7px}
+.stile-val{font-family:var(--d);font-size:32px;letter-spacing:1px}
+
+.ntiles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+@media(max-width:460px){.ntiles{grid-template-columns:repeat(2,1fr)}}
+.ntile{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center}
+.ntile-lbl{font-size:9px;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-bottom:5px}
+.ntile-val{font-family:var(--d);font-size:22px;letter-spacing:1px}
+
+/* VERDICT BREAKDOWN */
 .vbreak{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:14px}
-.vbreak-title{font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:14px}
-.vbreak-header{display:grid;grid-template-columns:1fr 80px 80px 70px;gap:8px;margin-bottom:8px}
-.vbreak-hdr{font-size:9px;letter-spacing:1px;color:var(--muted);text-transform:uppercase;text-align:right}
-.vbreak-hdr:first-child{text-align:left}
-.vbreak-row{display:grid;grid-template-columns:1fr 80px 80px 70px;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--dim)}
-.vbreak-row:last-child{border-bottom:none}
-.vbreak-name{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:500}
-.vbreak-num{font-size:13px;font-family:'Courier New',monospace;font-weight:700;text-align:right}
-.vbreak-var{font-size:12px;font-family:'Courier New',monospace;font-weight:700;text-align:right;padding:3px 6px;border-radius:6px}
-.vbreak-var.over{color:var(--red);background:rgba(255,59,59,0.1)}
-.vbreak-var.under{color:var(--green);background:rgba(0,255,136,0.08)}
-.vbreak-var.even{color:var(--muted)}
-.bar-wrap{height:4px;background:var(--dim);border-radius:2px;overflow:hidden;margin-top:4px}
-.bar-fill{height:100%;border-radius:2px;transition:width .7s cubic-bezier(.4,0,.2,1)}
+.vbreak-ttl{font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:14px}
+.vbrow{display:grid;grid-template-columns:1fr 80px 80px 72px;gap:8px;align-items:center;padding:9px 0;border-bottom:1px solid var(--dim)}
+.vbrow:last-child{border-bottom:none}
+@media(max-width:460px){.vbrow{grid-template-columns:1fr 60px 60px 56px}}
+.vbname{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:500}
+.vbnum{font-size:13px;font-family:monospace;font-weight:700;text-align:right}
+.vbar-wrap{height:3px;background:var(--dim);border-radius:2px;overflow:hidden;margin-top:3px}
+.vbar{height:100%;border-radius:2px;transition:width .7s ease}
+.vbvar{font-size:11px;font-family:monospace;font-weight:700;text-align:center;padding:4px 6px;border-radius:6px}
+.vbvar.none{color:var(--muted)}
+.vbvar.even{color:var(--green);background:rgba(0,255,136,.08)}
+.vbvar.over{color:var(--red);background:rgba(255,59,59,.1)}
+.vbvar.under{color:var(--green);background:rgba(0,255,136,.08)}
 
 /* INSIGHTS */
 .insights{display:grid;gap:10px;margin-bottom:14px}
-.insight{display:flex;gap:14px;align-items:flex-start;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px}
-.insight-icon{font-size:20px;flex-shrink:0;line-height:1;margin-top:1px}
-.insight-body{font-size:13px;line-height:1.6;color:var(--muted)}
-.insight-body strong{color:var(--text);font-weight:600}
+.ins{display:flex;gap:13px;align-items:flex-start;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:15px}
+.ins-ico{font-size:20px;flex-shrink:0;line-height:1;margin-top:1px}
+.ins-txt{font-size:13px;line-height:1.65;color:var(--muted)}
+.ins-txt strong{color:var(--text);font-weight:600}
 
 /* HISTORY */
-.history-section{margin:32px 24px 0}
-@media(min-width:640px){.history-section{max-width:860px;margin:32px auto 0}}
-.history-label{font-size:11px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:12px}
-.history-row{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:8px;cursor:pointer;transition:border-color .2s}
-.history-row:hover{border-color:var(--green)}
-.history-month{font-size:13px;font-weight:600;flex:1}
-.history-grade{font-family:var(--display);font-size:22px;letter-spacing:1px}
-.history-score{font-size:12px;color:var(--muted)}
-.del-history-btn{background:none;border:none;color:var(--dim);font-size:14px;cursor:pointer;padding:4px 6px;border-radius:6px;transition:color .2s}
-.del-history-btn:hover{color:var(--red)}
-.clear-btn{background:none;border:none;font-size:12px;color:var(--muted);cursor:pointer;text-decoration:underline;padding:8px;display:block;margin:12px auto 0}
-.clear-btn:hover{color:var(--red)}
+.hist{margin-top:32px}
+.hist-lbl{font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:12px}
+.hrow{display:flex;align-items:center;gap:12px;padding:13px 16px;background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:8px;cursor:pointer;transition:.2s}
+.hrow:hover{border-color:var(--green)}
+.hrow-month{font-size:13px;font-weight:600;flex:1}
+.hrow-inc{font-size:12px;color:var(--muted)}
+.hrow-grade{font-family:var(--d);font-size:24px;letter-spacing:1px}
+.hrow-score{font-size:12px;color:var(--muted);min-width:45px;text-align:right}
+.hrow-del{background:none;border:none;color:var(--dim);font-size:14px;cursor:pointer;padding:4px 7px;border-radius:6px;transition:.2s}
+.hrow-del:hover{color:var(--red)}
+.clear-all{display:block;background:none;border:none;font-size:12px;color:var(--muted);cursor:pointer;text-decoration:underline;padding:8px;margin:10px auto 0}
+.clear-all:hover{color:var(--red)}
 
-@keyframes pop{0%{transform:scale(.85);opacity:0}60%{transform:scale(1.04)}100%{transform:scale(1);opacity:1}}
-.pop{animation:pop .4s cubic-bezier(.4,0,.2,1) forwards}
-@keyframes fadeUp{from{transform:translateY(16px);opacity:0}to{transform:translateY(0);opacity:1}}
-.fade-up{animation:fadeUp .35s ease forwards}
+@keyframes pop{0%{opacity:0;transform:scale(.8)}60%{transform:scale(1.04)}100%{opacity:1;transform:scale(1)}}
+@keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.pop{animation:pop .4s ease forwards}
+.up{animation:up .35s ease forwards}
 </style>
 </head>
 <body>
 
-<div class="header">
-  <div class="header-eyebrow">Monthly Finance Verdict</div>
-  <div class="header-title">WAS I<br><span>STUPID?</span></div>
-  <div class="header-sub">Plan your spending. Track what actually happened.<br>Get an honest verdict — no excuses.<br><span style="font-size:12px;opacity:.6">🏠 Housing includes: Maintenance, Gas, Light, Generator, Trash, Internet, Washing Soap</span></div>
+<div class="hdr">
+  <div class="hdr-eye">Monthly Finance Verdict</div>
+  <div class="hdr-title">WAS I<br><em>STUPID?</em></div>
+  <div class="hdr-sub">Plan your spending. Track what actually happened.<br>Get an honest verdict — no excuses.</div>
+  <div class="hdr-note">🏠 Housing = Maintenance + Gas + Light + Generator + Trash + Internet + Washing Soap</div>
 </div>
 
-<div class="month-bar">
-  <button class="month-btn" onclick="changeMonth(-1)">‹</button>
-  <div class="month-label" id="month-label">MAY 2026</div>
-  <button class="month-btn" onclick="changeMonth(1)">›</button>
+<div class="month-nav">
+  <button class="mbtn" onclick="changeMonth(-1)">‹</button>
+  <div class="mlabel" id="mlabel">MAY 2026</div>
+  <button class="mbtn" onclick="changeMonth(1)">›</button>
 </div>
 
-<!-- TOP INPUTS -->
-<div class="top-inputs">
-  <div class="input-card">
-    <div class="input-label"><span>💼</span> Income</div>
-    <input class="input-field" id="inp-income" type="number" placeholder="0" min="0" oninput="autoCalc()">
-    <div class="input-hint">GH₵ earned this month</div>
-  </div>
-  <div class="input-card">
-    <div class="input-label"><span>🏦</span> Saved</div>
-    <input class="input-field" id="inp-saved" type="number" placeholder="0" min="0" oninput="autoCalc()">
-    <div class="input-hint">GH₵ put aside</div>
-  </div>
-  <div class="input-card" style="grid-column:span 2" id="debt-card">
-    <div class="input-label"><span>💳</span> Debt Payments</div>
-    <input class="input-field" id="inp-debt" type="number" placeholder="0" min="0" oninput="autoCalc()">
-    <div class="input-hint">GH₵ paid to loans/credit</div>
-  </div>
-</div>
+<div class="wrap">
 
-<!-- CATEGORIES -->
-<div class="cat-section">
-  <div class="cat-section-header">
-    <div class="cat-section-title">Spending by Category</div>
-    <button class="add-cat-btn" onclick="addCategory()">＋ Add Category</button>
+  <!-- TOP INPUTS -->
+  <div class="top-grid">
+    <div class="icard">
+      <div class="icard-label">💼 Income</div>
+      <input class="icard-input" id="inp-income" type="number" placeholder="0" min="0">
+      <div class="icard-sub">GH₵ earned</div>
+    </div>
+    <div class="icard">
+      <div class="icard-label">🏦 Saved</div>
+      <input class="icard-input" id="inp-saved" type="number" placeholder="0" min="0">
+      <div class="icard-sub">GH₵ put aside</div>
+    </div>
+    <div class="icard">
+      <div class="icard-label">💳 Debt Payments</div>
+      <input class="icard-input" id="inp-debt" type="number" placeholder="0" min="0">
+      <div class="icard-sub">GH₵ to loans</div>
+    </div>
   </div>
 
-  <!-- Column headers -->
-  <div class="cat-col-headers">
-    <div class="col-hdr">Category</div>
-    <div class="col-hdr" style="color:var(--amber)">Planned</div>
-    <div class="col-hdr" style="color:var(--blue)">Actual</div>
-    <div class="col-hdr">Diff</div>
+  <!-- CATEGORIES -->
+  <div class="sec-title">
+    <div class="sec-label">Spending by Category</div>
+    <button class="add-btn" onclick="addCat()">＋ Add Category</button>
+  </div>
+
+  <div class="col-hdrs">
+    <div class="ch" style="text-align:left">Category</div>
+    <div class="ch" style="color:var(--amber)">Planned</div>
+    <div class="ch" style="color:var(--blue)">Actual</div>
+    <div class="ch">Diff</div>
     <div></div>
   </div>
 
   <div id="cat-rows"></div>
 
-  <!-- Totals -->
-  <div class="cat-totals" id="cat-totals">
-    <div class="totals-label">Total</div>
-    <div class="totals-val" id="total-planned" style="color:var(--amber)">—</div>
-    <div class="totals-val" id="total-actual" style="color:var(--blue)">—</div>
-    <div class="totals-val" id="total-diff">—</div>
+  <div class="totals">
+    <div class="tlabel">Total</div>
+    <div class="tval" id="tot-planned" style="color:var(--amber)">—</div>
+    <div class="tval" id="tot-actual" style="color:var(--blue)">—</div>
+    <div class="tval" id="tot-diff">—</div>
     <div></div>
   </div>
-</div>
 
-<!-- JUDGE -->
-<div class="judge-wrap">
-  <button class="judge-btn" onclick="judge()">JUDGE ME</button>
-</div>
+  <!-- JUDGE -->
+  <div class="judge-wrap">
+    <button class="judge-btn" onclick="judge()">JUDGE ME</button>
+  </div>
 
-<!-- VERDICT -->
-<div class="verdict" id="verdict">
-  <div class="verdict-hero pop" id="verdict-hero">
-    <div class="grade-big" id="grade-big">A+</div>
-    <div class="grade-label" id="grade-label">Financial Genius</div>
-    <div class="grade-verdict" id="grade-verdict"></div>
-  </div>
-  <div class="score-row fade-up">
-    <div class="score-tile"><div class="score-tile-label">Score</div><div class="score-tile-val" id="v-score">—</div></div>
-    <div class="score-tile"><div class="score-tile-label">Savings Rate</div><div class="score-tile-val" id="v-savrate">—</div></div>
-    <div class="score-tile"><div class="score-tile-label">Budget Kept</div><div class="score-tile-val" id="v-budkeep">—</div></div>
-  </div>
-  <div class="numbers-grid fade-up">
-    <div class="num-tile"><div class="num-tile-label">Earned</div><div class="num-tile-val" id="v-income" style="color:var(--green)">—</div></div>
-    <div class="num-tile"><div class="num-tile-label">Planned</div><div class="num-tile-val" id="v-planned" style="color:var(--amber)">—</div></div>
-    <div class="num-tile"><div class="num-tile-label">Actually Spent</div><div class="num-tile-val" id="v-actual" style="color:var(--blue)">—</div></div>
-    <div class="num-tile"><div class="num-tile-label">Saved</div><div class="num-tile-val" id="v-saved" style="color:var(--purple)">—</div></div>
-    <div class="num-tile"><div class="num-tile-label">Overspent</div><div class="num-tile-val" id="v-over" style="color:var(--red)">—</div></div>
-    <div class="num-tile"><div class="num-tile-label">Under Budget</div><div class="num-tile-val" id="v-under" style="color:var(--green)">—</div></div>
-  </div>
-  <div class="vbreak fade-up" id="vbreak">
-    <div class="vbreak-title">Planned vs Actual — Category Breakdown</div>
-    <div class="vbreak-header">
-      <div class="vbreak-hdr">Category</div>
-      <div class="vbreak-hdr" style="color:var(--amber)">Planned</div>
-      <div class="vbreak-hdr" style="color:var(--blue)">Actual</div>
-      <div class="vbreak-hdr">Diff</div>
+  <!-- VERDICT -->
+  <div class="verdict" id="verdict">
+    <div class="vhero pop" id="vhero">
+      <div class="vgrade" id="vgrade">A+</div>
+      <div class="vlabel" id="vlabel">Financial Genius</div>
+      <div class="vtext" id="vtext"></div>
     </div>
-    <div id="vbreak-rows"></div>
+    <div class="stiles up">
+      <div class="stile"><div class="stile-lbl">Score</div><div class="stile-val" id="vs-score">—</div></div>
+      <div class="stile"><div class="stile-lbl">Savings Rate</div><div class="stile-val" id="vs-srate">—</div></div>
+      <div class="stile"><div class="stile-lbl">Budget Kept</div><div class="stile-val" id="vs-bkeep">—</div></div>
+    </div>
+    <div class="ntiles up">
+      <div class="ntile"><div class="ntile-lbl">Earned</div><div class="ntile-val" id="vn-inc" style="color:var(--green)">—</div></div>
+      <div class="ntile"><div class="ntile-lbl">Planned</div><div class="ntile-val" id="vn-plan" style="color:var(--amber)">—</div></div>
+      <div class="ntile"><div class="ntile-lbl">Actually Spent</div><div class="ntile-val" id="vn-act" style="color:var(--blue)">—</div></div>
+      <div class="ntile"><div class="ntile-lbl">Saved</div><div class="ntile-val" id="vn-saved" style="color:var(--purple)">—</div></div>
+      <div class="ntile"><div class="ntile-lbl">Overspent by</div><div class="ntile-val" id="vn-over" style="color:var(--red)">—</div></div>
+      <div class="ntile"><div class="ntile-lbl">Under Budget</div><div class="ntile-val" id="vn-under" style="color:var(--green)">—</div></div>
+    </div>
+    <div class="vbreak up" id="vbreak">
+      <div class="vbreak-ttl">Planned vs Actual — Category Breakdown</div>
+      <div id="vbrows"></div>
+    </div>
+    <div class="insights up" id="insights"></div>
   </div>
-  <div class="insights fade-up" id="insights"></div>
-</div>
 
-<!-- HISTORY -->
-<div class="history-section">
-  <div class="history-label">Past Verdicts</div>
-  <div id="history-list"></div>
-  <button class="clear-btn" onclick="clearAll()">Clear all data</button>
-</div>
+  <!-- HISTORY -->
+  <div class="hist">
+    <div class="hist-lbl">Past Verdicts</div>
+    <div id="hist-list"></div>
+    <button class="clear-all" onclick="clearAll()">Clear all data</button>
+  </div>
+
+</div><!-- /wrap -->
 
 <script>
-// ── DATA ──
 const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
 const MS=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
-const DEFAULT_CATS=[
-  {id:'housing',name:'Housing',emoji:'🏠'},
-  {id:'fiancee',name:'Fiancée',emoji:'💍'},
-  {id:'food',name:'Food',emoji:'🍔'},
-  {id:'gym',name:'Gym',emoji:'🏋️'},
-  {id:'transport',name:'Transport',emoji:'🚌'},
-  {id:'tithes',name:'Tithes',emoji:'🙏'},
-  {id:'data',name:'Data & Airtime',emoji:'📱'},
-  {id:'haircut',name:'Haircut',emoji:'💈'},
-  {id:'family',name:'Daughter & Mum',emoji:'👨‍👩‍👧'},
-  {id:'medical',name:'Medical',emoji:'💊'},
-  {id:'shows',name:'Shows',emoji:'🎬'},
+const EMOJIS=['🏠','💍','🍔','🏋️','🚌','🙏','📱','💈','👨‍👩‍👧','💊','🎬','☕','🛍','✈️','🎮','👔','💅','🎁','🛒','🍕','📚','🔧','💰','🎵','🏖','🐾','🧴','🍺','💡','🎯'];
+
+// YOUR PERSONAL CATEGORIES — edit these anytime
+const MY_CATS = [
+  {id:'housing',   name:'Housing',         emoji:'🏠'},
+  {id:'fiancee',   name:'Fiancée',          emoji:'💍'},
+  {id:'food',      name:'Food',             emoji:'🍔'},
+  {id:'gym',       name:'Gym',              emoji:'🏋️'},
+  {id:'transport', name:'Transport',        emoji:'🚌'},
+  {id:'tithes',    name:'Tithes',           emoji:'🙏'},
+  {id:'data',      name:'Data & Airtime',   emoji:'📱'},
+  {id:'haircut',   name:'Haircut',          emoji:'💈'},
+  {id:'family',    name:'Daughter & Mum',   emoji:'👨‍👩‍👧'},
+  {id:'medical',   name:'Medical',          emoji:'💊'},
+  {id:'shows',     name:'Shows',            emoji:'🎬'},
 ];
-const EMOJIS=['🍔','🚌','🏠','💡','🎉','💊','📚','📌','☕','🛍','✈️','🎮','🐾','👔','💅','🍺','🏋️','🎁','💈','🧴','🛒','🍕','🏥','📱','🔧','🧾','💰','🌿','🎵','🏖'];
-const COLORS=['#ffaa00','#4488ff','#00ff88','#ff3b3b','#aa66ff','#ff6699','#00ccff','#ff9900','#88ff44','#ff44aa'];
 
-let curYear=new Date().getFullYear(), curMonth=new Date().getMonth();
-let cats=[...DEFAULT_CATS.map(c=>({...c}))];
-let history=[];
-let pickerOpen=null;
+let curYear = new Date().getFullYear();
+let curMonth = new Date().getMonth();
+let cats = MY_CATS.map(c => ({...c}));
+let history = [];
+let openPicker = null;
 
-function load(){try{history=JSON.parse(localStorage.getItem('wis2_history')||'[]');const savedCats=localStorage.getItem('wis2_cats');if(savedCats)cats=JSON.parse(savedCats)}catch(e){}}
-function save(){try{localStorage.setItem('wis2_history',JSON.stringify(history));localStorage.setItem('wis2_cats',JSON.stringify(cats))}catch(e){}}
-load();
-
-const fmt=v=>v===0?'0':v>=1000?(v/1000).toFixed(1)+'k':String(Math.round(v));
-const fmtFull=v=>'GH₵'+Number(v).toLocaleString('en-GH',{minimumFractionDigits:0,maximumFractionDigits:0});
-const mkKey=()=>curYear+'-'+String(curMonth+1).padStart(2,'0');
-
-// ── MONTH NAV ──
-function updateMonthLabel(){document.getElementById('month-label').textContent=MS[curMonth]+' '+curYear}
-function changeMonth(d){
-  curMonth+=d;if(curMonth>11){curMonth=0;curYear++}if(curMonth<0){curMonth=11;curYear--}
-  updateMonthLabel();loadMonth();
+// STORAGE
+const S_HIS = 'wis_h', S_CATS = 'wis_c', S_VER = 'wis_v', VER = 'v5';
+function loadStorage() {
+  try {
+    history = JSON.parse(localStorage.getItem(S_HIS) || '[]');
+    const v = localStorage.getItem(S_VER);
+    const sc = localStorage.getItem(S_CATS);
+    if (sc && v === VER) cats = JSON.parse(sc);
+    else { cats = MY_CATS.map(c => ({...c})); localStorage.setItem(S_VER, VER); }
+  } catch(e) {}
 }
-updateMonthLabel();
+function saveStorage() {
+  try {
+    localStorage.setItem(S_HIS, JSON.stringify(history));
+    localStorage.setItem(S_CATS, JSON.stringify(cats));
+    localStorage.setItem(S_VER, VER);
+  } catch(e) {}
+}
+loadStorage();
 
-// ── RENDER CATEGORY ROWS ──
-function renderCatRows(){
-  const entry=history.find(h=>h.key===mkKey());
-  const container=document.getElementById('cat-rows');
-  container.innerHTML='';
-  cats.forEach((cat,idx)=>{
-    const planned=entry&&entry.cats&&entry.cats[cat.id]?entry.cats[cat.id].planned||0:0;
-    const actual=entry&&entry.cats&&entry.cats[cat.id]?entry.cats[cat.id].actual||0:0;
-    const row=document.createElement('div');
-    row.className='cat-row';row.id='catrow-'+cat.id;
-    row.innerHTML=`
-      <div class="cat-name-wrap">
-        <button class="cat-emoji-btn" onclick="openEmojiPicker('${cat.id}',event)" title="Change emoji">${cat.emoji}</button>
-        <input class="cat-name-input" value="${cat.name}" placeholder="Category name" oninput="renameCat('${cat.id}',this.value)" />
-        <div class="emoji-picker" id="epicker-${cat.id}" style="display:none;position:absolute;top:100%;left:0;margin-top:4px"></div>
+// FORMAT
+const fmtK = v => v === 0 ? '0' : v >= 1000 ? (v/1000).toFixed(1)+'k' : String(Math.round(v));
+const fmtG = v => 'GH₵' + Number(v).toLocaleString('en-GH', {minimumFractionDigits:0, maximumFractionDigits:0});
+const mkKey = () => curYear + '-' + String(curMonth+1).padStart(2,'0');
+
+// MONTH NAV
+function updateLabel() { document.getElementById('mlabel').textContent = MS[curMonth] + ' ' + curYear; }
+function changeMonth(d) {
+  curMonth += d;
+  if (curMonth > 11) { curMonth = 0; curYear++; }
+  if (curMonth < 0) { curMonth = 11; curYear--; }
+  updateLabel(); loadMonth();
+}
+updateLabel();
+
+// RENDER CATEGORY ROWS
+function renderRows() {
+  const entry = history.find(h => h.key === mkKey());
+  const container = document.getElementById('cat-rows');
+  container.innerHTML = '';
+
+  cats.forEach(cat => {
+    const saved = entry && entry.catData && entry.catData[cat.id];
+    const planned = saved ? (saved.planned || 0) : 0;
+    const actual  = saved ? (saved.actual  || 0) : 0;
+
+    const row = document.createElement('div');
+    row.className = 'cat-row';
+    row.id = 'row-' + cat.id;
+    row.innerHTML = `
+      <div class="cname" id="cname-${cat.id}">
+        <button class="cemoji" onclick="togglePicker('${cat.id}',event)">${cat.emoji}</button>
+        <input class="cname-inp" value="${cat.name}" placeholder="Name" oninput="renameCat('${cat.id}',this.value)">
+        <div class="epicker" id="ep-${cat.id}"></div>
       </div>
-      <div class="cat-num-wrap" style="position:relative">
-        <div class="cat-num-label" style="color:var(--amber)">Planned</div>
-        <input class="cat-num-input" id="planned-${cat.id}" type="number" placeholder="0" min="0" value="${planned||''}" oninput="updateTotals()">
+      <div class="cnum">
+        <div class="cnum-lbl" style="color:var(--amber)">Planned</div>
+        <input class="cnum-inp" id="p-${cat.id}" type="number" placeholder="0" min="0" value="${planned||''}" oninput="recalc()">
       </div>
-      <div class="cat-num-wrap actual-wrap" style="position:relative">
-        <div class="cat-num-label" style="color:var(--blue)">Actual</div>
-        <input class="cat-num-input" id="actual-${cat.id}" type="number" placeholder="0" min="0" value="${actual||''}" oninput="updateTotals()">
+      <div class="cnum actual">
+        <div class="cnum-lbl" style="color:var(--blue)">Actual</div>
+        <input class="cnum-inp" id="a-${cat.id}" type="number" placeholder="0" min="0" value="${actual||''}" oninput="recalc()">
       </div>
-      <div class="variance-pill noplan" id="var-${cat.id}">—</div>
-      <button class="del-cat-btn" onclick="deleteCat('${cat.id}')" ${cats.length<=1?'disabled':''} title="Remove">✕</button>`;
+      <div class="vpill none" id="vp-${cat.id}">—</div>
+      <button class="xbtn" onclick="delCat('${cat.id}')" ${cats.length <= 1 ? 'disabled' : ''}>✕</button>`;
     container.appendChild(row);
-    // position emoji picker relative to wrapper
-    const nameWrap=row.querySelector('.cat-name-wrap');
-    nameWrap.style.position='relative';
   });
-  updateTotals();
+
+  recalc();
 }
 
-// ── CAT OPERATIONS ──
-function addCategory(){
-  const id='cat_'+Date.now();
-  const emoji=EMOJIS[Math.floor(Math.random()*EMOJIS.length)];
-  cats.push({id,name:'New Category',emoji});
-  save();renderCatRows();
-  // focus name input
-  setTimeout(()=>{const inp=document.getElementById('catrow-'+id);if(inp){const ni=inp.querySelector('.cat-name-input');if(ni){ni.select()}}},50);
-}
-function deleteCat(id){
-  if(cats.length<=1)return;
-  cats=cats.filter(c=>c.id!==id);
-  save();renderCatRows();
-}
-function renameCat(id,val){
-  const c=cats.find(c=>c.id===id);if(c)c.name=val;
-  save();
+// RECALC VARIANCE + TOTALS
+function recalc() {
+  let tP = 0, tA = 0;
+  cats.forEach(cat => {
+    const p = parseFloat(document.getElementById('p-' + cat.id)?.value) || 0;
+    const a = parseFloat(document.getElementById('a-' + cat.id)?.value) || 0;
+    tP += p; tA += a;
+    const pill = document.getElementById('vp-' + cat.id);
+    if (!pill) return;
+    if (!p && !a) { pill.className = 'vpill none'; pill.textContent = '—'; return; }
+    if (!p)       { pill.className = 'vpill none'; pill.textContent = 'no plan'; return; }
+    const d = a - p;
+    if (Math.abs(d) < 1) { pill.className = 'vpill even'; pill.textContent = '✓ on'; return; }
+    pill.className = 'vpill ' + (d > 0 ? 'over' : 'under');
+    pill.textContent = (d > 0 ? '+' : '') + fmtK(d);
+  });
+  document.getElementById('tot-planned').textContent = tP ? fmtG(tP) : '—';
+  document.getElementById('tot-actual').textContent  = tA ? fmtG(tA) : '—';
+  const diff = tA - tP;
+  const el = document.getElementById('tot-diff');
+  if (!tP && !tA) { el.textContent = '—'; el.style.color = 'var(--muted)'; }
+  else if (!tP)   { el.textContent = '—'; el.style.color = 'var(--muted)'; }
+  else { el.textContent = (diff > 0 ? '+' : '') + fmtK(diff); el.style.color = diff > 0 ? 'var(--red)' : diff < 0 ? 'var(--green)' : 'var(--muted)'; }
 }
 
-// ── EMOJI PICKER ──
-function openEmojiPicker(id,e){
+// CAT OPERATIONS
+function addCat() {
+  const id = 'c' + Date.now();
+  const emoji = EMOJIS[Math.floor(Math.random() * EMOJIS.length)];
+  cats.push({ id, name: 'New Category', emoji });
+  saveStorage(); renderRows();
+  setTimeout(() => { const el = document.querySelector('#row-' + id + ' .cname-inp'); if (el) { el.focus(); el.select(); } }, 60);
+}
+function delCat(id) {
+  if (cats.length <= 1) return;
+  cats = cats.filter(c => c.id !== id);
+  saveStorage(); renderRows();
+}
+function renameCat(id, val) {
+  const c = cats.find(c => c.id === id);
+  if (c) { c.name = val; saveStorage(); }
+}
+
+// EMOJI PICKER
+function togglePicker(id, e) {
   e.stopPropagation();
-  if(pickerOpen&&pickerOpen!==id){document.getElementById('epicker-'+pickerOpen).style.display='none'}
-  const el=document.getElementById('epicker-'+id);
-  if(el.style.display==='none'||!el.innerHTML){
-    el.innerHTML=EMOJIS.map(em=>`<button class="emoji-opt" onclick="selectEmoji('${id}','${em}')">${em}</button>`).join('');
-    el.style.display='flex';pickerOpen=id;
-  }else{el.style.display='none';pickerOpen=null}
+  if (openPicker && openPicker !== id) {
+    const prev = document.getElementById('ep-' + openPicker);
+    if (prev) prev.classList.remove('show');
+  }
+  const el = document.getElementById('ep-' + id);
+  if (!el) return;
+  if (!el.innerHTML) {
+    el.innerHTML = EMOJIS.map(em => `<button class="eopt" onclick="pickEmoji('${id}','${em}')">${em}</button>`).join('');
+  }
+  el.classList.toggle('show');
+  openPicker = el.classList.contains('show') ? id : null;
 }
-function selectEmoji(id,emoji){
-  const c=cats.find(c=>c.id===id);if(c)c.emoji=emoji;
-  document.getElementById('epicker-'+id).style.display='none';
-  pickerOpen=null;save();renderCatRows();
+function pickEmoji(id, emoji) {
+  const c = cats.find(c => c.id === id);
+  if (c) c.emoji = emoji;
+  const el = document.getElementById('ep-' + id);
+  if (el) el.classList.remove('show');
+  openPicker = null;
+  saveStorage(); renderRows();
 }
-document.addEventListener('click',()=>{if(pickerOpen){const el=document.getElementById('epicker-'+pickerOpen);if(el)el.style.display='none';pickerOpen=null}});
+document.addEventListener('click', () => {
+  if (openPicker) { const el = document.getElementById('ep-' + openPicker); if (el) el.classList.remove('show'); openPicker = null; }
+});
 
-// ── TOTALS + VARIANCE ──
-function updateTotals(){
-  let tP=0,tA=0;
-  cats.forEach(cat=>{
-    const p=parseFloat(document.getElementById('planned-'+cat.id)?.value)||0;
-    const a=parseFloat(document.getElementById('actual-'+cat.id)?.value)||0;
-    tP+=p;tA+=a;
-    const el=document.getElementById('var-'+cat.id);if(!el)return;
-    if(!p&&!a){el.className='variance-pill noplan';el.textContent='—';return}
-    if(!p){el.className='variance-pill noplan';el.textContent='no plan';return}
-    const diff=a-p;
-    if(Math.abs(diff)<1){el.className='variance-pill even';el.textContent='✓';return}
-    el.className='variance-pill '+(diff>0?'over':'under');
-    el.textContent=(diff>0?'+':'')+fmt(diff);
-  });
-  document.getElementById('total-planned').textContent=tP?'GH₵'+fmt(tP):'—';
-  document.getElementById('total-actual').textContent=tA?'GH₵'+fmt(tA):'—';
-  const diff=tA-tP;
-  const td=document.getElementById('total-diff');
-  if(!tP&&!tA){td.textContent='—';td.style.color='var(--muted)'}
-  else if(!tP){td.textContent='—';td.style.color='var(--muted)'}
-  else{td.textContent=(diff>0?'+':'')+fmt(diff);td.style.color=diff>0?'var(--red)':diff<0?'var(--green)':'var(--muted)'}
-}
-
-// ── LOAD MONTH ──
-function loadMonth(){
-  const entry=history.find(h=>h.key===mkKey());
-  ['income','saved','debt'].forEach(f=>{document.getElementById('inp-'+f).value=entry?entry[f]||'':''});
-  renderCatRows();
-  if(entry){renderVerdict(entry);document.getElementById('verdict').classList.add('show')}
+// LOAD MONTH DATA INTO INPUTS
+function loadMonth() {
+  const entry = history.find(h => h.key === mkKey());
+  document.getElementById('inp-income').value = entry ? entry.income || '' : '';
+  document.getElementById('inp-saved').value  = entry ? entry.saved  || '' : '';
+  document.getElementById('inp-debt').value   = entry ? entry.debt   || '' : '';
+  if (entry && entry.catDefs) cats = entry.catDefs.map(c => ({...c}));
+  renderRows();
+  if (entry) { renderVerdict(entry); document.getElementById('verdict').classList.add('show'); }
   else document.getElementById('verdict').classList.remove('show');
 }
 
-// ── AUTO CALC ──
-function autoCalc(){updateTotals()}
-
-// ── SCORING ──
-function computeScore(income,totalActual,saved,debt,planned,catData){
-  if(!income&&!totalActual)return null;
-  let s=100;
-  const sRate=income>0?((income-totalActual)/income)*100:null;
-  const eRatio=income>0?(totalActual/income)*100:null;
-  const dRatio=income>0?(debt/income)*100:0;
-  if(sRate===null)s-=20;
-  else if(sRate<0)s-=42;else if(sRate<5)s-=32;else if(sRate<10)s-=20;else if(sRate<15)s-=12;else if(sRate<20)s-=5;
-  if(income>0&&saved/income>=0.2)s+=5;
-  if(eRatio!==null){if(eRatio>120)s-=35;else if(eRatio>100)s-=25;else if(eRatio>90)s-=14;else if(eRatio>80)s-=6;}
-  if(dRatio>50)s-=25;else if(dRatio>40)s-=18;else if(dRatio>30)s-=10;else if(dRatio>20)s-=4;
-  // budget discipline
-  if(planned>0){const overAmt=Math.max(0,totalActual-planned);const overPct=overAmt/planned*100;if(overPct>50)s-=20;else if(overPct>25)s-=12;else if(overPct>10)s-=6;}
-  // category discipline
-  const catKeys=Object.keys(catData).filter(k=>catData[k].planned>0);
-  if(catKeys.length){const broken=catKeys.filter(k=>catData[k].actual>catData[k].planned).length;const ratio=broken/catKeys.length;if(ratio>0.6)s-=15;else if(ratio>0.3)s-=8;else if(ratio>0)s-=3;}
-  return Math.max(0,Math.min(100,Math.round(s)));
-}
-
-const GRADES=[
-  {min:90,grade:'A+',label:'Financial Genius',color:'var(--green)',bg:'rgba(0,255,136,0.06)',border:'rgba(0,255,136,0.2)',v:"You crushed it. Stayed within budget, saved well, and kept spending under control. This is what financial discipline actually looks like. Keep this standard."},
-  {min:80,grade:'A',label:'Very Smart',color:'var(--green)',bg:'rgba(0,255,136,0.04)',border:'rgba(0,255,136,0.15)',v:"Great month. A few small slips but you're making genuinely smart choices. Savings were solid and most categories stayed in line. Respect."},
-  {min:70,grade:'B',label:'Pretty Good',color:'var(--blue)',bg:'rgba(68,136,255,0.06)',border:'rgba(68,136,255,0.2)',v:"Solid month overall. You planned reasonably and mostly stuck to it. A couple of categories got away from you. Not bad — you know exactly what to tighten."},
-  {min:60,grade:'C',label:'Could Do Better',color:'var(--amber)',bg:'rgba(255,170,0,0.06)',border:'rgba(255,170,0,0.2)',v:"Average. You had a plan and partially followed it. The gap between what you planned and what actually happened is your problem. That gap is a choice."},
-  {min:45,grade:'D',label:'Needs Work',color:'var(--amber)',bg:'rgba(255,170,0,0.04)',border:'rgba(255,170,0,0.12)',v:"Rough month. Multiple categories over budget, savings too low, spending too high. You had the plan — you just didn't follow it. What's the excuse?"},
-  {min:0,grade:'F',label:'Yes. You Were Stupid.',color:'var(--red)',bg:'rgba(255,59,59,0.07)',border:'rgba(255,59,59,0.25)',v:"This month was bad and the numbers prove it. You spent more than planned, probably more than you earned, and saved almost nothing. Stop pretending it \"just happened\" — it was a series of bad choices. Make a real plan and actually follow it."}
+// GRADE SYSTEM
+const GRADES = [
+  { min:90, g:'A+', l:'Financial Genius', c:'var(--green)', bg:'rgba(0,255,136,.06)', bc:'rgba(0,255,136,.22)',
+    t:"You absolutely crushed it. Savings solid, spending controlled, budget respected. This is what financial discipline actually looks like. Keep this standard." },
+  { min:80, g:'A',  l:'Very Smart',       c:'var(--green)', bg:'rgba(0,255,136,.04)', bc:'rgba(0,255,136,.15)',
+    t:"Great month. A few small slips but you're making genuinely smart choices. Most of your plan held. You know what you're doing." },
+  { min:70, g:'B',  l:'Pretty Good',      c:'var(--blue)',  bg:'rgba(77,159,255,.06)', bc:'rgba(77,159,255,.2)',
+    t:"Solid month. Mostly in control, a couple of categories slipped. Not bad at all — you know exactly what to tighten next month." },
+  { min:60, g:'C',  l:'Could Do Better',  c:'var(--amber)', bg:'rgba(255,170,0,.06)', bc:'rgba(255,170,0,.2)',
+    t:"Average. You had a plan and partially followed it. The gap between what you planned and what happened is your problem. That gap is a choice." },
+  { min:45, g:'D',  l:'Needs Work',       c:'var(--amber)', bg:'rgba(255,170,0,.04)', bc:'rgba(255,170,0,.12)',
+    t:"Rough month. Multiple categories over budget, savings too low. You had the plan — you just didn't follow it. What happened?" },
+  { min:0,  g:'F',  l:'Yes. You Were Stupid.', c:'var(--red)', bg:'rgba(255,59,59,.07)', bc:'rgba(255,59,59,.25)',
+    t:"This month was bad and the numbers prove it. Spent more than planned, saved nothing meaningful. Stop pretending it just happened. Make a real plan and actually follow it next month." }
 ];
 
-// ── JUDGE ──
-function judge(){
-  const income=parseFloat(document.getElementById('inp-income').value)||0;
-  const saved=parseFloat(document.getElementById('inp-saved').value)||0;
-  const debt=parseFloat(document.getElementById('inp-debt').value)||0;
-  const catData={};
-  let totalPlanned=0,totalActual=0;
-  cats.forEach(cat=>{
-    const p=parseFloat(document.getElementById('planned-'+cat.id)?.value)||0;
-    const a=parseFloat(document.getElementById('actual-'+cat.id)?.value)||0;
-    catData[cat.id]={planned:p,actual:a,name:cat.name,emoji:cat.emoji};
-    totalPlanned+=p;totalActual+=a;
+function score(income, totalActual, saved, debt, totalPlanned, catData) {
+  if (!income && !totalActual) return null;
+  let s = 100;
+  const sR = income > 0 ? ((income - totalActual) / income) * 100 : null;
+  const eR = income > 0 ? (totalActual / income) * 100 : null;
+  const dR = income > 0 ? (debt / income) * 100 : 0;
+  // savings rate (40 pts)
+  if (sR === null) s -= 20;
+  else if (sR < 0) s -= 42; else if (sR < 5) s -= 32; else if (sR < 10) s -= 20;
+  else if (sR < 15) s -= 12; else if (sR < 20) s -= 5;
+  if (income > 0 && saved / income >= 0.2) s += 5;
+  // expense ratio (35 pts)
+  if (eR !== null) {
+    if (eR > 120) s -= 35; else if (eR > 100) s -= 25; else if (eR > 90) s -= 14; else if (eR > 80) s -= 6;
+  }
+  // debt ratio (20 pts)
+  if (dR > 50) s -= 20; else if (dR > 40) s -= 14; else if (dR > 30) s -= 8; else if (dR > 20) s -= 3;
+  // budget overshoot (15 pts)
+  if (totalPlanned > 0) {
+    const pct = (totalActual - totalPlanned) / totalPlanned * 100;
+    if (pct > 50) s -= 15; else if (pct > 25) s -= 10; else if (pct > 10) s -= 5;
+  }
+  // category discipline (10 pts)
+  const withPlan = Object.keys(catData).filter(k => catData[k].planned > 0);
+  if (withPlan.length) {
+    const broken = withPlan.filter(k => catData[k].actual > catData[k].planned).length / withPlan.length;
+    if (broken > 0.6) s -= 10; else if (broken > 0.3) s -= 6; else if (broken > 0) s -= 2;
+  }
+  return Math.max(0, Math.min(100, Math.round(s)));
+}
+
+// JUDGE
+function judge() {
+  const income = parseFloat(document.getElementById('inp-income').value) || 0;
+  const saved  = parseFloat(document.getElementById('inp-saved').value)  || 0;
+  const debt   = parseFloat(document.getElementById('inp-debt').value)   || 0;
+  let totalPlanned = 0, totalActual = 0;
+  const catData = {};
+  cats.forEach(cat => {
+    const p = parseFloat(document.getElementById('p-' + cat.id)?.value) || 0;
+    const a = parseFloat(document.getElementById('a-' + cat.id)?.value) || 0;
+    catData[cat.id] = { planned: p, actual: a, name: cat.name, emoji: cat.emoji };
+    totalPlanned += p; totalActual += a;
   });
-  if(!income&&!totalActual){alert('Enter at least your income or some spending.');return}
-  const score=computeScore(income,totalActual,saved,debt,totalPlanned,catData);
-  const record={key:mkKey(),month:MONTHS[curMonth],year:curYear,income,saved,debt,totalPlanned,totalActual,catData,catDefs:[...cats],score,ts:Date.now()};
-  const idx=history.findIndex(h=>h.key===record.key);
-  if(idx>=0)history[idx]=record;else history.unshift(record);
-  save();renderVerdict(record);
+  if (!income && !totalActual) { alert('Enter at least your income or some spending.'); return; }
+  const sc = score(income, totalActual, saved, debt, totalPlanned, catData);
+  const record = { key: mkKey(), month: MONTHS[curMonth], year: curYear, income, saved, debt, totalPlanned, totalActual, catData, catDefs: cats.map(c=>({...c})), score: sc, ts: Date.now() };
+  const idx = history.findIndex(h => h.key === record.key);
+  if (idx >= 0) history[idx] = record; else history.unshift(record);
+  saveStorage(); renderVerdict(record);
   document.getElementById('verdict').classList.add('show');
-  setTimeout(()=>document.getElementById('verdict').scrollIntoView({behavior:'smooth',block:'start'}),50);
+  setTimeout(() => document.getElementById('verdict').scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
   renderHistory();
 }
 
-// ── RENDER VERDICT ──
-function renderVerdict(r){
-  const g=GRADES.find(gr=>r.score>=gr.min)||GRADES[GRADES.length-1];
-  const hero=document.getElementById('verdict-hero');
-  hero.style.background=g.bg;hero.style.borderColor=g.border;
-  document.getElementById('grade-big').textContent=g.grade;document.getElementById('grade-big').style.color=g.color;
-  document.getElementById('grade-label').textContent=g.label;document.getElementById('grade-label').style.color=g.color;
-  document.getElementById('grade-verdict').textContent=g.v;
-  document.getElementById('v-score').textContent=r.score??'—';document.getElementById('v-score').style.color=g.color;
-  const sR=r.income>0?Math.round((r.income-r.totalActual)/r.income*100):null;
-  const srEl=document.getElementById('v-savrate');
-  srEl.textContent=sR!==null?sR+'%':'—';
-  srEl.style.color=sR===null?'var(--muted)':sR>=20?'var(--green)':sR>=10?'var(--amber)':'var(--red)';
-  // budget kept
-  const cd=r.catData||{};
-  const withPlan=Object.keys(cd).filter(k=>cd[k].planned>0);
-  const kept=withPlan.filter(k=>cd[k].actual<=cd[k].planned).length;
-  const bkEl=document.getElementById('v-budkeep');
-  bkEl.textContent=withPlan.length?kept+'/'+withPlan.length:'—';
-  bkEl.style.color=!withPlan.length?'var(--muted)':kept===withPlan.length?'var(--green)':kept>=withPlan.length*.6?'var(--amber)':'var(--red)';
-  // number tiles
-  document.getElementById('v-income').textContent=fmtFull(r.income);
-  document.getElementById('v-planned').textContent=r.totalPlanned?fmtFull(r.totalPlanned):'—';
-  document.getElementById('v-actual').textContent=fmtFull(r.totalActual);
-  document.getElementById('v-saved').textContent=fmtFull(r.saved);
-  const totalOver=withPlan.reduce((s,k)=>s+Math.max(0,cd[k].actual-cd[k].planned),0);
-  const totalUnder=withPlan.reduce((s,k)=>s+Math.max(0,cd[k].planned-cd[k].actual),0);
-  document.getElementById('v-over').textContent=totalOver?fmtFull(totalOver):'GH₵0';
-  document.getElementById('v-under').textContent=totalUnder?fmtFull(totalUnder):'GH₵0';
+// RENDER VERDICT
+function renderVerdict(r) {
+  const g = GRADES.find(gr => r.score >= gr.min) || GRADES[GRADES.length - 1];
+  const hero = document.getElementById('vhero');
+  hero.style.background = g.bg; hero.style.borderColor = g.bc;
+  document.getElementById('vgrade').textContent = g.g; document.getElementById('vgrade').style.color = g.c;
+  document.getElementById('vlabel').textContent = g.l; document.getElementById('vlabel').style.color = g.c;
+  document.getElementById('vtext').textContent  = g.t;
 
-  // CATEGORY BREAKDOWN TABLE
-  const catKeys=Object.keys(cd).filter(k=>cd[k].planned||cd[k].actual).sort((a,b)=>cd[b].actual-cd[a].actual);
-  const maxAmt=catKeys.reduce((m,k)=>Math.max(m,cd[k].actual,cd[k].planned),1);
-  document.getElementById('vbreak-rows').innerHTML=catKeys.map(k=>{
-    const row=cd[k];const diff=row.actual-row.planned;
-    const varClass=!row.planned?'even':diff>0?'over':diff<0?'under':'even';
-    const varText=!row.planned?'no plan':Math.abs(diff)<1?'✓':(diff>0?'+':'')+fmtFull(diff);
-    const plannedW=row.planned?Math.round(row.planned/maxAmt*100):0;
-    const actualW=row.actual?Math.round(row.actual/maxAmt*100):0;
-    return`<div class="vbreak-row">
-      <div class="vbreak-name"><span>${row.emoji||'📌'}</span>${row.name}</div>
+  const sR = r.income > 0 ? Math.round((r.income - r.totalActual) / r.income * 100) : null;
+  const srEl = document.getElementById('vs-srate');
+  srEl.textContent = sR !== null ? sR + '%' : '—';
+  srEl.style.color = sR === null ? 'var(--muted)' : sR >= 20 ? 'var(--green)' : sR >= 10 ? 'var(--amber)' : 'var(--red)';
+  document.getElementById('vs-score').textContent = r.score ?? '—';
+  document.getElementById('vs-score').style.color = g.c;
+
+  const cd = r.catData || {};
+  const withPlan = Object.keys(cd).filter(k => cd[k].planned > 0);
+  const kept = withPlan.filter(k => cd[k].actual <= cd[k].planned).length;
+  const bkEl = document.getElementById('vs-bkeep');
+  bkEl.textContent = withPlan.length ? kept + '/' + withPlan.length : '—';
+  bkEl.style.color = !withPlan.length ? 'var(--muted)' : kept === withPlan.length ? 'var(--green)' : kept >= withPlan.length * .6 ? 'var(--amber)' : 'var(--red)';
+
+  document.getElementById('vn-inc').textContent   = fmtG(r.income);
+  document.getElementById('vn-plan').textContent  = r.totalPlanned ? fmtG(r.totalPlanned) : '—';
+  document.getElementById('vn-act').textContent   = fmtG(r.totalActual);
+  document.getElementById('vn-saved').textContent = fmtG(r.saved);
+  const over  = withPlan.reduce((s,k) => s + Math.max(0, cd[k].actual - cd[k].planned), 0);
+  const under = withPlan.reduce((s,k) => s + Math.max(0, cd[k].planned - cd[k].actual), 0);
+  document.getElementById('vn-over').textContent  = over  ? fmtG(over)  : 'GH₵0';
+  document.getElementById('vn-under').textContent = under ? fmtG(under) : 'GH₵0';
+
+  // BREAKDOWN TABLE
+  const keys = Object.keys(cd).filter(k => cd[k].planned || cd[k].actual).sort((a,b) => cd[b].actual - cd[a].actual);
+  const maxV = keys.reduce((m,k) => Math.max(m, cd[k].actual, cd[k].planned), 1);
+  document.getElementById('vbrows').innerHTML = keys.map(k => {
+    const row = cd[k], diff = row.actual - row.planned;
+    const vc = !row.planned ? 'none' : Math.abs(diff) < 1 ? 'even' : diff > 0 ? 'over' : 'under';
+    const vt = !row.planned ? 'no plan' : Math.abs(diff) < 1 ? '✓' : (diff > 0 ? '+' : '') + fmtG(diff);
+    const pw = row.planned ? Math.round(row.planned / maxV * 100) : 0;
+    const aw = row.actual  ? Math.round(row.actual  / maxV * 100) : 0;
+    const barColor = vc === 'over' ? 'var(--red)' : 'var(--blue)';
+    return `<div class="vbrow">
+      <div class="vbname"><span>${row.emoji||'📌'}</span><span>${row.name}</span></div>
       <div>
-        <div class="vbreak-num" style="color:var(--amber)">${row.planned?fmtFull(row.planned):'—'}</div>
-        <div class="bar-wrap" style="margin-top:4px"><div class="bar-fill" style="width:${plannedW}%;background:var(--amber);opacity:.6"></div></div>
+        <div class="vbnum" style="color:var(--amber)">${row.planned ? fmtG(row.planned) : '—'}</div>
+        <div class="vbar-wrap"><div class="vbar" style="width:${pw}%;background:var(--amber);opacity:.5"></div></div>
       </div>
       <div>
-        <div class="vbreak-num" style="color:var(--blue)">${row.actual?fmtFull(row.actual):'—'}</div>
-        <div class="bar-wrap" style="margin-top:4px"><div class="bar-fill" style="width:${actualW}%;background:${varClass==='over'?'var(--red)':'var(--blue)'}"></div></div>
+        <div class="vbnum" style="color:${barColor}">${row.actual ? fmtG(row.actual) : '—'}</div>
+        <div class="vbar-wrap"><div class="vbar" style="width:${aw}%;background:${barColor}"></div></div>
       </div>
-      <div class="vbreak-var ${varClass}">${varText}</div>
+      <div class="vbvar ${vc}">${vt}</div>
     </div>`;
   }).join('');
 
   // INSIGHTS
-  const ins=[];
-  if(sR===null)ins.push({i:'💡',t:'<strong>No income entered.</strong> Add your income to unlock your full savings rate and financial health score.'});
-  else if(sR<0)ins.push({i:'🔴',t:`<strong>You spent ${fmtFull(r.totalActual-r.income)} more than you earned.</strong> That is a deficit, not a budget. Every month like this puts you further behind.`});
-  else if(sR<10)ins.push({i:'🟡',t:`<strong>Savings rate: ${sR}%.</strong> The healthy minimum is 20%. You're saving a fraction of what you should be. Even one fewer expense category could change this.`});
-  else if(sR>=20)ins.push({i:'🟢',t:`<strong>Savings rate: ${sR}% — above the 20% benchmark.</strong> You're actually building something. Most people never get here.`});
-  else ins.push({i:'🟡',t:`<strong>Savings rate: ${sR}%.</strong> Getting closer to 20% but not quite there. A little more discipline and you'd be genuinely in the clear.`});
+  const ins = [];
+  if (sR === null) ins.push({i:'💡', t:'<strong>No income entered.</strong> Add your income to get savings rate and full verdict.'});
+  else if (sR < 0) ins.push({i:'🔴', t:`<strong>You spent ${fmtG(r.totalActual - r.income)} more than you earned.</strong> That is a deficit, not a budget. Every month like this you fall further behind.`});
+  else if (sR < 10) ins.push({i:'🟡', t:`<strong>Savings rate: ${sR}%.</strong> Target is 20%+. You're saving a fraction of what you should. Even cutting one category could change this fast.`});
+  else if (sR >= 20) ins.push({i:'🟢', t:`<strong>Savings rate: ${sR}% — above the 20% benchmark.</strong> You're actually building something. Most people never get here consistently.`});
+  else ins.push({i:'🟡', t:`<strong>Savings rate: ${sR}%.</strong> Getting close to 20%. One more push and you'd be in the strong zone.`});
 
-  if(r.totalPlanned>0){
-    const gap=r.totalActual-r.totalPlanned;
-    if(gap>0)ins.push({i:'⚠️',t:`<strong>You overspent your plan by ${fmtFull(gap)}.</strong> You had a budget — you just didn't follow it. That's not a money problem, that's a discipline problem.`});
-    else if(gap<0)ins.push({i:'✅',t:`<strong>You spent ${fmtFull(Math.abs(gap))} less than planned.</strong> That's genuine discipline. The plan worked because you made it work.`});
-    else ins.push({i:'✅',t:'<strong>You hit your budget almost exactly.</strong> That is rare and impressive. Perfect financial control.'});
+  if (r.totalPlanned > 0) {
+    const gap = r.totalActual - r.totalPlanned;
+    if (gap > 0) ins.push({i:'⚠️', t:`<strong>You overspent your plan by ${fmtG(gap)}.</strong> You had a plan — you just didn't follow it. That's not a money problem, that's a discipline problem.`});
+    else if (gap < 0) ins.push({i:'✅', t:`<strong>You spent ${fmtG(Math.abs(gap))} less than planned.</strong> Genuine discipline. The plan worked because you made it work.`});
+    else ins.push({i:'✅', t:'<strong>You hit your budget almost exactly.</strong> That is rare. Perfect control.'});
+  } else {
+    ins.push({i:'💡', t:'<strong>No planned amounts set.</strong> Set a Planned amount for each category next month. You can\'t know if you failed without a plan to compare against.'});
   }
 
-  if(withPlan.length>0){
-    const broken=withPlan.filter(k=>cd[k].actual>cd[k].planned);
-    if(broken.length===0)ins.push({i:'✅',t:`<strong>All ${withPlan.length} category budgets respected.</strong> Perfect discipline across the board.`});
-    else{const worst=broken.sort((a,b)=>(cd[b].actual-cd[b].planned)-(cd[a].actual-cd[a].planned))[0];
-      ins.push({i:'❌',t:`<strong>${broken.length} out of ${withPlan.length} categories went over budget.</strong> Biggest offender: <strong>${cd[worst].name}</strong> — planned ${fmtFull(cd[worst].planned)}, actually spent ${fmtFull(cd[worst].actual)} (+${fmtFull(cd[worst].actual-cd[worst].planned)}).`});}
-  }else{ins.push({i:'💡',t:'<strong>No planned amounts set.</strong> Set a "Planned" amount for each category next month. You can\'t know if you failed without a plan.'});}
+  if (withPlan.length) {
+    const broken = withPlan.filter(k => cd[k].actual > cd[k].planned);
+    if (!broken.length) ins.push({i:'✅', t:`<strong>All ${withPlan.length} category budgets respected.</strong> Every single one. That's real discipline.`});
+    else {
+      const worst = broken.sort((a,b) => (cd[b].actual-cd[b].planned) - (cd[a].actual-cd[a].planned))[0];
+      ins.push({i:'❌', t:`<strong>${broken.length}/${withPlan.length} categories went over budget.</strong> Worst offender: <strong>${cd[worst].name}</strong> — planned ${fmtG(cd[worst].planned)}, spent ${fmtG(cd[worst].actual)} (+${fmtG(cd[worst].actual - cd[worst].planned)}).`});
+    }
+  }
 
-  const topCats=catKeys.slice(0,1);
-  if(topCats.length&&r.totalActual>0){const top=topCats[0];const pct=Math.round(cd[top].actual/r.totalActual*100);ins.push({i:cd[top].emoji||'📌',t:`<strong>${cd[top].name} was your biggest spend at ${pct}% of total spending</strong> — ${fmtFull(cd[top].actual)}.${pct>40?' That's dominating your budget. Is it essential or a habit you haven\'t questioned?':' That looks proportionate.'}`);}
+  if (keys.length && r.totalActual > 0) {
+    const top = keys[0]; const pct = Math.round(cd[top].actual / r.totalActual * 100);
+    ins.push({i: cd[top].emoji||'📌', t:`<strong>${cd[top].name} was your biggest spend — ${pct}% of total (${fmtG(cd[top].actual)}).</strong>${pct > 35 ? ' That\'s dominating your budget. Is it truly essential?' : ' That looks proportionate.'}`});
+  }
 
-  if(r.debt>0&&r.income>0){const dPct=Math.round(r.debt/r.income*100);ins.push({i:dPct>30?'💸':'👍',t:`<strong>${dPct}% of income went to debt payments.</strong>${dPct>40?' That is a debt crisis. You are working for your creditors.':dPct>20?' Manageable, but pay it down faster to free up cash.':' That\'s a healthy debt load — keep chipping away.'}`});}
+  if (r.debt > 0 && r.income > 0) {
+    const dp = Math.round(r.debt / r.income * 100);
+    ins.push({i: dp > 30 ? '💸' : '👍', t:`<strong>${dp}% of income went to debt payments (${fmtG(r.debt)}).</strong>${dp > 40 ? ' That is a debt crisis — you are working for your creditors.' : dp > 20 ? ' Manageable, but pay it down faster to free up cash.' : ' Healthy debt load — keep chipping away.'}`});
+  }
 
-  if(history.length>=2){const prev=history.find(h=>h.key!==mkKey()&&h.score!=null);if(prev&&r.score!=null){const d=r.score-prev.score;if(Math.abs(d)>=8)ins.push({i:d>0?'📈':'📉',t:`<strong>Score ${d>0?'up':'down'} ${Math.abs(d)} points</strong> vs ${prev.month} ${prev.year} (${prev.score}/100 → ${r.score}/100). ${d>0?'Real progress. Keep going.':'Something slipped. What changed?'}`});}}
+  if (history.length >= 2) {
+    const prev = history.find(h => h.key !== mkKey() && h.score != null);
+    if (prev && r.score != null) {
+      const d = r.score - prev.score;
+      if (Math.abs(d) >= 8) ins.push({i: d > 0 ? '📈' : '📉', t:`<strong>Score ${d > 0 ? 'up' : 'down'} ${Math.abs(d)} points</strong> vs ${prev.month} ${prev.year} (${prev.score}/100 → ${r.score}/100). ${d > 0 ? 'Real progress — keep going.' : 'Something slipped. What changed?'}`});
+    }
+  }
 
-  document.getElementById('insights').innerHTML=ins.map(i=>`<div class="insight"><div class="insight-icon">${i.i}</div><div class="insight-body">${i.t}</div></div>`).join('');
+  document.getElementById('insights').innerHTML = ins.map(i => `<div class="ins"><div class="ins-ico">${i.i}</div><div class="ins-txt">${i.t}</div></div>`).join('');
 }
 
-// ── HISTORY ──
-function renderHistory(){
-  const el=document.getElementById('history-list');
-  if(!history.length){el.innerHTML='<div style="font-size:13px;color:var(--muted);padding:8px 0">No past verdicts yet.</div>';return}
-  el.innerHTML=history.slice(0,12).map(h=>{
-    const g=GRADES.find(gr=>h.score>=gr.min)||GRADES[GRADES.length-1];
-    return`<div class="history-row" onclick="loadHistoryEntry('${h.key}')">
-      <div class="history-month">${h.month} ${h.year}</div>
-      <div class="history-score">${fmtFull(h.income)} earned</div>
-      <div class="history-grade" style="color:${g.color}">${g.grade}</div>
-      <div class="history-score">${h.score??'—'}/100</div>
-      <button class="del-history-btn" onclick="event.stopPropagation();deleteEntry('${h.key}')">✕</button>
+// HISTORY
+function renderHistory() {
+  const el = document.getElementById('hist-list');
+  if (!history.length) { el.innerHTML = '<div style="font-size:13px;color:var(--muted);padding:8px 0">No past verdicts yet. Judge yourself first.</div>'; return; }
+  el.innerHTML = history.slice(0, 12).map(h => {
+    const g = GRADES.find(gr => h.score >= gr.min) || GRADES[GRADES.length - 1];
+    return `<div class="hrow" onclick="loadEntry('${h.key}')">
+      <div class="hrow-month">${h.month} ${h.year}</div>
+      <div class="hrow-inc">${fmtG(h.income)}</div>
+      <div class="hrow-grade" style="color:${g.c}">${g.g}</div>
+      <div class="hrow-score">${h.score ?? '—'}/100</div>
+      <button class="hrow-del" onclick="event.stopPropagation();delEntry('${h.key}')">✕</button>
     </div>`;
   }).join('');
 }
-function loadHistoryEntry(key){
-  const e=history.find(h=>h.key===key);if(!e)return;
-  const d=new Date(e.year,MONTHS.indexOf(e.month),1);
-  curYear=d.getFullYear();curMonth=d.getMonth();
-  if(e.catDefs)cats=[...e.catDefs];
-  updateMonthLabel();loadMonth();
-  window.scrollTo({top:0,behavior:'smooth'});
+function loadEntry(key) {
+  const e = history.find(h => h.key === key); if (!e) return;
+  curYear = e.year; curMonth = MONTHS.indexOf(e.month);
+  updateLabel(); loadMonth();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
-function deleteEntry(key){history=history.filter(h=>h.key!==key);save();renderHistory()}
-function clearAll(){if(confirm('Delete all saved data?')){history=[];save();renderHistory();document.getElementById('verdict').classList.remove('show')}}
+function delEntry(key) { history = history.filter(h => h.key !== key); saveStorage(); renderHistory(); }
+function clearAll() { if (confirm('Delete all saved data?')) { history = []; saveStorage(); renderHistory(); document.getElementById('verdict').classList.remove('show'); } }
 
-// ── INIT ──
-renderCatRows();
+// INIT
+renderRows();
 renderHistory();
 </script>
 </body>
