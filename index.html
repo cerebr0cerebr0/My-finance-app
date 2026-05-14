@@ -30,7 +30,7 @@ body{font-family:var(--f);background:var(--bg);color:var(--text);min-height:100v
 .dlbl{font-size:9px;letter-spacing:1.6px;color:var(--muted);text-transform:uppercase;margin-bottom:6px}
 .dval{font-family:var(--d);font-size:34px;line-height:1}
 .dsub{font-size:11px;color:var(--muted);margin-top:5px}
-.tabs{position:sticky;top:0;z-index:50;background:var(--bg);display:grid;grid-template-columns:repeat(5,1fr);gap:8px;padding:10px 0;margin-bottom:10px}
+.tabs{position:sticky;top:0;z-index:50;background:var(--bg);display:grid;grid-template-columns:repeat(6,1fr);gap:8px;padding:10px 0;margin-bottom:10px}
 @media(max-width:760px){.tabs{grid-template-columns:repeat(3,1fr)}}
 .tab{border:1px solid var(--border);background:var(--card);color:var(--text);padding:11px 8px;border-radius:12px;font-weight:800;font-size:12px;cursor:pointer}
 .tab.active,.tab:hover{border-color:var(--green);color:var(--green);background:rgba(0,255,136,.06)}
@@ -74,6 +74,16 @@ body{font-family:var(--f);background:var(--bg);color:var(--text);min-height:100v
 .hist-row:hover{border-color:var(--green)}
 .small{font-size:12px;color:var(--muted)}
 .strong{font-weight:900}
+
+.behavior-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:10px}
+@media(max-width:760px){.behavior-grid{grid-template-columns:1fr}}
+.behavior-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:15px}
+.behavior-title{font-size:12px;font-weight:900;color:var(--text);margin-bottom:6px}
+.behavior-text{font-size:13px;color:var(--muted);line-height:1.65}
+.behavior-good{border-color:rgba(0,255,136,.22)}
+.behavior-warn{border-color:rgba(255,170,0,.22)}
+.behavior-bad{border-color:rgba(255,59,59,.24)}
+
 </style>
 </head>
 <body>
@@ -102,6 +112,7 @@ body{font-family:var(--f);background:var(--bg);color:var(--text);min-height:100v
     <button class="tab active" onclick="showSection('income',this)">💼 Income</button>
     <button class="tab" onclick="showSection('budget',this)">📊 Budget</button>
     <button class="tab" onclick="showSection('savings',this)">🏦 Savings</button>
+    <button class="tab" onclick="showSection('behavior',this)">🧠 Behavior</button>
     <button class="tab" onclick="showSection('history',this)">🕒 History</button>
     <button class="tab" onclick="showAll(this)">👁 All</button>
   </div>
@@ -159,6 +170,23 @@ body{font-family:var(--f);background:var(--bg);color:var(--text);min-height:100v
       <div class="verdict-title" id="verdict-grade">—</div>
       <div class="verdict-msg" id="verdict-msg">Enter your data and judge the month.</div>
     </div>
+  </section>
+
+
+  <section id="behavior" class="section">
+    <div class="sec-title">
+      <div class="sec-label">Behavioral Finance Detection</div>
+      <button class="btn" onclick="renderBehavior()">Refresh Analysis</button>
+    </div>
+
+    <div class="verdict">
+      <div class="verdict-title" style="font-size:38px">BEHAVIOR</div>
+      <div class="verdict-msg">
+        The app detects habits, impulsivity, lifestyle inflation, emotional consumption, discipline, and monthly patterns from your saved history.
+      </div>
+    </div>
+
+    <div class="behavior-grid" id="behavior-list"></div>
   </section>
 
   <section id="history" class="section">
@@ -373,6 +401,7 @@ function saveDraft(){
   if(idx>=0)history[idx]=entry; else history.unshift(entry);
   saveHistory();
   renderHistory();
+renderBehavior();
   recalc();
 }
 
@@ -409,6 +438,7 @@ function judgeMonth(){
   saveHistory();
   renderVerdict(entry);
   renderHistory();
+  renderBehavior();
   recalc();
   showSection('savings',document.querySelector('.tab:nth-child(3)'));
 }
@@ -418,6 +448,147 @@ function renderVerdict(entry){
   grade.textContent=entry.grade||'—';
   grade.style.color=entry.grade==='A+'||entry.grade==='A'?'var(--green)':entry.grade==='B+'||entry.grade==='B'?'var(--blue)':entry.grade==='C'?'var(--amber)':'var(--red)';
   msg.innerHTML=`<strong>${entry.title||''}</strong><br>${entry.msg||'Enter your data and judge the month.'}<br><br>Savings rate: <strong>${entry.savingsRate??0}%</strong>.<br>Calculated Monthly Savings: <strong>${fmt(monthlySavings(entry.totalIncome,entry.totalActual,entry.debt||0))}</strong>.<br><span style='color:var(--muted)'>Formula: Savings category + positive budget difference.</span>`;
+}
+
+
+function sumCatFromEntry(entry, nameIncludes){
+  if(!entry || !entry.categories) return 0;
+  const term = nameIncludes.toLowerCase();
+  return Object.values(entry.categories).reduce((sum,c)=>{
+    const n=(c.name||'').toLowerCase();
+    return n.includes(term) ? sum + (parseFloat(c.actual)||0) : sum;
+  },0);
+}
+
+function judgedHistory(){
+  return history
+    .filter(h=>h && h.score!=null)
+    .sort((a,b)=>(a.year*100+MONTHS.indexOf(a.month))-(b.year*100+MONTHS.indexOf(b.month)));
+}
+
+function avg(arr){
+  if(!arr.length) return 0;
+  return arr.reduce((a,b)=>a+b,0)/arr.length;
+}
+
+function addBehaviorCard(items,type,title,text){
+  const cls = type === 'good' ? 'behavior-good' : type === 'bad' ? 'behavior-bad' : 'behavior-warn';
+  const icon = type === 'good' ? '🟢' : type === 'bad' ? '🔴' : '🟡';
+  items.push(`<div class="behavior-card ${cls}">
+    <div class="behavior-title">${icon} ${title}</div>
+    <div class="behavior-text">${text}</div>
+  </div>`);
+}
+
+function renderBehavior(){
+  const list=document.getElementById('behavior-list');
+  if(!list) return;
+
+  const data=judgedHistory();
+  const items=[];
+
+  if(data.length < 2){
+    list.innerHTML=`<div class="behavior-card behavior-warn">
+      <div class="behavior-title">🟡 Not enough history yet</div>
+      <div class="behavior-text">Judge at least 2 months before the app can detect reliable financial behavior patterns.</div>
+    </div>`;
+    return;
+  }
+
+  const last=data[data.length-1];
+  const prev=data[data.length-2];
+
+  const lastIncome=last.totalIncome||0;
+  const prevIncome=prev.totalIncome||0;
+  const lastActual=last.totalActual||0;
+  const prevActual=prev.totalActual||0;
+
+  const lastSavings=monthlySavings(last.totalIncome,last.totalActual,last.debt||0);
+  const prevSavings=monthlySavings(prev.totalIncome,prev.totalActual,prev.debt||0);
+
+  const lastSpendRate=lastIncome ? (lastActual/lastIncome)*100 : 0;
+  const prevSpendRate=prevIncome ? (prevActual/prevIncome)*100 : 0;
+
+  const lastSavingsRate=lastIncome ? (lastSavings/lastIncome)*100 : 0;
+  const prevSavingsRate=prevIncome ? (prevSavings/prevIncome)*100 : 0;
+
+  // Discipline
+  const keptRatio = last.totalCats ? (last.kept/last.totalCats)*100 : 0;
+  if(keptRatio >= 85){
+    addBehaviorCard(items,'good','Discipline Pattern',`You respected <strong>${Math.round(keptRatio)}%</strong> of your planned categories this month. That shows strong budget discipline.`);
+  }else if(keptRatio >= 60){
+    addBehaviorCard(items,'warn','Discipline Pattern',`You respected <strong>${Math.round(keptRatio)}%</strong> of your planned categories. Your discipline is acceptable, but several categories still need control.`);
+  }else{
+    addBehaviorCard(items,'bad','Discipline Pattern',`You respected only <strong>${Math.round(keptRatio)}%</strong> of your planned categories. This suggests weak execution, not just weak planning.`);
+  }
+
+  // Lifestyle inflation
+  const incomeChange = prevIncome ? ((lastIncome-prevIncome)/prevIncome)*100 : 0;
+  const spendChange = prevActual ? ((lastActual-prevActual)/prevActual)*100 : 0;
+
+  if(incomeChange > 0 && spendChange > incomeChange + 10){
+    addBehaviorCard(items,'bad','Lifestyle Inflation',`Your income increased by <strong>${Math.round(incomeChange)}%</strong>, but spending increased by <strong>${Math.round(spendChange)}%</strong>. Lifestyle is growing faster than income.`);
+  }else if(incomeChange > 0 && spendChange <= incomeChange){
+    addBehaviorCard(items,'good','Lifestyle Inflation',`Income increased by <strong>${Math.round(incomeChange)}%</strong> while spending stayed controlled. This is wealth-building behavior.`);
+  }else{
+    addBehaviorCard(items,'warn','Lifestyle Inflation',`No strong lifestyle inflation detected this month. Keep watching whether spending grows faster than income.`);
+  }
+
+  // Impulsivity proxy: overspend categories
+  const overCats = Object.values(last.categories||{}).filter(c=>(c.planned||0)>0 && (c.actual||0)>(c.planned||0));
+  if(overCats.length >= 4){
+    const worst = overCats.sort((a,b)=>(b.actual-b.planned)-(a.actual-a.planned))[0];
+    addBehaviorCard(items,'bad','Impulsivity Signal',`You overspent in <strong>${overCats.length}</strong> categories. Biggest slip: <strong>${worst.name}</strong> by <strong>${fmt((worst.actual||0)-(worst.planned||0))}</strong>. This may indicate impulse spending or weak category boundaries.`);
+  }else if(overCats.length > 0){
+    addBehaviorCard(items,'warn','Impulsivity Signal',`You overspent in <strong>${overCats.length}</strong> categories. Not critical, but these are the places to watch next month.`);
+  }else{
+    addBehaviorCard(items,'good','Impulsivity Signal',`No category overspending detected. Your behavior looks controlled this month.`);
+  }
+
+  // Emotional consumption proxy: Food + Shows + Fiancee + Personal lifestyle
+  const food = sumCatFromEntry(last,'food');
+  const shows = sumCatFromEntry(last,'shows');
+  const fiancee = sumCatFromEntry(last,'fiancée') + sumCatFromEntry(last,'fiancee');
+  const lifestyle = food + shows + fiancee;
+  const lifestyleRate = lastIncome ? (lifestyle/lastIncome)*100 : 0;
+
+  if(lifestyleRate > 40){
+    addBehaviorCard(items,'bad','Emotional / Lifestyle Consumption',`Food, Shows and relationship/lifestyle spending represent about <strong>${Math.round(lifestyleRate)}%</strong> of income. This suggests comfort or emotional consumption is dominating your money flow.`);
+  }else if(lifestyleRate > 25){
+    addBehaviorCard(items,'warn','Emotional / Lifestyle Consumption',`Lifestyle consumption is around <strong>${Math.round(lifestyleRate)}%</strong> of income. It is not dangerous yet, but it can block wealth building if it keeps growing.`);
+  }else{
+    addBehaviorCard(items,'good','Emotional / Lifestyle Consumption',`Lifestyle consumption is under control at around <strong>${Math.round(lifestyleRate)}%</strong> of income.`);
+  }
+
+  // Monthly pattern: savings trend
+  if(lastSavingsRate > prevSavingsRate + 5){
+    addBehaviorCard(items,'good','Monthly Savings Pattern',`Savings rate improved from <strong>${Math.round(prevSavingsRate)}%</strong> to <strong>${Math.round(lastSavingsRate)}%</strong>. Your behavior is improving.`);
+  }else if(lastSavingsRate + 5 < prevSavingsRate){
+    addBehaviorCard(items,'bad','Monthly Savings Pattern',`Savings rate dropped from <strong>${Math.round(prevSavingsRate)}%</strong> to <strong>${Math.round(lastSavingsRate)}%</strong>. Something in your behavior became more consumption-heavy.`);
+  }else{
+    addBehaviorCard(items,'warn','Monthly Savings Pattern',`Savings rate is mostly stable at around <strong>${Math.round(lastSavingsRate)}%</strong>. Stable is good, but growth requires pushing it higher.`);
+  }
+
+  // Habits: 3-month repeated overspend if enough data
+  if(data.length >= 3){
+    const recent=data.slice(-3);
+    const repeated={};
+    recent.forEach(m=>{
+      Object.values(m.categories||{}).forEach(c=>{
+        if((c.planned||0)>0 && (c.actual||0)>(c.planned||0)){
+          repeated[c.name]=(repeated[c.name]||0)+1;
+        }
+      });
+    });
+    const chronic=Object.entries(repeated).filter(([_,count])=>count>=2).map(([name])=>name);
+    if(chronic.length){
+      addBehaviorCard(items,'bad','Repeated Habit Detected',`These categories overspent in at least 2 of the last 3 judged months: <strong>${chronic.join(', ')}</strong>. This is no longer an accident; it is a habit.`);
+    }else{
+      addBehaviorCard(items,'good','Repeated Habit Detected',`No repeated overspending habit detected across the last 3 judged months.`);
+    }
+  }
+
+  list.innerHTML=items.join('');
 }
 
 function renderHistory(){
