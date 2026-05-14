@@ -186,6 +186,16 @@ body{font-family:var(--f);background:var(--bg);color:var(--text);min-height:100v
 .parent-row .cname{border-color:rgba(0,255,136,.18)}
 .parent-total{font-size:14px;font-weight:800;color:var(--text);padding-top:5px;font-family:monospace}
 
+
+.wealth-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:18px}
+@media(max-width:760px){.wealth-grid{grid-template-columns:repeat(2,1fr)}}
+.wealth-card{background:linear-gradient(180deg,#101018,#0a0a10);border:1px solid #222230;border-radius:18px;padding:18px}
+.wealth-title{font-size:10px;letter-spacing:1.6px;color:var(--muted);text-transform:uppercase;margin-bottom:8px}
+.wealth-score{font-family:var(--d);font-size:42px;line-height:1}
+.wealth-desc{font-size:11px;color:var(--muted);margin-top:6px;line-height:1.5}
+.wealth-insight{margin-top:16px;background:rgba(0,255,136,.05);border:1px solid rgba(0,255,136,.14);padding:16px;border-radius:16px;font-size:13px;line-height:1.7;color:var(--muted)}
+.wealth-insight strong{color:var(--text)}
+
 </style>
 </head>
 <body>
@@ -229,7 +239,38 @@ body{font-family:var(--f);background:var(--bg);color:var(--text);min-height:100v
     </div>
   </div>
 
-  <div class="quick-warning" id="dash-warning">
+  
+<div class="wealth-grid">
+  <div class="wealth-card">
+    <div class="wealth-title">Wealth Score</div>
+    <div class="wealth-score" id="wealth-score" style="color:var(--green)">—</div>
+    <div class="wealth-desc">How much your behavior builds long-term wealth</div>
+  </div>
+
+  <div class="wealth-card">
+    <div class="wealth-title">Freedom Score</div>
+    <div class="wealth-score" id="freedom-score" style="color:var(--blue)">—</div>
+    <div class="wealth-desc">Dependence on one income source</div>
+  </div>
+
+  <div class="wealth-card">
+    <div class="wealth-title">Growth Score</div>
+    <div class="wealth-score" id="growth-score" style="color:var(--amber)">—</div>
+    <div class="wealth-desc">Income expansion & future trajectory</div>
+  </div>
+
+  <div class="wealth-card">
+    <div class="wealth-title">Lifestyle Risk</div>
+    <div class="wealth-score" id="risk-score" style="color:var(--red)">—</div>
+    <div class="wealth-desc">How dangerous your lifestyle is financially</div>
+  </div>
+</div>
+
+<div class="wealth-insight" id="wealth-insight">
+  <strong>Wealth Intelligence:</strong> The app will analyze whether your behavior is helping you become richer or simply survive better.
+</div>
+
+<div class="quick-warning" id="dash-warning">
     <strong>Dashboard view:</strong> enter your details below, then use “Judge Me” to generate the full financial verdict.
   </div>
 
@@ -269,13 +310,13 @@ body{font-family:var(--f);background:var(--bg);color:var(--text);min-height:100v
 <div class="top-grid" style="grid-template-columns:1fr 1fr;">
   <div class="icard">
     <div class="icard-label">🏦 Saved</div>
-    <input class="icard-input" id="inp-saved" type="number" placeholder="0" min="0" oninput="updateDashboard()">
+    <input class="icard-input" id="inp-saved" type="number" placeholder="0" min="0" oninput="updateDashboard(); saveCurrentMonthDraft()">
     <div class="icard-sub">GH₵ put aside</div>
   </div>
 
   <div class="icard">
     <div class="icard-label">💳 Debt Payments</div>
-    <input class="icard-input" id="inp-debt" type="number" placeholder="0" min="0" oninput="updateDashboard()">
+    <input class="icard-input" id="inp-debt" type="number" placeholder="0" min="0" oninput="updateDashboard(); saveCurrentMonthDraft()">
     <div class="icard-sub">GH₵ to loans</div>
   </div>
 </div>
@@ -284,7 +325,8 @@ body{font-family:var(--f);background:var(--bg);color:var(--text);min-height:100v
   <div class="icard-label">📝 Monthly Comments</div>
   <textarea id="monthly-comments"
     style="width:100%;min-height:120px;background:none;border:none;outline:none;color:var(--text);font-family:var(--f);font-size:14px;resize:vertical"
-    placeholder="What happened this month? Why did you overspend? Any major event, emergency or achievement?"></textarea>
+    placeholder="What happened this month? Why did you overspend? Any major event, emergency or achievement?" oninput="saveCurrentMonthDraft()"></textarea>
+  <button class="add-btn" style="margin-top:12px" onclick="saveCurrentMonthDraft()">💾 Save Now</button>
 </div>
 
 </div>
@@ -409,7 +451,7 @@ function renderIncomeSources() {
           value="${val || ''}"
           placeholder="0"
           min="0"
-          oninput="updateIncomeTotal()">
+          oninput="updateIncomeTotal(); saveCurrentMonthDraft()">
         <div class="icard-sub">GH₵ ${src.name.toLowerCase()} income</div>
       </div>
     `;
@@ -430,6 +472,8 @@ function updateIncomeTotal() {
   if (typeof updateDashboard === 'function') {
     updateDashboard();
   }
+
+  calculateWealthMetrics();
 }
 
 
@@ -495,6 +539,7 @@ const mkKey = () => curYear + '-' + String(curMonth+1).padStart(2,'0');
 // MONTH NAV
 function updateLabel() { document.getElementById('mlabel').textContent = MS[curMonth] + ' ' + curYear; }
 function changeMonth(d) {
+  saveCurrentMonthDraft();
   curMonth += d;
   if (curMonth > 11) { curMonth = 0; curYear++; }
   if (curMonth < 0) { curMonth = 11; curYear--; }
@@ -547,11 +592,11 @@ function renderRows() {
           </div>
           <div class="cnum">
             <div class="cnum-lbl" style="color:var(--amber)">Planned</div>
-            <input class="cnum-inp" id="p-${key}" type="number" placeholder="0" min="0" value="${planned||''}" oninput="recalc()">
+            <input class="cnum-inp" id="p-${key}" type="number" placeholder="0" min="0" value="${planned||''}" oninput="recalc(); saveCurrentMonthDraft()">
           </div>
           <div class="cnum actual">
             <div class="cnum-lbl" style="color:var(--blue)">Actual</div>
-            <input class="cnum-inp" id="a-${key}" type="number" placeholder="0" min="0" value="${actual||''}" oninput="recalc()">
+            <input class="cnum-inp" id="a-${key}" type="number" placeholder="0" min="0" value="${actual||''}" oninput="recalc(); saveCurrentMonthDraft()">
           </div>
           <div class="vpill none" id="vp-${key}">—</div>
           <div></div>`;
@@ -575,11 +620,11 @@ function renderRows() {
       </div>
       <div class="cnum">
         <div class="cnum-lbl" style="color:var(--amber)">Planned</div>
-        <input class="cnum-inp" id="p-${cat.id}" type="number" placeholder="0" min="0" value="${planned||''}" oninput="recalc()">
+        <input class="cnum-inp" id="p-${cat.id}" type="number" placeholder="0" min="0" value="${planned||''}" oninput="recalc(); saveCurrentMonthDraft()">
       </div>
       <div class="cnum actual">
         <div class="cnum-lbl" style="color:var(--blue)">Actual</div>
-        <input class="cnum-inp" id="a-${cat.id}" type="number" placeholder="0" min="0" value="${actual||''}" oninput="recalc()">
+        <input class="cnum-inp" id="a-${cat.id}" type="number" placeholder="0" min="0" value="${actual||''}" oninput="recalc(); saveCurrentMonthDraft()">
       </div>
       <div class="vpill none" id="vp-${cat.id}">—</div>
       <button class="xbtn" onclick="delCat('${cat.id}')" ${cats.length <= 1 ? 'disabled' : ''}>✕</button>`;
@@ -1081,6 +1126,168 @@ function delEntry(key) { history = history.filter(h => h.key !== key); saveStora
 function clearAll() { if (confirm('Delete all saved data?')) { history = []; saveStorage(); renderHistory(); document.getElementById('verdict').classList.remove('show'); } }
 
 
+
+// AUTOSAVE CURRENT MONTH DATA
+function saveCurrentMonthDraft() {
+  const incomeSources = {};
+  let income = 0;
+
+  document.querySelectorAll('.income-input').forEach(inp => {
+    const val = parseFloat(inp.value) || 0;
+    incomeSources[inp.dataset.income] = val;
+    income += val;
+  });
+
+  const saved = parseFloat(document.getElementById('inp-saved')?.value) || 0;
+  const debt = parseFloat(document.getElementById('inp-debt')?.value) || 0;
+  const comments = document.getElementById('monthly-comments')?.value || '';
+
+  let totalPlanned = 0, totalActual = 0;
+  const catData = {};
+
+  cats.forEach(cat => {
+    if (cat.subcategories && cat.subcategories.length) {
+      let pTotal = 0, aTotal = 0;
+
+      cat.subcategories.forEach(sub => {
+        const key = cat.id + '_' + sub.id;
+        const p = parseFloat(document.getElementById('p-' + key)?.value) || 0;
+        const a = parseFloat(document.getElementById('a-' + key)?.value) || 0;
+        catData[key] = { planned:p, actual:a, name:sub.name, emoji:cat.emoji, parent:cat.name };
+        pTotal += p;
+        aTotal += a;
+      });
+
+      catData[cat.id] = { planned:pTotal, actual:aTotal, name:cat.name, emoji:cat.emoji, isParent:true };
+      totalPlanned += pTotal;
+      totalActual += aTotal;
+      return;
+    }
+
+    const p = parseFloat(document.getElementById('p-' + cat.id)?.value) || 0;
+    const a = parseFloat(document.getElementById('a-' + cat.id)?.value) || 0;
+    catData[cat.id] = { planned:p, actual:a, name:cat.name, emoji:cat.emoji };
+    totalPlanned += p;
+    totalActual += a;
+  });
+
+  const existing = history.find(h => h.key === mkKey()) || {};
+  const record = {
+    ...existing,
+    key: mkKey(),
+    month: MONTHS[curMonth],
+    year: curYear,
+    income,
+    incomeSources,
+    saved,
+    debt,
+    comments,
+    totalPlanned,
+    totalActual,
+    catData,
+    catDefs: cats.map(c => ({...c})),
+    ts: Date.now()
+  };
+
+  const idx = history.findIndex(h => h.key === record.key);
+  if (idx >= 0) history[idx] = record;
+  else history.unshift(record);
+
+  saveStorage();
+  renderHistory();
+}
+
+
+
+// WEALTH INTELLIGENCE ENGINE
+function calculateWealthMetrics() {
+
+  let income = 0;
+  const incomes = [];
+
+  document.querySelectorAll('.income-input').forEach(inp => {
+    const val = parseFloat(inp.value) || 0;
+    income += val;
+    incomes.push(val);
+  });
+
+  let actual = 0;
+  let food = 0;
+  let shows = 0;
+
+  cats.forEach(cat => {
+
+    if (cat.subcategories && cat.subcategories.length) {
+      cat.subcategories.forEach(sub => {
+        actual += parseFloat(document.getElementById('a-' + cat.id + '_' + sub.id)?.value) || 0;
+      });
+      return;
+    }
+
+    const val = parseFloat(document.getElementById('a-' + cat.id)?.value) || 0;
+    actual += val;
+
+    if (cat.id === 'food') food = val;
+    if (cat.id === 'shows') shows = val;
+  });
+
+  const saved = parseFloat(document.getElementById('inp-saved')?.value) || 0;
+
+  if (!income) return;
+
+  // Wealth score
+  let wealth = 50;
+
+  const savingsRate = ((income - actual) / income) * 100;
+
+  if (savingsRate >= 40) wealth += 35;
+  else if (savingsRate >= 25) wealth += 25;
+  else if (savingsRate >= 15) wealth += 10;
+  else wealth -= 15;
+
+  if (saved > 0) wealth += 10;
+
+  if ((food + shows) / income > 0.35) wealth -= 15;
+
+  wealth = Math.max(0, Math.min(100, Math.round(wealth)));
+
+  // Freedom score
+  const largestIncome = Math.max(...incomes, 0);
+  const dependency = income ? largestIncome / income : 1;
+  const freedom = Math.round((1 - dependency) * 100);
+
+  // Growth score
+  let growth = 40;
+  if (incomes.filter(v => v > 0).length >= 3) growth += 30;
+  if (saved > income * 0.2) growth += 20;
+  growth = Math.min(100, growth);
+
+  // Risk score
+  let risk = 20;
+  if (food / income > 0.2) risk += 20;
+  if (shows / income > 0.1) risk += 20;
+  if (saved === 0) risk += 30;
+  risk = Math.min(100, risk);
+
+  document.getElementById('wealth-score').textContent = wealth;
+  document.getElementById('freedom-score').textContent = freedom;
+  document.getElementById('growth-score').textContent = growth;
+  document.getElementById('risk-score').textContent = risk;
+
+  const insight = document.getElementById('wealth-insight');
+
+  if (wealth >= 80) {
+    insight.innerHTML = '<strong>Wealth Intelligence:</strong> Your current financial behavior resembles wealth builders rather than consumers.';
+  }
+  else if (wealth >= 60) {
+    insight.innerHTML = '<strong>Wealth Intelligence:</strong> You are financially disciplined, but your system still needs stronger wealth acceleration.';
+  }
+  else {
+    insight.innerHTML = '<strong>Wealth Intelligence:</strong> Your current structure is helping you survive, not become wealthy. Consumption is limiting long-term growth.';
+  }
+}
+
+
 // DASHBOARD + SECTION CONTROLS
 function showSection(id, btn) {
   document.querySelectorAll('.app-section').forEach(s => s.classList.remove('show'));
@@ -1136,6 +1343,8 @@ function updateDashboard() {
   }
 }
 
+
+window.addEventListener('beforeunload', saveCurrentMonthDraft);
 
 // INIT
 loadMonth();
