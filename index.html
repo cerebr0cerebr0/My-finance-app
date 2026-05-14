@@ -658,22 +658,11 @@ function collectPermanentProfile() {
   savePermanentProfile(profile);
 }
 
-function getSavingsBalance() {
-  const profile = getPermanentProfile();
-  return parseFloat(profile.savingsBalance || 0) || 0;
-}
 
-function setSavingsBalance(v) {
-  const profile = getPermanentProfile();
-  profile.savingsBalance = Math.max(0, Math.round(v || 0));
-  savePermanentProfile(profile);
-  updateSavingsBalanceDisplay();
-}
 
-function updateSavingsBalanceDisplay() {
-  const el = document.getElementById('savings-balance-display');
-  if (el) el.textContent = fmtG(getSavingsBalance());
-}
+
+
+
 
 function applyPermanentProfileToInputs(entry) {
   const profile = getPermanentProfile();
@@ -713,20 +702,7 @@ function applyPermanentProfileToInputs(entry) {
   updateSavingsBalanceDisplay();
 }
 
-function rolloverUnusedMoneyToSavings(record) {
-  if (!record || record.rolloverApplied) return;
 
-  const leftover = Math.max(0, (record.income || 0) - (record.totalActual || 0) - (record.debt || 0));
-  const intentional = record.saved || 0;
-  const amountToAdd = Math.max(leftover, intentional);
-
-  if (amountToAdd > 0) {
-    setSavingsBalance(getSavingsBalance() + amountToAdd);
-    record.rolloverApplied = true;
-    record.rolloverAdded = amountToAdd;
-    saveStorage();
-  }
-}
 
 function saveStorage() {
   try {
@@ -1184,41 +1160,7 @@ function analyzeBudgetStructure(income, saved, debt, catData) {
 
 
 
-function applySavingsGrowthAfterJudgment(record) {
-  if (!record) return;
 
-  // Prevent double-counting the same month
-  if (record.rolloverApplied) {
-    updateSavingsBalanceDisplay();
-    return;
-  }
-
-  const income = record.income || 0;
-  const actual = record.totalActual || 0;
-  const debt = record.debt || 0;
-  const intentionalSaved = record.saved || 0;
-
-  // Money left after actual spending and debt
-  const leftover = Math.max(0, income - actual - debt);
-
-  // Add intentional saving + remaining unspent money that was not already counted
-  // If intentional saving is already part of leftover, this still protects the savings habit.
-  const amountToAdd = Math.max(leftover, intentionalSaved);
-
-  if (amountToAdd > 0) {
-    const current = getSavingsBalance();
-    setSavingsBalance(current + amountToAdd);
-
-    record.rolloverApplied = true;
-    record.rolloverAdded = amountToAdd;
-
-    const idx = history.findIndex(h => h.key === record.key);
-    if (idx >= 0) history[idx] = record;
-
-    saveStorage();
-    updateSavingsBalanceDisplay();
-  }
-}
 
 
 // JUDGE
@@ -1265,6 +1207,7 @@ function judge() {
   if (idx >= 0) history[idx] = record; else history.unshift(record);
   saveStorage(); collectPermanentProfile(); collectPermanentProfile();
   applySavingsGrowthAfterJudgment(record);
+  applyMonthlySavingsGrowth(record);
   renderVerdict(record);
   document.getElementById('verdict').classList.add('show');
   setTimeout(() => document.getElementById('verdict').scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
@@ -1542,12 +1485,70 @@ function clearAll() { if (confirm('Delete all saved data?')) { history = []; sav
 
 
 
+
+
+
+
+// ACCUMULATED SAVINGS ENGINE - RELIABLE VERSION
+function getSavingsBalance() {
+  const raw = localStorage.getItem('wis_accumulated_savings_balance');
+  return parseFloat(raw || '0') || 0;
+}
+
+function setSavingsBalance(v) {
+  const clean = Math.max(0, Math.round(parseFloat(v || 0)));
+  localStorage.setItem('wis_accumulated_savings_balance', String(clean));
+  updateSavingsBalanceDisplay();
+}
+
+function updateSavingsBalanceDisplay() {
+  const el = document.getElementById('savings-balance-display');
+  if (el) el.textContent = fmtG(getSavingsBalance());
+}
+
+function applyMonthlySavingsGrowth(record) {
+  if (!record) return;
+
+  const appliedKey = 'wis_savings_applied_' + record.key;
+
+  // prevent double adding for the same month
+  if (localStorage.getItem(appliedKey) === 'yes') {
+    updateSavingsBalanceDisplay();
+    return;
+  }
+
+  const income = record.income || 0;
+  const actual = record.totalActual || 0;
+  const debt = record.debt || 0;
+  const intentionalSaved = record.saved || 0;
+
+  // money not spent this month
+  const leftover = Math.max(0, income - actual - debt);
+
+  // Add unspent money. If user entered an intentional saved amount higher than leftover,
+  // use that amount instead.
+  const amountToAdd = Math.max(leftover, intentionalSaved);
+
+  if (amountToAdd > 0) {
+    setSavingsBalance(getSavingsBalance() + amountToAdd);
+    localStorage.setItem(appliedKey, 'yes');
+
+    record.rolloverApplied = true;
+    record.rolloverAdded = amountToAdd;
+
+    const idx = history.findIndex(h => h.key === record.key);
+    if (idx >= 0) history[idx] = record;
+    saveStorage();
+  }
+
+  updateSavingsBalanceDisplay();
+}
+
 function manualSetSavingsBalance() {
   const current = getSavingsBalance();
   const val = prompt('Enter your current accumulated savings balance:', current);
   if (val === null) return;
-  const n = parseFloat(val) || 0;
-  setSavingsBalance(n);
+  setSavingsBalance(parseFloat(val) || 0);
 }
 
 
@@ -1808,6 +1809,7 @@ loadMonth();
 renderHistory();
 updateIncomeTotal();
 updateDashboard();
+updateSavingsBalanceDisplay();
 </script>
 </body>
 </html>
