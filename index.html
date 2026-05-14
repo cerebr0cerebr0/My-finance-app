@@ -415,6 +415,7 @@ body{font-family:var(--f);background:var(--bg);color:var(--text);min-height:100v
 const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
 const MS=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
 const EMOJIS=['🏠','💍','🍔','🏋️','🚌','🙏','📱','💈','👨‍👩‍👧','💊','🎬','☕','🛍','✈️','🎮','👔','💅','🎁','🛒','🍕','📚','🔧','💰','🎵','🏖','🐾','🧴','🍺','💡','🎯'];
+
 const INCOME_SOURCES = [
   {id:'salary', name:'Salary'},
   {id:'training', name:'Training'},
@@ -428,11 +429,12 @@ const INCOME_SOURCES = [
 function renderIncomeSources() {
   const entry = history.find(h => h.key === mkKey());
   const container = document.getElementById('income-sources');
+  if (!container) return;
 
   let total = 0;
 
   container.innerHTML = INCOME_SOURCES.map(src => {
-    const val = entry?.incomeSources?.[src.id] || 0;
+    const val = entry && entry.incomeSources ? (entry.incomeSources[src.id] || 0) : 0;
     total += val;
 
     return `
@@ -445,15 +447,14 @@ function renderIncomeSources() {
           value="${val || ''}"
           placeholder="0"
           min="0"
-          oninput="updateIncomeTotal(); saveCurrentMonthDraft()">
+          oninput="updateIncomeTotal(); saveCurrentMonthDraft();">
         <div class="icard-sub">GH₵ ${src.name.toLowerCase()} income</div>
       </div>
     `;
   }).join('');
 
-  document.getElementById('total-income-display').textContent = fmtG(total);
-  updateDashboard();
-  updateDashboard();
+  const totalEl = document.getElementById('total-income-display');
+  if (totalEl) totalEl.textContent = fmtG(total);
 }
 
 function updateIncomeTotal() {
@@ -463,9 +464,12 @@ function updateIncomeTotal() {
     total += parseFloat(inp.value) || 0;
   });
 
-  document.getElementById('total-income-display').textContent = fmtG(total);
-  updateDashboard();
+  const totalEl = document.getElementById('total-income-display');
+  if (totalEl) totalEl.textContent = fmtG(total);
+
+  if (typeof updateDashboard === 'function') updateDashboard();
 }
+
 
 
 // YOUR PERSONAL CATEGORIES — edit these anytime
@@ -744,14 +748,29 @@ document.addEventListener('click', () => {
 // LOAD MONTH DATA INTO INPUTS
 function loadMonth() {
   const entry = history.find(h => h.key === mkKey());
+
   renderIncomeSources();
-  document.getElementById('inp-saved').value  = entry ? entry.saved  || '' : '';
-  document.getElementById('inp-debt').value   = entry ? entry.debt   || '' : '';
-  document.getElementById('monthly-comments').value = entry ? entry.comments || '' : '';
+
+  const savedEl = document.getElementById('inp-saved');
+  const debtEl = document.getElementById('inp-debt');
+  const commentsEl = document.getElementById('monthly-comments');
+
+  if (savedEl) savedEl.value = entry ? entry.saved || '' : '';
+  if (debtEl) debtEl.value = entry ? entry.debt || '' : '';
+  if (commentsEl) commentsEl.value = entry ? entry.comments || '' : '';
+
   if (entry && entry.catDefs) cats = entry.catDefs.map(c => ({...c}));
+
   renderRows();
-  if (entry) { renderVerdict(entry); document.getElementById('verdict').classList.add('show'); }
-  else document.getElementById('verdict').classList.remove('show');
+  updateIncomeTotal();
+  updateDashboard();
+
+  if (entry && entry.score != null) {
+    renderVerdict(entry);
+    document.getElementById('verdict').classList.add('show');
+  } else {
+    document.getElementById('verdict').classList.remove('show');
+  }
 }
 
 // GRADE SYSTEM
@@ -1335,8 +1354,10 @@ function updateDashboard() {
 window.addEventListener('beforeunload', saveCurrentMonthDraft);
 
 // INIT
-renderRows();
+loadMonth();
 renderHistory();
+updateIncomeTotal();
+updateDashboard();
 </script>
 </body>
 </html>
