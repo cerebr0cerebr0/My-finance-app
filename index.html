@@ -196,6 +196,12 @@ body{font-family:var(--f);background:var(--bg);color:var(--text);min-height:100v
 .wealth-insight{margin-top:16px;background:rgba(0,255,136,.05);border:1px solid rgba(0,255,136,.14);padding:16px;border-radius:16px;font-size:13px;line-height:1.7;color:var(--muted)}
 .wealth-insight strong{color:var(--text)}
 
+
+.advice-box{background:rgba(77,159,255,.05);border:1px solid rgba(77,159,255,.18);border-radius:14px;padding:15px;margin-bottom:10px}
+.advice-title{font-size:12px;font-weight:800;color:var(--text);margin-bottom:6px}
+.advice-text{font-size:13px;line-height:1.65;color:var(--muted)}
+.advice-text strong{color:var(--text)}
+
 </style>
 </head>
 <body>
@@ -998,6 +1004,128 @@ function judge() {
 updateDashboard();
 }
 
+
+// ACTIONABLE FINANCIAL ADVICE ENGINE
+function buildActionAdvice(r, cd) {
+  const advice = [];
+  const income = r.income || 0;
+  if (!income) return advice;
+
+  const pct = v => Math.round((v / income) * 100);
+  const targetAmount = p => Math.round(income * p / 100);
+
+  const savedRate = pct(r.saved || 0);
+  const savingsPotentialRate = pct(Math.max(0, income - (r.totalActual || 0)));
+
+  // Savings advice
+  if ((r.saved || 0) === 0) {
+    advice.push({
+      title:'Savings Action',
+      text:`You saved <strong>0%</strong> intentionally. Start with at least <strong>${fmtG(targetAmount(10))}</strong> next month, then push toward <strong>${fmtG(targetAmount(20))}</strong> for a strong wealth-building habit.`
+    });
+  } else if (savedRate < 10) {
+    advice.push({
+      title:'Savings Action',
+      text:`Your intentional savings rate is <strong>${savedRate}%</strong>. Minimum target should be <strong>10%</strong> (${fmtG(targetAmount(10))}). Wealth-builder target is <strong>20%</strong> (${fmtG(targetAmount(20))}). Increase savings by at least <strong>${fmtG(Math.max(0, targetAmount(10) - r.saved))}</strong> next month.`
+    });
+  } else if (savedRate < 20) {
+    advice.push({
+      title:'Savings Action',
+      text:`Your intentional savings rate is <strong>${savedRate}%</strong>. Good start, but not yet wealth-building level. Push it to <strong>20%</strong> — target: <strong>${fmtG(targetAmount(20))}</strong>.`
+    });
+  } else {
+    advice.push({
+      title:'Savings Action',
+      text:`Your intentional savings rate is <strong>${savedRate}%</strong>. This is strong. Protect it first before increasing lifestyle expenses.`
+    });
+  }
+
+  // Food advice
+  const food = cd.food?.actual || cd.food?.planned || 0;
+  if (food) {
+    const foodPct = pct(food);
+    const idealFood = targetAmount(15);
+    const maxFood = targetAmount(20);
+
+    if (foodPct > 25) {
+      advice.push({
+        title:'Food Budget Advice',
+        text:`Food is <strong>${foodPct}%</strong> of income (${fmtG(food)}). Recommended range is <strong>10–15%</strong>; maximum acceptable is around <strong>20%</strong> (${fmtG(maxFood)}). Try reducing Food by <strong>${fmtG(Math.max(0, food - idealFood))}</strong> toward a target of <strong>${fmtG(idealFood)}</strong>.`
+      });
+    } else if (foodPct > 20) {
+      advice.push({
+        title:'Food Budget Advice',
+        text:`Food is <strong>${foodPct}%</strong>. This is slightly high. Keep it below <strong>${fmtG(maxFood)}</strong> and aim for <strong>${fmtG(idealFood)}</strong>.`
+      });
+    } else {
+      advice.push({
+        title:'Food Budget Advice',
+        text:`Food is <strong>${foodPct}%</strong>. This is acceptable. Keep it controlled and avoid letting it grow faster than income.`
+      });
+    }
+  }
+
+  // Housing advice
+  const housing = cd.housing?.actual || cd.housing?.planned || 0;
+  if (housing) {
+    const hPct = pct(housing);
+    const idealHousing = targetAmount(30);
+    const maxHousing = targetAmount(35);
+
+    if (hPct > 35) {
+      advice.push({
+        title:'Housing Advice',
+        text:`Housing is <strong>${hPct}%</strong> of income. Recommended range is <strong>25–30%</strong>; maximum should be around <strong>35%</strong> (${fmtG(maxHousing)}). Try to reduce housing-related costs by <strong>${fmtG(Math.max(0, housing - idealHousing))}</strong> over time.`
+      });
+    } else {
+      advice.push({
+        title:'Housing Advice',
+        text:`Housing is <strong>${hPct}%</strong>. This is financially healthy. Do not increase fixed housing costs unless income grows first.`
+      });
+    }
+  }
+
+  // Entertainment / shows advice
+  const shows = cd.shows?.actual || cd.shows?.planned || 0;
+  if (shows) {
+    const showsPct = pct(shows);
+    const maxShows = targetAmount(10);
+    if (showsPct > 10) {
+      advice.push({
+        title:'Lifestyle Spending Advice',
+        text:`Shows/entertainment is <strong>${showsPct}%</strong>. Keep lifestyle spending below <strong>10%</strong> (${fmtG(maxShows)}). Cut at least <strong>${fmtG(Math.max(0, shows - maxShows))}</strong> and move it to savings or debt reduction.`
+      });
+    }
+  }
+
+  // Under budget advice
+  const underBudget = Math.max(0, (r.totalPlanned || 0) - (r.totalActual || 0));
+  if (underBudget > 0) {
+    advice.push({
+      title:'What To Do With The Extra Money',
+      text:`You spent <strong>${fmtG(underBudget)}</strong> less than planned. Do not let it disappear. Suggested split: <strong>50%</strong> to emergency savings (${fmtG(underBudget*0.5)}), <strong>30%</strong> to investments/business growth (${fmtG(underBudget*0.3)}), and <strong>20%</strong> for flexibility (${fmtG(underBudget*0.2)}).`
+    });
+  }
+
+  // Wealth behavior advice
+  if (savingsPotentialRate >= 20 && savedRate < 20) {
+    advice.push({
+      title:'Wealth Discipline Gap',
+      text:`Your savings potential is <strong>${savingsPotentialRate}%</strong>, but intentional savings is only <strong>${savedRate}%</strong>. That means money may remain available but not protected. Move savings immediately when income arrives.`
+    });
+  }
+
+  // Next month mission
+  const nextSavingsTarget = Math.max(targetAmount(20), r.saved || 0);
+  advice.push({
+    title:'Next Month Mission',
+    text:`Target: save at least <strong>${fmtG(nextSavingsTarget)}</strong>, keep Food below <strong>${fmtG(targetAmount(20))}</strong>, and keep lifestyle spending below <strong>${fmtG(targetAmount(10))}</strong>. The goal is not just to survive the month — it is to become wealthier.`
+  });
+
+  return advice;
+}
+
+
 // RENDER VERDICT
 function renderVerdict(r) {
   const g = GRADES.find(gr => r.score >= gr.min) || GRADES[GRADES.length - 1];
@@ -1105,6 +1233,14 @@ function renderVerdict(r) {
     ins.push({
       i:b.icon,
       t:`<strong>Budget Structure Analysis:</strong> ${b.text}`
+    });
+  });
+
+  const actionAdvice = buildActionAdvice(r, cd);
+  actionAdvice.forEach(a => {
+    ins.push({
+      i:'🎯',
+      t:`<div class="advice-title">${a.title}</div><div class="advice-text">${a.text}</div>`
     });
   });
 
