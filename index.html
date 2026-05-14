@@ -202,6 +202,12 @@ body{font-family:var(--f);background:var(--bg);color:var(--text);min-height:100v
 .advice-text{font-size:13px;line-height:1.65;color:var(--muted)}
 .advice-text strong{color:var(--text)}
 
+
+.savings-balance-card{background:rgba(0,255,136,.05);border:1px solid rgba(0,255,136,.18);border-radius:16px;padding:16px;margin-top:14px}
+.savings-balance-title{font-size:10px;letter-spacing:1.6px;color:var(--muted);text-transform:uppercase;margin-bottom:6px}
+.savings-balance-value{font-family:var(--d);font-size:38px;color:var(--green)}
+.savings-balance-note{font-size:12px;color:var(--muted);line-height:1.6;margin-top:6px}
+
 </style>
 </head>
 <body>
@@ -313,7 +319,8 @@ body{font-family:var(--f);background:var(--bg);color:var(--text);min-height:100v
 <div class="top-grid" style="grid-template-columns:1fr 1fr;">
   <div class="icard">
     <div class="icard-label">🏦 Saved</div>
-    <input class="icard-input" id="inp-saved" type="number" placeholder="0" min="0" oninput="updateDashboard(); saveCurrentMonthDraft()">
+    <input class="icard-input" id="inp-saved" type="number" placeholder="0" min="0" oninput="updateDashboard();
+updateSavingsBalanceDisplay(); saveCurrentMonthDraft()">
     <div class="icard-sub">GH₵ put aside</div>
   </div>
 
@@ -322,6 +329,15 @@ body{font-family:var(--f);background:var(--bg);color:var(--text);min-height:100v
     <input class="icard-input" id="inp-debt" type="number" placeholder="0" min="0" oninput="updateDashboard(); saveCurrentMonthDraft()">
     <div class="icard-sub">GH₵ to loans</div>
   </div>
+</div>
+
+<div class="savings-balance-card">
+  <div class="savings-balance-title">Accumulated Savings Balance</div>
+  <div class="savings-balance-value" id="savings-balance-display">GH₵0</div>
+  <div class="savings-balance-note">
+    This grows over time. Each month, money not spent can be added to your savings balance.
+  </div>
+  <button class="add-btn" style="margin-top:10px" onclick="manualSetSavingsBalance()">Edit Balance</button>
 </div>
 
 <div class="icard" style="margin-top:14px">
@@ -434,13 +450,14 @@ const INCOME_SOURCES = [
 
 function renderIncomeSources() {
   const entry = history.find(h => h.key === mkKey());
+  const profile = getPermanentProfile();
   const container = document.getElementById('income-sources');
   if (!container) return;
 
   let total = 0;
 
   container.innerHTML = INCOME_SOURCES.map(src => {
-    const val = entry && entry.incomeSources ? (entry.incomeSources[src.id] || 0) : 0;
+    const val = entry?.incomeSources?.[src.id] ?? profile.incomeSources?.[src.id] ?? 0;
     total += val;
 
     return `
@@ -453,7 +470,7 @@ function renderIncomeSources() {
           value="${val || ''}"
           placeholder="0"
           min="0"
-          oninput="updateIncomeTotal(); saveCurrentMonthDraft();">
+          oninput="updateIncomeTotal(); collectPermanentProfile(); saveCurrentMonthDraft();">
         <div class="icard-sub">GH₵ ${src.name.toLowerCase()} income</div>
       </div>
     `;
@@ -523,6 +540,118 @@ function loadStorage() {
     else { cats = MY_CATS.map(c => ({...c})); localStorage.setItem(S_VER, VER); }
   } catch(e) {}
 }
+
+function getPermanentProfile() {
+  try {
+    return JSON.parse(localStorage.getItem(S_PERM) || '{}');
+  } catch(e) {
+    return {};
+  }
+}
+
+function savePermanentProfile(profile) {
+  try {
+    localStorage.setItem(S_PERM, JSON.stringify(profile));
+  } catch(e) {}
+}
+
+function collectPermanentProfile() {
+  const profile = getPermanentProfile();
+
+  profile.incomeSources = {};
+  document.querySelectorAll('.income-input').forEach(inp => {
+    profile.incomeSources[inp.dataset.income] = parseFloat(inp.value) || 0;
+  });
+
+  profile.plannedBudget = {};
+  cats.forEach(cat => {
+    if (cat.subcategories && cat.subcategories.length) {
+      cat.subcategories.forEach(sub => {
+        const key = cat.id + '_' + sub.id;
+        profile.plannedBudget[key] = parseFloat(document.getElementById('p-' + key)?.value) || 0;
+      });
+      return;
+    }
+
+    profile.plannedBudget[cat.id] = parseFloat(document.getElementById('p-' + cat.id)?.value) || 0;
+  });
+
+  profile.categories = cats.map(c => ({...c}));
+  profile.savedTarget = parseFloat(document.getElementById('inp-saved')?.value) || 0;
+
+  savePermanentProfile(profile);
+}
+
+function getSavingsBalance() {
+  const profile = getPermanentProfile();
+  return parseFloat(profile.savingsBalance || 0) || 0;
+}
+
+function setSavingsBalance(v) {
+  const profile = getPermanentProfile();
+  profile.savingsBalance = Math.max(0, Math.round(v));
+  savePermanentProfile(profile);
+  updateSavingsBalanceDisplay();
+}
+
+function updateSavingsBalanceDisplay() {
+  const el = document.getElementById('savings-balance-display');
+  if (el) el.textContent = fmtG(getSavingsBalance());
+}
+
+function applyPermanentProfileToInputs(entry) {
+  const profile = getPermanentProfile();
+
+  // income sources are permanent unless this month already has saved values
+  document.querySelectorAll('.income-input').forEach(inp => {
+    const id = inp.dataset.income;
+    const monthVal = entry?.incomeSources?.[id];
+    const permVal = profile.incomeSources?.[id];
+    inp.value = (monthVal ?? permVal ?? '') || '';
+  });
+
+  // Planned values are permanent defaults unless month has saved values
+  cats.forEach(cat => {
+    if (cat.subcategories && cat.subcategories.length) {
+      cat.subcategories.forEach(sub => {
+        const key = cat.id + '_' + sub.id;
+        const el = document.getElementById('p-' + key);
+        if (!el) return;
+        const monthVal = entry?.catData?.[key]?.planned;
+        const permVal = profile.plannedBudget?.[key];
+        el.value = (monthVal ?? permVal ?? '') || '';
+      });
+      return;
+    }
+
+    const el = document.getElementById('p-' + cat.id);
+    if (!el) return;
+    const monthVal = entry?.catData?.[cat.id]?.planned;
+    const permVal = profile.plannedBudget?.[cat.id];
+    el.value = (monthVal ?? permVal ?? '') || '';
+  });
+
+  const savedEl = document.getElementById('inp-saved');
+  if (savedEl) savedEl.value = (entry?.saved ?? profile.savedTarget ?? '') || '';
+
+  updateSavingsBalanceDisplay();
+}
+
+function rolloverUnusedMoneyToSavings(record) {
+  if (!record || record.rolloverApplied) return;
+
+  const leftover = Math.max(0, (record.income || 0) - (record.totalActual || 0) - (record.debt || 0));
+  const intentional = record.saved || 0;
+  const amountToAdd = Math.max(leftover, intentional);
+
+  if (amountToAdd > 0) {
+    setSavingsBalance(getSavingsBalance() + amountToAdd);
+    record.rolloverApplied = true;
+    record.rolloverAdded = amountToAdd;
+    saveStorage();
+  }
+}
+
 function saveStorage() {
   try {
     localStorage.setItem(S_HIS, JSON.stringify(history));
@@ -593,11 +722,11 @@ function renderRows() {
           </div>
           <div class="cnum">
             <div class="cnum-lbl" style="color:var(--amber)">Planned</div>
-            <input class="cnum-inp" id="p-${key}" type="number" placeholder="0" min="0" value="${planned||''}" oninput="recalc(); saveCurrentMonthDraft()">
+            <input class="cnum-inp" id="p-${key}" type="number" placeholder="0" min="0" value="${planned||''}" oninput="recalc(); collectPermanentProfile(); saveCurrentMonthDraft()">
           </div>
           <div class="cnum actual">
             <div class="cnum-lbl" style="color:var(--blue)">Actual</div>
-            <input class="cnum-inp" id="a-${key}" type="number" placeholder="0" min="0" value="${actual||''}" oninput="recalc(); saveCurrentMonthDraft()">
+            <input class="cnum-inp" id="a-${key}" type="number" placeholder="0" min="0" value="${actual||''}" oninput="recalc(); collectPermanentProfile(); saveCurrentMonthDraft()">
           </div>
           <div class="vpill none" id="vp-${key}">—</div>
           <div></div>`;
@@ -621,11 +750,11 @@ function renderRows() {
       </div>
       <div class="cnum">
         <div class="cnum-lbl" style="color:var(--amber)">Planned</div>
-        <input class="cnum-inp" id="p-${cat.id}" type="number" placeholder="0" min="0" value="${planned||''}" oninput="recalc(); saveCurrentMonthDraft()">
+        <input class="cnum-inp" id="p-${cat.id}" type="number" placeholder="0" min="0" value="${planned||''}" oninput="recalc(); collectPermanentProfile(); saveCurrentMonthDraft()">
       </div>
       <div class="cnum actual">
         <div class="cnum-lbl" style="color:var(--blue)">Actual</div>
-        <input class="cnum-inp" id="a-${cat.id}" type="number" placeholder="0" min="0" value="${actual||''}" oninput="recalc(); saveCurrentMonthDraft()">
+        <input class="cnum-inp" id="a-${cat.id}" type="number" placeholder="0" min="0" value="${actual||''}" oninput="recalc(); collectPermanentProfile(); saveCurrentMonthDraft()">
       </div>
       <div class="vpill none" id="vp-${cat.id}">—</div>
       <button class="xbtn" onclick="delCat('${cat.id}')" ${cats.length <= 1 ? 'disabled' : ''}>✕</button>`;
@@ -754,22 +883,45 @@ document.addEventListener('click', () => {
 // LOAD MONTH DATA INTO INPUTS
 function loadMonth() {
   const entry = history.find(h => h.key === mkKey());
+  const profile = getPermanentProfile();
+
+  if (profile.categories && profile.categories.length) {
+    cats = profile.categories.map(c => ({...c}));
+  } else if (entry && entry.catDefs) {
+    cats = entry.catDefs.map(c => ({...c}));
+  }
 
   renderIncomeSources();
+  renderRows();
 
-  const savedEl = document.getElementById('inp-saved');
+  applyPermanentProfileToInputs(entry);
+
   const debtEl = document.getElementById('inp-debt');
   const commentsEl = document.getElementById('monthly-comments');
 
-  if (savedEl) savedEl.value = entry ? entry.saved || '' : '';
+  // Actual, debt and comments are monthly
   if (debtEl) debtEl.value = entry ? entry.debt || '' : '';
   if (commentsEl) commentsEl.value = entry ? entry.comments || '' : '';
 
-  if (entry && entry.catDefs) cats = entry.catDefs.map(c => ({...c}));
+  // Actual values should load only when that month has data, otherwise they reset
+  cats.forEach(cat => {
+    if (cat.subcategories && cat.subcategories.length) {
+      cat.subcategories.forEach(sub => {
+        const key = cat.id + '_' + sub.id;
+        const el = document.getElementById('a-' + key);
+        if (el) el.value = entry?.catData?.[key]?.actual || '';
+      });
+      return;
+    }
 
-  renderRows();
+    const el = document.getElementById('a-' + cat.id);
+    if (el) el.value = entry?.catData?.[cat.id]?.actual || '';
+  });
+
+  recalc();
   updateIncomeTotal();
   updateDashboard();
+  updateSavingsBalanceDisplay();
 
   if (entry && entry.score != null) {
     renderVerdict(entry);
@@ -997,7 +1149,7 @@ function judge() {
   const record = { key: mkKey(), month: MONTHS[curMonth], year: curYear, income, incomeSources, saved, debt, comments, totalPlanned, totalActual, catData, catDefs: cats.map(c=>({...c})), score: sc, ts: Date.now() };
   const idx = history.findIndex(h => h.key === record.key);
   if (idx >= 0) history[idx] = record; else history.unshift(record);
-  saveStorage(); renderVerdict(record);
+  saveStorage(); collectPermanentProfile(); rolloverUnusedMoneyToSavings(record); renderVerdict(record);
   document.getElementById('verdict').classList.add('show');
   setTimeout(() => document.getElementById('verdict').scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
   renderHistory();
@@ -1103,7 +1255,7 @@ function buildActionAdvice(r, cd) {
   if (underBudget > 0) {
     advice.push({
       title:'What To Do With The Extra Money',
-      text:`You spent <strong>${fmtG(underBudget)}</strong> less than planned. Do not let it disappear. Suggested split: <strong>50%</strong> to emergency savings (${fmtG(underBudget*0.5)}), <strong>30%</strong> to investments/business growth (${fmtG(underBudget*0.3)}), and <strong>20%</strong> for flexibility (${fmtG(underBudget*0.2)}).`
+      text:`You spent <strong>${fmtG(underBudget)}</strong> less than planned. It has been added to your accumulated savings when the month is judged. Suggested split for future excess cash: <strong>50%</strong> to emergency savings (${fmtG(underBudget*0.5)}), <strong>30%</strong> to investments/business growth (${fmtG(underBudget*0.3)}), and <strong>20%</strong> for flexibility (${fmtG(underBudget*0.2)}).`
     });
   }
 
@@ -1273,6 +1425,16 @@ function clearAll() { if (confirm('Delete all saved data?')) { history = []; sav
 
 
 
+
+function manualSetSavingsBalance() {
+  const current = getSavingsBalance();
+  const val = prompt('Enter your current accumulated savings balance:', current);
+  if (val === null) return;
+  const n = parseFloat(val) || 0;
+  setSavingsBalance(n);
+}
+
+
 // AUTOSAVE CURRENT MONTH DATA
 function saveCurrentMonthDraft() {
   const incomeSources = {};
@@ -1340,7 +1502,9 @@ function saveCurrentMonthDraft() {
   else history.unshift(record);
 
   saveStorage();
+  collectPermanentProfile();
   renderHistory();
+  updateSavingsBalanceDisplay();
 }
 
 
