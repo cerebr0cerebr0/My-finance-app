@@ -3,1650 +3,969 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Wealth Discipline — Financial Tracking</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<title>Wealth Discipline Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
 :root{
-  --bg:#08080a;--card:#111114;--card2:#1a1a1f;--border:#262631;
-  --text:#f2f2f6;--muted:#777783;--dim:#34343d;
-  --green:#00ff88;--red:#ff3b3b;--amber:#ffaa00;--blue:#4d9fff;--purple:#bb77ff;
-  --f:'Inter',sans-serif;--d:'Bebas Neue',sans-serif;
+  --bg:#f6f7fb;
+  --sidebar:#151338;
+  --sidebar2:#0c1026;
+  --primary:#5747e8;
+  --primary2:#6d5dfc;
+  --text:#111827;
+  --muted:#6b7280;
+  --border:#e6e8f0;
+  --card:#ffffff;
+  --green:#16c784;
+  --red:#ff4d6d;
+  --amber:#f59e0b;
+  --blue:#2563eb;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:var(--f);background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:40px}
-.hdr{text-align:center;padding:24px 18px 8px}
-.hdr-eye{font-size:10px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-bottom:6px}
-.hdr-title{font-family:var(--d);font-size:clamp(46px,10vw,78px);line-height:.88;letter-spacing:1px}
-.hdr-title em{color:var(--green);font-style:normal}
-.hdr-sub{font-size:13px;color:var(--muted);line-height:1.6;margin-top:8px}
-.wrap{max-width:1080px;margin:0 auto;padding:0 16px}
-.month-nav{display:flex;align-items:center;justify-content:center;gap:12px;margin:14px 0 18px}
-.mbtn{width:40px;height:40px;border-radius:50%;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:22px;cursor:pointer}
-.mbtn:hover{border-color:var(--green)}
-.mlabel{font-family:var(--d);font-size:30px;letter-spacing:2px;min-width:190px;text-align:center}
-.dashboard{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:12px}
-@media(max-width:900px){.dashboard{grid-template-columns:repeat(2,1fr)}}
-.dcard{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:15px}
-.dlbl{font-size:9px;letter-spacing:1.6px;color:var(--muted);text-transform:uppercase;margin-bottom:6px}
-.dval{font-family:var(--d);font-size:34px;line-height:1}
-.dsub{font-size:11px;color:var(--muted);margin-top:5px}
-.tabs{position:sticky;top:0;z-index:50;background:var(--bg);display:grid;grid-template-columns:repeat(13,1fr);gap:8px;padding:10px 0;margin-bottom:10px}
-@media(max-width:760px){.tabs{grid-template-columns:repeat(3,1fr)}}
-.tab{border:1px solid var(--border);background:var(--card);color:var(--text);padding:11px 8px;border-radius:12px;font-weight:800;font-size:12px;cursor:pointer}
-.tab.active,.tab:hover{border-color:var(--green);color:var(--green);background:rgba(0,255,136,.06)}
-.section{display:none}
-.section.show{display:block}
-.sec-title{display:flex;align-items:center;justify-content:space-between;margin:16px 0 10px}
-.sec-label{font-size:11px;letter-spacing:2px;color:var(--muted);text-transform:uppercase}
-.btn{border:1px solid var(--border);background:var(--card);color:var(--text);border-radius:10px;padding:9px 12px;font-weight:800;font-size:12px;cursor:pointer}
-.btn:hover{border-color:var(--green);color:var(--green)}
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-@media(max-width:800px){.grid{grid-template-columns:1fr 1fr}}
-@media(max-width:520px){.grid{grid-template-columns:1fr}}
-.card{background:var(--card);border:1.5px solid var(--border);border-radius:16px;padding:15px}
-.label{font-size:10px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;margin-bottom:8px}
-.input{width:100%;background:none;border:none;outline:none;color:var(--text);font-family:var(--f);font-size:22px;font-weight:800;caret-color:var(--green)}
-.input::placeholder{color:var(--dim)}
-.sub{font-size:11px;color:var(--muted);margin-top:4px}
-.table-head,.row,.total-row{display:grid;grid-template-columns:1.3fr 1fr 1fr .8fr 42px;gap:8px;align-items:center}
-@media(max-width:640px){.table-head,.row,.total-row{grid-template-columns:1.2fr .85fr .85fr .7fr 34px;gap:5px}}
-.table-head{margin:8px 0 6px;color:var(--muted);font-size:9px;letter-spacing:1.4px;text-transform:uppercase}
-.row{margin-bottom:7px}
-.cell{background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:9px}
-.cell input{width:100%;background:none;border:none;outline:none;color:var(--text);font-weight:800;font-family:var(--f)}
-.name-input{font-size:13px}
-.num-input{font-size:15px;text-align:right}
-.diff{font-family:monospace;font-size:12px;font-weight:800;text-align:center;border-radius:8px;padding:8px 4px}
-.diff.none{background:var(--dim);color:var(--muted)}
-.diff.good{background:rgba(0,255,136,.08);color:var(--green)}
-.diff.bad{background:rgba(255,59,59,.09);color:var(--red)}
-.x{height:34px;border-radius:9px;border:1px solid var(--border);background:none;color:var(--muted);cursor:pointer}
-.x:hover{color:var(--red);border-color:var(--red)}
-.total-row{border-top:1px solid var(--border);padding-top:10px;margin-top:8px}
-.total-label{font-size:12px;font-weight:900;color:var(--muted);text-transform:uppercase}
-.total-val{text-align:right;font-family:monospace;font-weight:900}
-.note{width:100%;min-height:110px;background:var(--card);border:1.5px solid var(--border);border-radius:16px;color:var(--text);padding:14px;font-family:var(--f);outline:none;resize:vertical}
-.verdict{background:var(--card);border:1.5px solid var(--border);border-radius:18px;padding:18px;margin-top:12px}
-.verdict-title{font-family:var(--d);font-size:46px;line-height:1}
-.verdict-msg{font-size:14px;line-height:1.7;color:var(--muted);margin-top:8px}
-.hist-row{display:grid;grid-template-columns:1.2fr .9fr .9fr .9fr .6fr 42px;gap:8px;align-items:center;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:8px;cursor:pointer}
-@media(max-width:760px){.hist-row{grid-template-columns:1fr 1fr 1fr;gap:6px}}
-.hist-row:hover{border-color:var(--green)}
-.small{font-size:12px;color:var(--muted)}
-.strong{font-weight:900}
+body{
+  font-family:Inter,system-ui,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+}
 
-.behavior-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:10px}
-@media(max-width:760px){.behavior-grid{grid-template-columns:1fr}}
-.behavior-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:15px}
-.behavior-title{font-size:12px;font-weight:900;color:var(--text);margin-bottom:6px}
-.behavior-text{font-size:13px;color:var(--muted);line-height:1.65}
-.behavior-good{border-color:rgba(0,255,136,.22)}
-.behavior-warn{border-color:rgba(255,170,0,.22)}
-.behavior-bad{border-color:rgba(255,59,59,.24)}
-
-
-.wealth-engine-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px}
-@media(max-width:900px){.wealth-engine-grid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:620px){.wealth-engine-grid{grid-template-columns:1fr}}
-.wealth-metric{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:15px}
-.wealth-metric-title{font-size:10px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;margin-bottom:8px}
-.wealth-metric-value{font-family:var(--d);font-size:38px;line-height:1}
-.wealth-metric-status{font-size:12px;font-weight:900;margin-top:6px}
-.wealth-metric-desc{font-size:12px;color:var(--muted);line-height:1.6;margin-top:6px}
-.wealth-question{background:linear-gradient(180deg,#111119,#0b0b10);border:1px solid rgba(0,255,136,.18);border-radius:18px;padding:18px;margin-top:10px}
-.wealth-question-title{font-family:var(--d);font-size:40px;line-height:1;color:var(--green)}
-.wealth-question-text{font-size:14px;color:var(--muted);line-height:1.7;margin-top:8px}
-.asset-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:10px}
-@media(max-width:620px){.asset-grid{grid-template-columns:1fr}}
-
-
-.identity-card{background:linear-gradient(180deg,#111119,#09090d);border:1px solid rgba(0,255,136,.18);border-radius:18px;padding:20px;margin-top:10px}
-.identity-name{font-family:var(--d);font-size:48px;line-height:1;color:var(--green)}
-.identity-desc{font-size:14px;color:var(--muted);line-height:1.7;margin-top:10px}
-.trajectory-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px}
-@media(max-width:760px){.trajectory-grid{grid-template-columns:1fr}}
-.traj-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px}
-.traj-title{font-size:10px;letter-spacing:1.6px;color:var(--muted);text-transform:uppercase;margin-bottom:8px}
-.traj-value{font-family:var(--d);font-size:38px;line-height:1}
-.traj-desc{font-size:12px;color:var(--muted);line-height:1.6;margin-top:8px}
-
-
-.mission-card{background:linear-gradient(180deg,#111119,#09090d);border:1px solid rgba(77,159,255,.2);border-radius:18px;padding:18px}
-.mission-title{font-family:var(--d);font-size:38px;line-height:1;color:var(--blue)}
-.mission-item{padding:10px 0;border-bottom:1px solid var(--border);font-size:14px;line-height:1.6}
-.mission-item:last-child{border-bottom:none}
-.chart-wrap{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:14px}
-.pressure-banner{background:rgba(255,59,59,.08);border:1px solid rgba(255,59,59,.25);border-radius:16px;padding:16px;margin-top:12px}
-.pressure-title{font-size:13px;font-weight:900;color:var(--red);margin-bottom:6px}
-.pressure-text{font-size:14px;color:var(--muted);line-height:1.7}
-
-
-/* EXECUTIVE DASHBOARD */
-.exec-dashboard{
+/* TRUE LEFT SIDEBAR LAYOUT */
+.app{
   display:grid;
-  gap:14px;
+  grid-template-columns:260px minmax(0,1fr);
+  min-height:100vh;
 }
-.exec-hero{
-  background:
-    radial-gradient(circle at top left, rgba(0,255,136,.12), transparent 35%),
-    linear-gradient(135deg,#15151d,#0c0c11);
-  border:1px solid rgba(0,255,136,.18);
-  border-radius:24px;
-  padding:24px;
+
+.sidebar{
+  background:linear-gradient(180deg,var(--sidebar),var(--sidebar2));
+  color:white;
+  padding:20px 14px;
+  position:sticky;
+  top:0;
+  height:100vh;
+  overflow-y:auto;
 }
-.exec-kicker{
-  font-size:10px;
-  letter-spacing:2.2px;
-  color:var(--muted);
-  text-transform:uppercase;
-  margin-bottom:8px;
+
+.logo{
+  display:flex;
+  gap:12px;
+  align-items:center;
+  margin-bottom:30px;
+  padding:0 6px;
 }
-.exec-title{
-  font-family:var(--d);
-  font-size:clamp(48px,8vw,82px);
-  line-height:.85;
+
+.logo-icon{
+  width:42px;
+  height:42px;
+  border-radius:12px;
+  background:linear-gradient(135deg,#7c6cff,#5046e5);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:900;
 }
-.exec-title span{color:var(--green)}
-.exec-sub{
-  color:var(--muted);
+
+.logo-text{
+  font-size:19px;
+  font-weight:900;
+  line-height:1.05;
+}
+
+.nav{
+  display:grid;
+  gap:6px;
+}
+
+.nav button{
+  width:100%;
+  border:0;
+  background:transparent;
+  color:rgba(255,255,255,.78);
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:13px 12px;
+  border-radius:10px;
   font-size:14px;
-  line-height:1.7;
-  max-width:720px;
-  margin-top:12px;
+  font-weight:700;
+  cursor:pointer;
+  text-align:left;
 }
-.exec-summary{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
+
+.nav button:hover{
+  background:rgba(255,255,255,.08);
+  color:#fff;
+}
+
+.nav button.active{
+  background:linear-gradient(90deg,var(--primary),var(--primary2));
+  color:#fff;
+  box-shadow:0 12px 24px rgba(87,71,232,.28);
+}
+
+.sidebar-user{
+  margin-top:28px;
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:16px;
+  padding:14px;
+}
+
+.user-row{
+  display:flex;
   gap:10px;
+  align-items:center;
 }
-@media(max-width:900px){.exec-summary{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:540px){.exec-summary{grid-template-columns:1fr}}
-.exec-card{
-  background:linear-gradient(180deg,#15151c,#0f0f14);
-  border:1px solid var(--border);
-  border-radius:18px;
+
+.avatar{
+  width:38px;
+  height:38px;
+  border-radius:50%;
+  background:#6d5dfc;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:13px;
+  font-weight:900;
+}
+
+.user-name{
+  font-size:13px;
+  font-weight:900;
+}
+
+.user-status{
+  font-size:11px;
+  color:#8cffc5;
+  margin-top:3px;
+}
+
+.premium{
+  margin-top:14px;
+  background:linear-gradient(135deg,rgba(91,77,243,.38),rgba(124,58,237,.22));
+  border-radius:16px;
   padding:16px;
 }
-.exec-label{
-  font-size:10px;
-  color:var(--muted);
-  letter-spacing:1.7px;
-  text-transform:uppercase;
+
+.premium-title{
+  font-weight:900;
+  color:#c4b5fd;
   margin-bottom:8px;
 }
-.exec-value{
-  font-family:var(--d);
-  font-size:38px;
-  line-height:1;
-}
-.exec-note{
-  color:var(--muted);
+
+.premium-text{
   font-size:12px;
   line-height:1.5;
-  margin-top:6px;
+  color:rgba(255,255,255,.72);
 }
-.exec-main-grid{
-  display:grid;
-  grid-template-columns:1.2fr .8fr;
-  gap:12px;
+
+.main{
+  padding:24px 28px 36px;
+  min-width:0;
 }
-@media(max-width:900px){.exec-main-grid{grid-template-columns:1fr}}
-.exec-panel{
-  background:linear-gradient(180deg,#121218,#0c0c11);
-  border:1px solid var(--border);
-  border-radius:20px;
-  padding:16px;
+
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:20px;
+  margin-bottom:22px;
 }
-.exec-panel-title{
-  font-size:11px;
+
+.greeting h1{
+  font-size:30px;
+  letter-spacing:-.03em;
+  margin-bottom:6px;
+}
+
+.greeting p{
   color:var(--muted);
-  letter-spacing:1.8px;
-  text-transform:uppercase;
+  font-size:14px;
+}
+
+.actions{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  flex-wrap:wrap;
+}
+
+.month{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  background:white;
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:9px 10px;
+  font-size:13px;
+  font-weight:800;
+}
+
+.month button{
+  border:0;
+  background:#f1f5f9;
+  border-radius:8px;
+  width:28px;
+  height:28px;
+  cursor:pointer;
+}
+
+.action-btn{
+  border:1px solid var(--border);
+  background:white;
+  border-radius:12px;
+  padding:11px 14px;
+  font-weight:800;
+  cursor:pointer;
+}
+
+.action-btn.primary{
+  background:var(--primary);
+  color:white;
+  border-color:var(--primary);
+}
+
+/* SECTIONS */
+.section{display:none}
+.section.active{display:block}
+
+/* DASHBOARD */
+.summary{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:14px;
+  margin-bottom:16px;
+}
+
+.card{
+  background:white;
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:18px;
+  box-shadow:0 8px 24px rgba(15,23,42,.04);
+}
+
+.icon{
+  width:38px;
+  height:38px;
+  border-radius:12px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
   margin-bottom:12px;
 }
-.exec-chart{
+
+.label{
+  color:var(--muted);
+  font-size:12px;
+  margin-bottom:8px;
+}
+
+.value{
+  font-size:22px;
+  font-weight:900;
+  letter-spacing:-.03em;
+}
+
+.note{
+  color:var(--muted);
+  font-size:12px;
+  margin-top:8px;
+}
+
+.dashboard-grid{
+  display:grid;
+  grid-template-columns:1fr 340px;
+  gap:16px;
+}
+
+.left-col,.right-col{
+  display:grid;
+  gap:16px;
+  align-content:start;
+}
+
+.two{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+}
+
+.three{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:16px;
+}
+
+.panel{
+  background:white;
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:18px;
+  box-shadow:0 8px 24px rgba(15,23,42,.04);
+}
+
+.panel-title{
+  font-weight:900;
+  font-size:15px;
+  margin-bottom:4px;
+}
+
+.panel-sub{
+  color:var(--muted);
+  font-size:12px;
+  margin-bottom:12px;
+}
+
+.chart{
   height:260px;
 }
-.exec-list{
-  display:grid;
-  gap:10px;
-}
-.exec-alert{
-  background:#101015;
-  border:1px solid var(--border);
-  border-radius:14px;
-  padding:13px;
-}
-.exec-alert-title{
-  font-weight:900;
-  font-size:13px;
-  margin-bottom:5px;
-}
-.exec-alert-text{
-  color:var(--muted);
-  font-size:13px;
-  line-height:1.6;
-}
-.exec-status-good{color:var(--green)}
-.exec-status-warn{color:var(--amber)}
-.exec-status-bad{color:var(--red)}
 
+.big{
+  font-size:34px;
+  font-weight:900;
+  letter-spacing:-.04em;
+  margin-top:14px;
+}
+
+.progress{
+  height:9px;
+  background:#eef2f7;
+  border-radius:999px;
+  overflow:hidden;
+  margin:12px 0;
+}
+
+.fill{
+  height:100%;
+  border-radius:999px;
+  background:var(--primary);
+}
+
+.alert{
+  border-radius:16px;
+  padding:16px;
+  border:1px solid var(--border);
+  background:white;
+}
+
+.alert.coach{
+  background:linear-gradient(135deg,#f3f0ff,#fff);
+}
+
+.alert.danger{
+  background:linear-gradient(135deg,#fff0f3,#fff);
+  border-color:#ffd6de;
+}
+
+.alert.good{
+  background:linear-gradient(135deg,#ecfdf5,#fff);
+  border-color:#bbf7d0;
+}
+
+.alert-title{
+  font-weight:900;
+  margin-bottom:8px;
+}
+
+.alert-text{
+  color:#4b5563;
+  font-size:13px;
+  line-height:1.65;
+}
+
+.mission{
+  display:grid;
+  grid-template-columns:18px 1fr auto;
+  gap:10px;
+  align-items:center;
+  padding:9px 0;
+  border-bottom:1px solid #f1f5f9;
+  font-size:13px;
+}
+
+.mission:last-child{border-bottom:0}
+.check{
+  width:13px;
+  height:13px;
+  border-radius:4px;
+  border:1px solid #cbd5e1;
+}
+
+.breakdown{
+  display:flex;
+  height:16px;
+  overflow:hidden;
+  border-radius:6px;
+  background:#eef2f7;
+  margin:12px 0;
+}
+
+.breakdown span{display:block}
+
+/* FORM SECTIONS */
+.form-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:14px;
+}
+
+.input-card{
+  background:white;
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:15px;
+}
+
+.input-card input{
+  width:100%;
+  border:0;
+  outline:0;
+  font-size:22px;
+  font-weight:900;
+  color:var(--text);
+}
+
+.table-head,.row,.total{
+  display:grid;
+  grid-template-columns:1.4fr .9fr .9fr .7fr 40px;
+  gap:8px;
+  align-items:center;
+}
+
+.table-head{
+  font-size:10px;
+  letter-spacing:1.2px;
+  color:var(--muted);
+  text-transform:uppercase;
+  margin-bottom:8px;
+}
+
+.row{margin-bottom:8px}
+.cell{
+  background:white;
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:10px;
+}
+
+.cell input{
+  width:100%;
+  border:0;
+  outline:0;
+  background:transparent;
+  font-weight:800;
+}
+
+.num{text-align:right}
+.diff{
+  text-align:center;
+  font-weight:900;
+  border-radius:10px;
+  padding:10px;
+  background:#f1f5f9;
+  color:var(--muted);
+}
+
+.diff.good{background:#ecfdf5;color:var(--green)}
+.diff.bad{background:#fff0f3;color:var(--red)}
+
+.x{
+  border:1px solid var(--border);
+  background:white;
+  border-radius:10px;
+  height:38px;
+  cursor:pointer;
+}
+
+.total{
+  border-top:1px solid var(--border);
+  padding-top:12px;
+  margin-top:10px;
+  font-weight:900;
+}
+
+textarea{
+  width:100%;
+  min-height:120px;
+  resize:vertical;
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:14px;
+  outline:0;
+  font-family:inherit;
+}
+
+.btn{
+  border:1px solid var(--border);
+  background:white;
+  border-radius:12px;
+  padding:10px 13px;
+  font-weight:800;
+  cursor:pointer;
+}
+
+.btn:hover{border-color:var(--primary);color:var(--primary)}
+
+@media(max-width:1180px){
+  .summary{grid-template-columns:repeat(3,1fr)}
+  .dashboard-grid{grid-template-columns:1fr}
+}
+
+@media(max-width:900px){
+  .app{grid-template-columns:1fr}
+  .sidebar{position:relative;height:auto}
+  .nav{grid-template-columns:repeat(auto-fit,minmax(130px,1fr))}
+  .main{padding:18px}
+  .summary{grid-template-columns:repeat(2,1fr)}
+  .two,.three,.form-grid{grid-template-columns:1fr}
+}
+
+@media(max-width:560px){
+  .summary{grid-template-columns:1fr}
+  .topbar{flex-direction:column}
+}
 </style>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-<div class="hdr">
-  <div class="hdr-eye">Phase 1 Foundation</div>
-  <div class="hdr-title">FINANCIAL<br><em>TRACKING</em></div>
-  <div class="hdr-sub">Revenus, dépenses, historique, catégories, savings, budget vs actual.</div>
-</div>
+<div class="app">
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="logo-icon">↗</div>
+      <div class="logo-text">Wealth<br>Discipline</div>
+    </div>
 
-<div class="month-nav">
-  <button class="mbtn" onclick="changeMonth(-1)">‹</button>
-  <div class="mlabel" id="month-label"></div>
-  <button class="mbtn" onclick="changeMonth(1)">›</button>
-</div>
+    <nav class="nav">
+      <button class="active" onclick="showSection('dashboard',this)">🏠 Dashboard</button>
+      <button onclick="showSection('income',this)">💼 Income</button>
+      <button onclick="showSection('budget',this)">📊 Budget</button>
+      <button onclick="showSection('savings',this)">🏦 Savings</button>
+      <button onclick="showSection('wealth',this)">💰 Wealth</button>
+      <button onclick="showSection('identity',this)">🪪 Identity</button>
+      <button onclick="showSection('trajectory',this)">🚀 Trajectory</button>
+      <button onclick="showSection('missions',this)">🎯 Missions</button>
+      <button onclick="showSection('coach',this)">🤖 Coach</button>
+      <button onclick="showSection('progress',this)">📈 Progress</button>
+      <button onclick="showSection('history',this)">🕒 History</button>
+    </nav>
 
-<div class="wrap">
-  <div class="dashboard">
-    <div class="dcard"><div class="dlbl">Income</div><div class="dval" id="dash-income">GH₵0</div><div class="dsub">Total monthly income</div></div>
-    <div class="dcard"><div class="dlbl">Planned</div><div class="dval" id="dash-planned" style="color:var(--amber)">GH₵0</div><div class="dsub">Budget plan</div></div>
-    <div class="dcard"><div class="dlbl">Actual</div><div class="dval" id="dash-actual" style="color:var(--blue)">GH₵0</div><div class="dsub">Real spending</div></div>
-    <div class="dcard"><div class="dlbl">Savings</div><div class="dval" id="dash-savings" style="color:var(--green)">GH₵0</div><div class="dsub">Income - actual - debt</div></div>
-    <div class="dcard"><div class="dlbl">Status</div><div class="dval" id="dash-status">—</div><div class="dsub" id="dash-status-sub">Not judged</div></div>
-  </div>
-
-  <div class="tabs">
-    <button class="tab active" onclick="showSection('dashboard',this)">🏠 Dashboard</button>
-    <button class="tab" onclick="showSection('income',this)">💼 Income</button>
-    <button class="tab" onclick="showSection('budget',this)">📊 Budget</button>
-    <button class="tab" onclick="showSection('savings',this)">🏦 Savings</button>
-    <button class="tab" onclick="showSection('behavior',this)">🧠 Behavior</button>
-    <button class="tab" onclick="showSection('wealth',this)">💰 Wealth</button>
-    <button class="tab" onclick="showSection('identity',this)">🪪 Identity</button>
-    <button class="tab" onclick="showSection('trajectory',this)">🚀 Trajectory</button>
-    <button class="tab" onclick="showSection('missions',this)">🎯 Missions</button>
-    <button class="tab" onclick="showSection('coach',this)">🤖 Coach</button>
-    <button class="tab" onclick="showSection('progress',this)">📈 Progress</button>
-    <button class="tab" onclick="showSection('history',this)">🕒 History</button>
-    <button class="tab" onclick="showAll(this)">👁 All</button>
-  </div>
-
-
-  <section id="dashboard" class="section show">
-    <div class="exec-dashboard">
-      <div class="exec-hero">
-        <div class="exec-kicker">Wealth Discipline Dashboard</div>
-        <div class="exec-title">YOUR MONEY<br><span>COMMAND CENTER</span></div>
-        <div class="exec-sub">
-          One view for income, spending, savings, emergency runway, identity, missions, pressure alerts and progress.
-        </div>
-      </div>
-
-      <div class="exec-summary">
-        <div class="exec-card">
-          <div class="exec-label">This Month Verdict</div>
-          <div class="exec-value" id="ex-verdict">—</div>
-          <div class="exec-note" id="ex-verdict-note">Judge the month to see status.</div>
-        </div>
-
-        <div class="exec-card">
-          <div class="exec-label">Monthly Savings</div>
-          <div class="exec-value" id="ex-monthly-savings" style="color:var(--green)">GH₵0</div>
-          <div class="exec-note">Savings category + positive budget difference.</div>
-        </div>
-
-        <div class="exec-card">
-          <div class="exec-label">Total Savings Balance</div>
-          <div class="exec-value" id="ex-total-savings" style="color:var(--blue)">GH₵0</div>
-          <div class="exec-note">Accumulated judged monthly savings.</div>
-        </div>
-
-        <div class="exec-card">
-          <div class="exec-label">Emergency Runway</div>
-          <div class="exec-value" id="ex-runway" style="color:var(--amber)">—</div>
-          <div class="exec-note">How long you survive if income stops.</div>
-        </div>
-      </div>
-
-      <div class="exec-main-grid">
-        <div class="exec-panel">
-          <div class="exec-panel-title">Savings Evolution</div>
-          <div class="exec-chart"><canvas id="execSavingsChart"></canvas></div>
-        </div>
-
-        <div class="exec-panel">
-          <div class="exec-panel-title">Current Identity</div>
-          <div class="identity-name" id="ex-identity" style="font-size:42px">—</div>
-          <div class="identity-desc" id="ex-identity-desc">Judge a month to identify your financial behavior.</div>
-        </div>
-      </div>
-
-      <div class="exec-main-grid">
-        <div class="exec-panel">
-          <div class="exec-panel-title">Income vs Spending</div>
-          <div class="exec-chart"><canvas id="execIncomeSpendChart"></canvas></div>
-        </div>
-
-        <div class="exec-panel">
-          <div class="exec-panel-title">Important Alerts</div>
-          <div class="exec-list" id="exec-alerts"></div>
-        </div>
-      </div>
-
-      <div class="exec-main-grid">
-        <div class="exec-panel">
-          <div class="exec-panel-title">Discipline Trend</div>
-          <div class="exec-chart"><canvas id="execDisciplineChart"></canvas></div>
-        </div>
-
-        <div class="exec-panel">
-          <div class="exec-panel-title">Next Month Mission</div>
-          <div class="exec-list" id="exec-missions"></div>
+    <div class="sidebar-user">
+      <div class="user-row">
+        <div class="avatar">OA</div>
+        <div>
+          <div class="user-name">Othniel ATSE</div>
+          <div class="user-status" id="side-identity">● Stable Operator</div>
         </div>
       </div>
     </div>
-  </section>
 
-  <section id="income" class="section">
-    <div class="sec-title"><div class="sec-label">Income Sources</div><button class="btn" onclick="addIncome()">＋ Add Income</button></div>
-    <div class="grid" id="income-list"></div>
-  </section>
-
-  <section id="budget" class="section">
-    <div class="sec-title"><div class="sec-label">Budget vs Actual</div><button class="btn" onclick="addCategory()">＋ Add Category</button></div>
-    <div class="table-head">
-      <div>Category</div><div style="text-align:right;color:var(--amber)">Planned</div><div style="text-align:right;color:var(--blue)">Actual</div><div style="text-align:center">Diff</div><div></div>
+    <div class="premium">
+      <div class="premium-title">♛ Premium</div>
+      <div class="premium-text">Your personal finance operating system.</div>
     </div>
-    <div id="category-list"></div>
-    <div class="total-row">
-      <div class="total-label">Total</div>
-      <div class="total-val" id="total-planned" style="color:var(--amber)">GH₵0</div>
-      <div class="total-val" id="total-actual" style="color:var(--blue)">GH₵0</div>
-      <div class="total-val" id="total-diff">—</div>
-      <div></div>
-    </div>
-  </section>
+  </aside>
 
-  <section id="savings" class="section">
-    <div class="sec-title"><div class="sec-label">Savings & Debt</div></div>
-    <div class="grid">
-      <div class="card">
-        <div class="label">💳 Debt Payments</div>
-        <input class="input" id="debt" type="number" min="0" placeholder="0" oninput="recalc(); saveDraft()">
-        <div class="sub">Debt paid this month</div>
+  <main class="main">
+    <div class="topbar">
+      <div class="greeting">
+        <h1>Good morning, Othniel 👋</h1>
+        <p id="top-sub">Here’s your financial overview.</p>
       </div>
-      <div class="card">
-        <div class="label">🏦 Calculated Monthly Savings</div>
-        <div class="input" id="monthly-savings-display">GH₵0</div>
-        <div class="sub">Savings Category + Positive Budget Difference</div>
-      </div>
-      <div class="card">
-        <div class="label">💰 Total Savings Balance</div>
-        <div class="input" id="total-savings-display">GH₵0</div>
-        <div class="sub">Sum of judged months</div>
+      <div class="actions">
+        <div class="month">
+          <button onclick="changeMonth(-1)">‹</button>
+          <span id="month-label">MAY 2026</span>
+          <button onclick="changeMonth(1)">›</button>
+        </div>
+        <button class="action-btn" onclick="window.print()">Download</button>
+        <button class="action-btn primary">Share</button>
       </div>
     </div>
 
-    <div class="sec-title"><div class="sec-label">Monthly Comment</div></div>
-    <textarea class="note" id="comment" placeholder="What happened this month?" oninput="saveDraft()"></textarea>
-
-    <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
-      <button class="btn" onclick="judgeMonth()">⚖️ Judge Month</button>
-      <button class="btn" onclick="saveDraft()">💾 Save Draft</button>
-      <button class="btn" onclick="clearCurrentMonth()">🧹 Clear Actuals</button>
-    </div>
-
-    <div class="verdict" id="verdict">
-      <div class="verdict-title" id="verdict-grade">—</div>
-      <div class="verdict-msg" id="verdict-msg">Enter your data and judge the month.</div>
-    </div>
-  </section>
-
-
-  <section id="behavior" class="section">
-    <div class="sec-title">
-      <div class="sec-label">Behavioral Finance Detection</div>
-      <button class="btn" onclick="renderBehavior()">Refresh Analysis</button>
-    </div>
-
-    <div class="verdict">
-      <div class="verdict-title" style="font-size:38px">BEHAVIOR</div>
-      <div class="verdict-msg">
-        The app detects habits, impulsivity, lifestyle inflation, emotional consumption, discipline, and monthly patterns from your saved history.
-      </div>
-    </div>
-
-    <div class="behavior-grid" id="behavior-list"></div>
-  </section>
-
-
-  <section id="wealth" class="section">
-    <div class="sec-title">
-      <div class="sec-label">Wealth Building Engine</div>
-      <button class="btn" onclick="renderWealthEngine()">Refresh Wealth Analysis</button>
-    </div>
-
-    <div class="wealth-question">
-      <div class="wealth-question-title">IS THIS MAKING YOU WEALTHIER?</div>
-      <div class="wealth-question-text" id="wealth-main-answer">
-        Judge the month first, then the app will evaluate whether your behavior is building wealth.
-      </div>
-    </div>
-
-    <div class="wealth-engine-grid">
-      <div class="wealth-metric">
-        <div class="wealth-metric-title">Investment Ratio</div>
-        <div class="wealth-metric-value" id="investment-ratio">—</div>
-        <div class="wealth-metric-status" id="investment-status">—</div>
-        <div class="wealth-metric-desc">How much of your income is converted into investments, assets, or business growth.</div>
+    <section id="dashboard" class="section active">
+      <div class="summary">
+        <div class="card">
+          <div class="icon" style="background:#dcfce7;color:#16a34a">💵</div>
+          <div class="label">Total Income</div>
+          <div class="value" id="dash-income">GH₵0</div>
+          <div class="note">This month</div>
+        </div>
+        <div class="card">
+          <div class="icon" style="background:#ffe4e6;color:#e11d48">💸</div>
+          <div class="label">Total Spending</div>
+          <div class="value" id="dash-actual">GH₵0</div>
+          <div class="note">Actual spending</div>
+        </div>
+        <div class="card">
+          <div class="icon" style="background:#dbeafe;color:#2563eb">🏦</div>
+          <div class="label">Savings</div>
+          <div class="value" id="dash-savings">GH₵0</div>
+          <div class="note">Calculated monthly savings</div>
+        </div>
+        <div class="card">
+          <div class="icon" style="background:#ede9fe;color:#7c3aed">🛡️</div>
+          <div class="label">Total Emergency Fund</div>
+          <div class="value" id="dash-emergency">GH₵0</div>
+          <div class="note">Runway: <span id="dash-runway">—</span></div>
+        </div>
+        <div class="card">
+          <div class="icon" style="background:#fef3c7;color:#d97706">🏆</div>
+          <div class="label">Financial Identity</div>
+          <div class="value" id="dash-identity" style="font-size:20px;color:#f59e0b">—</div>
+          <div class="note" id="dash-identity-note">Judge your month</div>
+        </div>
       </div>
 
-      <div class="wealth-metric">
-        <div class="wealth-metric-title">Income Diversification</div>
-        <div class="wealth-metric-value" id="diversification-score">—</div>
-        <div class="wealth-metric-status" id="diversification-status">—</div>
-        <div class="wealth-metric-desc">Measures how dependent you are on one income source.</div>
+      <div class="dashboard-grid">
+        <div class="left-col">
+          <div class="two">
+            <div class="panel">
+              <div class="panel-title">Wealth Evolution</div>
+              <div class="panel-sub">Savings and emergency fund growth</div>
+              <div class="chart"><canvas id="wealthChart"></canvas></div>
+            </div>
+            <div class="panel">
+              <div class="panel-title">Income vs Spending</div>
+              <div class="panel-sub">This month’s balance</div>
+              <div class="chart"><canvas id="incomeSpendChart"></canvas></div>
+            </div>
+          </div>
+
+          <div class="three">
+            <div class="panel">
+              <div class="panel-title">Emergency Runway</div>
+              <div class="big" id="runway-big" style="color:var(--green)">—</div>
+              <div class="alert-text">Estimated survival time if income stopped today.</div>
+              <div class="progress"><div class="fill" id="runway-fill" style="width:0%;background:var(--green)"></div></div>
+              <div class="note">Target: 6+ months</div>
+            </div>
+            <div class="panel">
+              <div class="panel-title">Projected Milestones</div>
+              <div style="margin-top:14px">
+                <div class="alert-text">Emergency fund target</div>
+                <div class="progress"><div class="fill" id="ef-target-fill" style="width:0%"></div></div>
+                <div class="note" id="ef-target-note">—</div>
+              </div>
+              <div style="margin-top:14px">
+                <div class="alert-text">GH₵100k Net Worth</div>
+                <div class="progress"><div class="fill" id="w100-fill" style="width:0%"></div></div>
+                <div class="note" id="w100-note">—</div>
+              </div>
+            </div>
+            <div class="panel">
+              <div class="panel-title">Discipline Trend</div>
+              <div class="chart" style="height:210px"><canvas id="disciplineChart"></canvas></div>
+            </div>
+          </div>
+
+          <div class="two">
+            <div class="panel">
+              <div class="panel-title">Spending Breakdown</div>
+              <div class="panel-sub">This month</div>
+              <div class="breakdown" id="breakdown-bar"></div>
+              <div id="breakdown-legend"></div>
+            </div>
+            <div class="panel">
+              <div class="panel-title">Top Spending Categories vs Plan</div>
+              <div class="panel-sub">Highest actual spending</div>
+              <div id="top-cats"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="right-col">
+          <div class="panel">
+            <div class="panel-title">Next Month Missions</div>
+            <div class="panel-sub">Complete missions and level up</div>
+            <div id="mission-list"></div>
+          </div>
+
+          <div class="two" style="grid-template-columns:1fr 1fr">
+            <div class="panel">
+              <div class="panel-title">🔥 Streak</div>
+              <div class="big" id="streak">—</div>
+              <div class="note">Months</div>
+            </div>
+            <div class="panel">
+              <div class="panel-title">🏆 Best</div>
+              <div class="big" id="best-streak">—</div>
+              <div class="note">Months</div>
+            </div>
+          </div>
+
+          <div class="alert coach">
+            <div class="alert-title">🤖 AI Financial Coach</div>
+            <div class="alert-text" id="coach-text">Judge your month to receive advice.</div>
+          </div>
+
+          <div class="alert danger">
+            <div class="alert-title">⚠️ Wealth Pressure</div>
+            <div class="alert-text" id="pressure-text">The app will challenge weak financial behavior honestly.</div>
+          </div>
+
+          <div class="alert good">
+            <div class="alert-title">📈 Income Intelligence</div>
+            <div class="alert-text" id="income-intel">Add income sources to detect dependency.</div>
+          </div>
+        </div>
       </div>
+    </section>
 
-      <div class="wealth-metric">
-        <div class="wealth-metric-title">Capital Accumulation</div>
-        <div class="wealth-metric-value" id="capital-accumulation">—</div>
-        <div class="wealth-metric-status" id="capital-status">—</div>
-        <div class="wealth-metric-desc">How much capital you are retaining this month.</div>
+    <section id="income" class="section">
+      <div class="panel">
+        <div class="panel-title">Income Sources</div>
+        <div class="panel-sub">Salary, training, consulting, business, bonus and other income.</div>
+        <div style="margin:14px 0"><button class="btn" onclick="addIncome()">＋ Add Income</button></div>
+        <div class="form-grid" id="income-list"></div>
       </div>
+    </section>
 
-      <div class="wealth-metric">
-        <div class="wealth-metric-title">Freedom Score</div>
-        <div class="wealth-metric-value" id="freedom-score">—</div>
-        <div class="wealth-metric-status" id="freedom-status">—</div>
-        <div class="wealth-metric-desc">How financially free you are from one income stream and high monthly consumption.</div>
+    <section id="budget" class="section">
+      <div class="panel">
+        <div class="panel-title">Budget vs Actual</div>
+        <div class="panel-sub">Planned budget remains stable, actual changes monthly.</div>
+        <div style="margin:14px 0"><button class="btn" onclick="addCategory()">＋ Add Category</button></div>
+        <div class="table-head"><div>Category</div><div style="text-align:right">Planned</div><div style="text-align:right">Actual</div><div style="text-align:center">Diff</div><div></div></div>
+        <div id="category-list"></div>
+        <div class="total"><div>Total</div><div id="total-planned" style="text-align:right">GH₵0</div><div id="total-actual" style="text-align:right">GH₵0</div><div id="total-diff" style="text-align:center">—</div><div></div></div>
       </div>
+    </section>
 
-      <div class="wealth-metric">
-        <div class="wealth-metric-title">Emergency Runway</div>
-        <div class="wealth-metric-value" id="runway-score">—</div>
-        <div class="wealth-metric-status" id="runway-status">—</div>
-        <div class="wealth-metric-desc">Estimated survival time if income stopped today, based on your accumulated Emergency Fund.</div>
+    <section id="savings" class="section">
+      <div class="panel">
+        <div class="panel-title">Savings & Monthly Comment</div>
+        <div class="form-grid" style="margin-top:14px">
+          <div class="input-card">
+            <div class="label">Debt Payments</div>
+            <input id="debt" type="number" min="0" placeholder="0" oninput="recalc();saveDraft()">
+          </div>
+          <div class="input-card">
+            <div class="label">Calculated Monthly Savings</div>
+            <div class="value" id="monthly-savings-display">GH₵0</div>
+          </div>
+          <div class="input-card">
+            <div class="label">Total Savings Balance</div>
+            <div class="value" id="total-savings-display">GH₵0</div>
+          </div>
+        </div>
+        <div style="margin-top:14px">
+          <textarea id="comment" placeholder="What happened this month?" oninput="saveDraft()"></textarea>
+        </div>
+        <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn" onclick="judgeMonth()">⚖️ Judge Month</button>
+          <button class="btn" onclick="saveDraft()">💾 Save Draft</button>
+          <button class="btn" onclick="clearCurrentMonth()">🧹 Clear Actuals</button>
+        </div>
       </div>
+    </section>
 
-      <div class="wealth-metric">
-        <div class="wealth-metric-title">Total Emergency Fund</div>
-        <div class="wealth-metric-value" id="total-emergency-fund">—</div>
-        <div class="wealth-metric-status" id="emergency-fund-status">Auto Calculated</div>
-        <div class="wealth-metric-desc">Sum of all judged months where the Emergency Fund category has an Actual value.</div>
-      </div>
-
-      <div class="wealth-metric">
-        <div class="wealth-metric-title">Asset Allocation</div>
-        <div class="wealth-metric-value" id="asset-allocation">—</div>
-        <div class="wealth-metric-status" id="asset-status">—</div>
-        <div class="wealth-metric-desc">Checks whether your money is going to assets or being consumed.</div>
-      </div>
-    </div>
-
-    <div class="sec-title"><div class="sec-label">Wealth Inputs</div></div>
-    <div class="asset-grid">
-      <div class="card">
-        <div class="label">🏦 Investments / Capital Kept</div>
-        <input class="input" id="wealth-investments" type="number" min="0" placeholder="0" oninput="saveWealthInputs(); renderWealthEngine()">
-        <div class="sub">Extra money kept aside beyond normal spending. Use 0 if none.</div>
-      </div>
-      <div class="card">
-        <div class="label">🛡️ Emergency Fund Source</div>
-        <div class="input" style="font-size:28px">Emergency Fund Category</div>
-        <div class="sub">Each month, enter the amount added into the Actual value of the “Emergency Fund” category. The app accumulates it month by month.</div>
-      </div>
-      <div class="card">
-        <div class="label">🏢 Business Reinvestment</div>
-        <input class="input" id="business-reinvestment" type="number" min="0" placeholder="0" oninput="saveWealthInputs(); renderWealthEngine()">
-        <div class="sub">Money reinvested to grow income capacity.</div>
-      </div>
-      <div class="card">
-        <div class="label">🎯 Wealth Goal</div>
-        <input class="input" id="wealth-goal" type="number" min="0" placeholder="100000" oninput="saveWealthInputs(); renderWealthEngine()">
-        <div class="sub">Target capital milestone.</div>
-      </div>
-
-      <div class="card">
-        <div class="label">📊 Stocks / Funds</div>
-        <input class="input" id="asset-stocks" type="number" min="0" placeholder="0" oninput="saveWealthInputs(); renderWealthEngine()">
-        <div class="sub">ETFs, mutual funds, stocks, bonds.</div>
-      </div>
-      <div class="card">
-        <div class="label">₿ Crypto</div>
-        <input class="input" id="asset-crypto" type="number" min="0" placeholder="0" oninput="saveWealthInputs(); renderWealthEngine()">
-        <div class="sub">Crypto assets, only if applicable.</div>
-      </div>
-      <div class="card">
-        <div class="label">🏡 Land / Property</div>
-        <input class="input" id="asset-property" type="number" min="0" placeholder="0" oninput="saveWealthInputs(); renderWealthEngine()">
-        <div class="sub">Land, property contribution, real estate.</div>
-      </div>
-      <div class="card">
-        <div class="label">🏢 Business Assets</div>
-        <input class="input" id="asset-business" type="number" min="0" placeholder="0" oninput="saveWealthInputs(); renderWealthEngine()">
-        <div class="sub">Equipment, tools, inventory, business capital.</div>
-      </div>
-
-    </div>
-
-    
-    <div class="sec-title"><div class="sec-label">Investment Meaning</div></div>
-    <div class="wealth-question">
-      <div class="wealth-question-title" style="font-size:34px">WHAT COUNTS AS INVESTMENT?</div>
-      <div class="wealth-question-text">
-        Investment means money that is no longer just sitting idle or being consumed.
-        It is money converted into assets or future earning power:
-        stocks, funds, land, business assets, equipment, inventory, or scalable income capacity.
-        <br><br>
-        Savings protects you. Investment grows you.<br><br><strong>Emergency Fund rule:</strong> the category named Emergency Fund represents the amount added this month. The app automatically builds the Total Emergency Fund across judged months.
-      </div>
-    </div>
-
-    <div class="sec-title"><div class="sec-label">Wealth Advice</div></div>
-    <div class="behavior-grid" id="wealth-advice-list"></div>
-  </section>
-
-
-  <section id="identity" class="section">
-    <div class="sec-title">
-      <div class="sec-label">Financial Identity System</div>
-      <button class="btn" onclick="renderFinancialIdentity()">Refresh Identity</button>
-    </div>
-
-    <div class="identity-card">
-      <div class="identity-name" id="financial-identity-name">—</div>
-      <div class="identity-desc" id="financial-identity-desc">
-        Judge at least one month to reveal your current financial identity.
-      </div>
-    </div>
-
-    <div class="behavior-grid" id="identity-reasons"></div>
-  </section>
-
-  <section id="trajectory" class="section">
-    <div class="sec-title">
-      <div class="sec-label">Long-Term Trajectory</div>
-      <button class="btn" onclick="renderLongTermTrajectory()">Refresh Projection</button>
-    </div>
-
-    <div class="wealth-question">
-      <div class="wealth-question-title">WHERE IS THIS TAKING YOU?</div>
-      <div class="wealth-question-text" id="trajectory-summary">
-        The app projects your 1-year, 5-year, and 10-year direction based on your current financial pace.
-      </div>
-    </div>
-
-    <div class="trajectory-grid">
-      <div class="traj-card">
-        <div class="traj-title">1 Year Projection</div>
-        <div class="traj-value" id="traj-1y">—</div>
-        <div class="traj-desc" id="traj-1y-desc">Projected capital retained in 12 months.</div>
-      </div>
-
-      <div class="traj-card">
-        <div class="traj-title">5 Year Projection</div>
-        <div class="traj-value" id="traj-5y">—</div>
-        <div class="traj-desc" id="traj-5y-desc">Projected capital retained in 5 years.</div>
-      </div>
-
-      <div class="traj-card">
-        <div class="traj-title">10 Year Projection</div>
-        <div class="traj-value" id="traj-10y">—</div>
-        <div class="traj-desc" id="traj-10y-desc">Projected capital retained in 10 years.</div>
-      </div>
-    </div>
-
-    <div class="trajectory-grid">
-      <div class="traj-card">
-        <div class="traj-title">Emergency Fund Target</div>
-        <div class="traj-value" id="traj-emergency">—</div>
-        <div class="traj-desc">Estimated time to reach 6 months of expenses.</div>
-      </div>
-
-      <div class="traj-card">
-        <div class="traj-title">GH₵100k Milestone</div>
-        <div class="traj-value" id="traj-100k">—</div>
-        <div class="traj-desc">Estimated time to reach GH₵100,000 retained capital.</div>
-      </div>
-
-      <div class="traj-card">
-        <div class="traj-title">Financial Independence Probability</div>
-        <div class="traj-value" id="traj-fi">—</div>
-        <div class="traj-desc">Simple probability based on savings pace, income diversity and runway.</div>
-      </div>
-    </div>
-
-    <div class="behavior-grid" id="trajectory-advice"></div>
-  </section>
-
-
-  <section id="missions" class="section">
-    <div class="sec-title">
-      <div class="sec-label">Missions & Challenges</div>
-      <button class="btn" onclick="renderMissions()">Refresh Missions</button>
-    </div>
-
-    <div class="mission-card">
-      <div class="mission-title">NEXT MONTH MISSION</div>
-      <div id="mission-list"></div>
-    </div>
-
-    <div class="trajectory-grid">
-      <div class="traj-card">
-        <div class="traj-title">Discipline Streak</div>
-        <div class="traj-value" id="discipline-streak">—</div>
-        <div class="traj-desc">Consecutive months with healthy discipline.</div>
-      </div>
-
-      <div class="traj-card">
-        <div class="traj-title">Wealth Momentum</div>
-        <div class="traj-value" id="wealth-momentum">—</div>
-        <div class="traj-desc">Direction of your capital growth.</div>
-      </div>
-
-      <div class="traj-card">
-        <div class="traj-title">Consistency Score</div>
-        <div class="traj-value" id="consistency-score">—</div>
-        <div class="traj-desc">Measures stability of financial discipline.</div>
-      </div>
-    </div>
-  </section>
-
-  <section id="coach" class="section">
-    <div class="sec-title">
-      <div class="sec-label">AI Financial Coach</div>
-      <button class="btn" onclick="renderCoach()">Refresh Coach</button>
-    </div>
-
-    <div class="wealth-question">
-      <div class="wealth-question-title">AI FINANCIAL COACH</div>
-      <div class="wealth-question-text">
-        The coach analyzes your behavior and gives direct financial advice.
-      </div>
-    </div>
-
-    <div class="behavior-grid" id="coach-advice"></div>
-
-    <div class="pressure-banner">
-      <div class="pressure-title">WEALTH PRESSURE SYSTEM</div>
-      <div class="pressure-text" id="pressure-system">
-        The app will sometimes challenge your financial behavior honestly.
-      </div>
-    </div>
-  </section>
-
-  <section id="progress" class="section">
-    <div class="sec-title">
-      <div class="sec-label">Visual Wealth Progress</div>
-      <button class="btn" onclick="renderProgressCharts()">Refresh Charts</button>
-    </div>
-
-    <div class="trajectory-grid">
-      <div class="chart-wrap"><canvas id="savingsChart"></canvas></div>
-      <div class="chart-wrap"><canvas id="freedomChart"></canvas></div>
-      <div class="chart-wrap"><canvas id="disciplineChart"></canvas></div>
-    </div>
-
-    <div class="trajectory-grid" style="margin-top:10px">
-      <div class="chart-wrap"><canvas id="lifestyleChart"></canvas></div>
-      <div class="chart-wrap"><canvas id="incomeChart"></canvas></div>
-      <div class="chart-wrap"><canvas id="runwayChart"></canvas></div>
-    </div>
-  </section>
-
-  <section id="history" class="section">
-    <div class="sec-title"><div class="sec-label">Monthly History</div><button class="btn" onclick="clearAllData()">Clear All</button></div>
-    <div id="history-list"></div>
-  </section>
+    <section id="wealth" class="section"><div class="panel"><div class="panel-title">Wealth</div><div id="wealth-content" class="alert-text">Wealth engine summary appears on the dashboard.</div></div></section>
+    <section id="identity" class="section"><div class="panel"><div class="panel-title">Financial Identity</div><div class="big" id="identity-name">—</div><div class="alert-text" id="identity-desc">Judge your month.</div></div></section>
+    <section id="trajectory" class="section"><div class="panel"><div class="panel-title">Long-Term Trajectory</div><div id="trajectory-content" class="alert-text">Your 1-year, 5-year, and 10-year projections appear here.</div></div></section>
+    <section id="missions" class="section"><div class="panel"><div class="panel-title">Missions</div><div id="missions-full"></div></div></section>
+    <section id="coach" class="section"><div class="panel"><div class="panel-title">AI Financial Coach</div><div id="coach-full"></div></div></section>
+    <section id="progress" class="section"><div class="panel"><div class="panel-title">Progress</div><div class="chart"><canvas id="progressChart"></canvas></div></div></section>
+    <section id="history" class="section"><div class="panel"><div class="panel-title">History</div><div style="margin:14px 0"><button class="btn" onclick="clearAllData()">Clear All</button></div><div id="history-list"></div></div></section>
+  </main>
 </div>
 
 <script>
 const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
 const SHORT=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
 const DEFAULT_INCOME=[
-  {id:'salary',name:'Salary',amount:0},
-  {id:'training',name:'Training',amount:0},
-  {id:'consulting',name:'Consulting',amount:0},
-  {id:'bonus',name:'Bonus',amount:0},
-  {id:'gift',name:'Gift',amount:0},
-  {id:'business',name:'Business',amount:0},
-  {id:'other',name:'Other',amount:0}
+  {id:'salary',name:'Salary',amount:0},{id:'training',name:'Training',amount:0},{id:'consulting',name:'Consulting',amount:0},
+  {id:'bonus',name:'Bonus',amount:0},{id:'gift',name:'Gift',amount:0},{id:'business',name:'Business',amount:0},{id:'other',name:'Other',amount:0}
 ];
 const DEFAULT_CATS=[
-  {id:'housing_maintenance',name:'Housing - Maintenance Fee',planned:0,actual:0},
-  {id:'housing_gas',name:'Housing - Gas',planned:0,actual:0},
-  {id:'housing_light',name:'Housing - Light',planned:0,actual:0},
-  {id:'housing_generator',name:'Housing - Generator',planned:0,actual:0},
-  {id:'housing_trash',name:'Housing - Trash',planned:0,actual:0},
-  {id:'housing_internet',name:'Housing - Internet',planned:0,actual:0},
-  {id:'housing_soap',name:'Housing - Washing Soap',planned:0,actual:0},
-  {id:'fiancee',name:'Fiancée',planned:0,actual:0},
-  {id:'food',name:'Food',planned:0,actual:0},
-  {id:'gym',name:'Gym',planned:0,actual:0},
-  {id:'transport',name:'Transport',planned:0,actual:0},
-  {id:'tithes',name:'Tithes',planned:0,actual:0},
-  {id:'data',name:'Personal Data & Airtime',planned:0,actual:0},
-  {id:'haircut',name:'Haircut',planned:0,actual:0},
-  {id:'family',name:'Daughter & Mum',planned:0,actual:0},
-  {id:'medical',name:'Medical',planned:0,actual:0},
-  {id:'shows',name:'Shows',planned:0,actual:0}
+  {id:'housing_maintenance',name:'Housing - Maintenance Fee',planned:0,actual:0},{id:'housing_gas',name:'Housing - Gas',planned:0,actual:0},
+  {id:'housing_light',name:'Housing - Light',planned:0,actual:0},{id:'housing_generator',name:'Housing - Generator',planned:0,actual:0},
+  {id:'housing_trash',name:'Housing - Trash',planned:0,actual:0},{id:'housing_internet',name:'Housing - Internet',planned:0,actual:0},
+  {id:'housing_soap',name:'Housing - Washing Soap',planned:0,actual:0},{id:'fiancee',name:'Fiancée',planned:0,actual:0},
+  {id:'food',name:'Food',planned:0,actual:0},{id:'gym',name:'Gym',planned:0,actual:0},{id:'transport',name:'Transport',planned:0,actual:0},
+  {id:'tithes',name:'Tithes',planned:0,actual:0},{id:'data',name:'Personal Data & Airtime',planned:0,actual:0},
+  {id:'haircut',name:'Haircut',planned:0,actual:0},{id:'family',name:'Daughter & Mum',planned:0,actual:0},{id:'medical',name:'Medical',planned:0,actual:0},
+  {id:'shows',name:'Shows',planned:0,actual:0},{id:'emergency',name:'Emergency Fund',planned:0,actual:0},{id:'savings',name:'Savings',planned:0,actual:0}
 ];
 
-let curYear=new Date().getFullYear();
-let curMonth=new Date().getMonth();
-let incomeSources=[];
-let categories=[];
-let history=[];
-
-const S='wd_phase1_history';
-const P='wd_phase1_profile';
+let curYear=new Date().getFullYear(),curMonth=new Date().getMonth();
+let incomeSources=[],categories=[],history=[];
+let charts={};
+const S='wd_saas_history',P='wd_saas_profile';
 
 function fmt(v){return 'GH₵'+Math.round(v||0).toLocaleString('en-GH')}
 function key(){return curYear+'-'+String(curMonth+1).padStart(2,'0')}
 function loadHistory(){try{history=JSON.parse(localStorage.getItem(S)||'[]')}catch(e){history=[]}}
 function saveHistory(){localStorage.setItem(S,JSON.stringify(history))}
 function loadProfile(){try{return JSON.parse(localStorage.getItem(P)||'{}')}catch(e){return {}}}
-function saveProfile(profile){localStorage.setItem(P,JSON.stringify(profile))}
+function saveProfile(p){localStorage.setItem(P,JSON.stringify(p))}
+function getEntry(){return history.find(h=>h.key===key())}
+function getDefaults(){const p=loadProfile();incomeSources=p.incomeSources||DEFAULT_INCOME.map(x=>({...x}));categories=p.categories||DEFAULT_CATS.map(x=>({...x}))}
 function updateMonthLabel(){document.getElementById('month-label').textContent=SHORT[curMonth]+' '+curYear}
 
-function getEntry(){return history.find(h=>h.key===key())}
-function getProfileDefaults(){
-  const p=loadProfile();
-  incomeSources=p.incomeSources||DEFAULT_INCOME.map(x=>({...x}));
-  categories=p.categories||DEFAULT_CATS.map(x=>({...x}));
+function showSection(id,btn){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  setTimeout(renderDashboard,80);
 }
 
 function renderIncome(){
-  const entry=getEntry();
-  const list=document.getElementById('income-list');
-  list.innerHTML='';
+  const entry=getEntry(),list=document.getElementById('income-list');list.innerHTML='';
   incomeSources.forEach(src=>{
-    const val=entry?.income?.[src.id] ?? src.amount ?? 0;
-    const div=document.createElement('div');
-    div.className='card';
-    div.innerHTML=`
-      <div class="label">💼 <input value="${src.name}" style="background:none;border:none;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:1.2px;font-weight:900;outline:none;width:80%" oninput="renameIncome('${src.id}',this.value)"></div>
-      <input class="input" type="number" min="0" value="${val||''}" placeholder="0" id="inc-${src.id}" oninput="recalc(); saveDraft(); savePermanent()">
-      <div class="sub">Monthly income source</div>`;
+    const val=entry?.income?.[src.id]??src.amount??0;
+    const div=document.createElement('div');div.className='input-card';
+    div.innerHTML=`<div class="label"><input value="${src.name}" style="border:0;outline:0;color:var(--muted);font-weight:800;width:80%" oninput="renameIncome('${src.id}',this.value)"></div>
+    <input type="number" min="0" value="${val||''}" placeholder="0" id="inc-${src.id}" oninput="recalc();saveDraft();savePermanent()">`;
     list.appendChild(div);
   });
 }
 
 function renderCategories(){
-  const entry=getEntry();
-  const list=document.getElementById('category-list');
-  list.innerHTML='';
+  const entry=getEntry(),list=document.getElementById('category-list');list.innerHTML='';
   categories.forEach(cat=>{
-    const planned=entry?.categories?.[cat.id]?.planned ?? cat.planned ?? 0;
-    const actual=entry?.categories?.[cat.id]?.actual ?? '';
-    const row=document.createElement('div');
-    row.className='row';
-    row.innerHTML=`
-      <div class="cell"><input class="name-input" value="${cat.name}" oninput="renameCat('${cat.id}',this.value); savePermanent()"></div>
-      <div class="cell"><input class="num-input" id="pl-${cat.id}" type="number" min="0" value="${planned||''}" placeholder="0" oninput="recalc(); saveDraft(); savePermanent()"></div>
-      <div class="cell"><input class="num-input" id="ac-${cat.id}" type="number" min="0" value="${actual||''}" placeholder="0" oninput="recalc(); saveDraft()"></div>
-      <div class="diff none" id="df-${cat.id}">—</div>
-      <button class="x" onclick="deleteCat('${cat.id}')">✕</button>`;
+    const planned=entry?.categories?.[cat.id]?.planned??cat.planned??0;
+    const actual=entry?.categories?.[cat.id]?.actual??'';
+    const row=document.createElement('div');row.className='row';
+    row.innerHTML=`<div class="cell"><input value="${cat.name}" oninput="renameCat('${cat.id}',this.value);savePermanent()"></div>
+    <div class="cell"><input class="num" id="pl-${cat.id}" type="number" min="0" value="${planned||''}" placeholder="0" oninput="recalc();saveDraft();savePermanent()"></div>
+    <div class="cell"><input class="num" id="ac-${cat.id}" type="number" min="0" value="${actual||''}" placeholder="0" oninput="recalc();saveDraft()"></div>
+    <div class="diff" id="df-${cat.id}">—</div><button class="x" onclick="deleteCat('${cat.id}')">✕</button>`;
     list.appendChild(row);
   });
 }
 
-function renameIncome(id,name){const x=incomeSources.find(i=>i.id===id); if(x){x.name=name; savePermanent()}}
-function renameCat(id,name){const c=categories.find(x=>x.id===id); if(c){c.name=name; savePermanent()}}
-function addIncome(){const id='income_'+Date.now(); incomeSources.push({id,name:'New Income',amount:0}); savePermanent(); renderIncome(); recalc()}
-function addCategory(){const id='cat_'+Date.now(); categories.push({id,name:'New Category',planned:0,actual:0}); savePermanent(); renderCategories(); recalc()}
-function deleteCat(id){categories=categories.filter(c=>c.id!==id); savePermanent(); renderCategories(); recalc(); saveDraft()}
+function renameIncome(id,name){const x=incomeSources.find(i=>i.id===id);if(x){x.name=name;savePermanent()}}
+function renameCat(id,name){const c=categories.find(x=>x.id===id);if(c){c.name=name;savePermanent()}}
+function addIncome(){const id='income_'+Date.now();incomeSources.push({id,name:'New Income',amount:0});savePermanent();renderIncome();recalc()}
+function addCategory(){const id='cat_'+Date.now();categories.push({id,name:'New Category',planned:0,actual:0});savePermanent();renderCategories();recalc()}
+function deleteCat(id){categories=categories.filter(c=>c.id!==id);savePermanent();renderCategories();recalc();saveDraft()}
 
-function collectIncome(){
-  const data={}; let total=0;
-  incomeSources.forEach(src=>{
-    const v=parseFloat(document.getElementById('inc-'+src.id)?.value)||0;
-    data[src.id]=v; total+=v;
-  });
-  return {data,total};
-}
-
+function collectIncome(){const data={};let total=0;incomeSources.forEach(src=>{const v=parseFloat(document.getElementById('inc-'+src.id)?.value)||0;data[src.id]=v;total+=v});return{data,total}}
 function collectCategories(){
-  const data={}; let planned=0, actual=0, kept=0, count=0;
+  const data={};let planned=0,actual=0,kept=0,count=0;
   categories.forEach(cat=>{
     const p=parseFloat(document.getElementById('pl-'+cat.id)?.value)||0;
     const a=parseFloat(document.getElementById('ac-'+cat.id)?.value)||0;
-    data[cat.id]={name:cat.name,planned:p,actual:a};
-    planned+=p; actual+=a;
-    if(p>0){count++; if(a<=p) kept++}
-    const d=a-p, el=document.getElementById('df-'+cat.id);
-    if(el){
-      if(!p&&!a){el.className='diff none';el.textContent='—'}
-      else if(!p){el.className='diff none';el.textContent='no plan'}
-      else if(Math.abs(d)<1){el.className='diff good';el.textContent='✓'}
-      else{el.className='diff '+(d>0?'bad':'good');el.textContent=(d>0?'+':'')+Math.round(d)}
-    }
+    data[cat.id]={name:cat.name,planned:p,actual:a};planned+=p;actual+=a;
+    if(p>0){count++;if(a<=p)kept++}
+    const d=a-p,el=document.getElementById('df-'+cat.id);
+    if(el){if(!p&&!a){el.className='diff';el.textContent='—'}else if(Math.abs(d)<1){el.className='diff good';el.textContent='✓'}else{el.className='diff '+(d>0?'bad':'good');el.textContent=(d>0?'+':'')+Math.round(d)}}
   });
-  return {data,planned,actual,kept,count};
+  return{data,planned,actual,kept,count}
 }
-
-function getSavingsCategoryAmount(categoriesData){
-  if(!categoriesData) return 0;
-
-  const entry = Object.values(categoriesData).find(c =>
-    (c.name || '').trim().toLowerCase() === 'savings'
-  );
-
-  return entry ? (parseFloat(entry.actual)||0) : 0;
-}
-
-function monthlySavings(income,actual,debt){
-  const cats = collectCategories();
-  const totalDiff = Math.max(0, cats.planned - cats.actual);
-  const savingsCategory = getSavingsCategoryAmount(cats.data);
-
-  return Math.max(0, savingsCategory + totalDiff);
-}
-function totalSavingsBalance(){
-  const seen=new Set();
-  return history.reduce((sum,h)=>{
-    if(!h||h.score==null||seen.has(h.key))return sum;
-    seen.add(h.key);
-    return sum+monthlySavings(h.totalIncome,h.totalActual,h.debt||0);
-  },0);
-}
+function savingsCat(data){const e=Object.values(data||{}).find(c=>(c.name||'').toLowerCase().trim()==='savings');return e?parseFloat(e.actual)||0:0}
+function emergencyCat(data){const e=Object.values(data||{}).find(c=>(c.name||'').toLowerCase().trim()==='emergency fund');return e?parseFloat(e.actual)||0:0}
+function monthlySavingsFromData(data,planned,actual){return Math.max(0,savingsCat(data)+Math.max(0,(planned||0)-(actual||0)))}
+function monthlySavings(income,actual,debt){const c=collectCategories();return monthlySavingsFromData(c.data,c.planned,c.actual)}
+function totalSavingsBalance(){return history.filter(h=>h.score!=null).reduce((s,h)=>s+monthlySavingsFromData(h.categories,h.totalPlanned,h.totalActual),0)}
+function totalEmergencyFund(){return history.filter(h=>h.score!=null).reduce((s,h)=>s+emergencyCat(h.categories),0)}
 
 function recalc(){
-  const inc=collectIncome();
-  const cats=collectCategories();
-  const debt=parseFloat(document.getElementById('debt')?.value)||0;
-  const save=monthlySavings(inc.total,cats.actual,debt);
-
+  const inc=collectIncome(),cats=collectCategories(),debt=parseFloat(document.getElementById('debt')?.value)||0;
+  const save=monthlySavingsFromData(cats.data,cats.planned,cats.actual);
   document.getElementById('dash-income').textContent=fmt(inc.total);
-  document.getElementById('dash-planned').textContent=fmt(cats.planned);
   document.getElementById('dash-actual').textContent=fmt(cats.actual);
   document.getElementById('dash-savings').textContent=fmt(save);
   document.getElementById('monthly-savings-display').textContent=fmt(save);
   document.getElementById('total-savings-display').textContent=fmt(totalSavingsBalance());
-
   document.getElementById('total-planned').textContent=fmt(cats.planned);
   document.getElementById('total-actual').textContent=fmt(cats.actual);
-  const diff=cats.actual-cats.planned;
-  const td=document.getElementById('total-diff');
+  const diff=cats.actual-cats.planned,td=document.getElementById('total-diff');
   td.textContent=cats.planned?((diff>0?'+':'')+Math.round(diff)):'—';
   td.style.color=diff>0?'var(--red)':diff<0?'var(--green)':'var(--muted)';
-
-  const entry=getEntry();
-  if(entry?.score!=null){
-    document.getElementById('dash-status').textContent=entry.grade;
-    document.getElementById('dash-status-sub').textContent=entry.title;
-  }else{
-    document.getElementById('dash-status').textContent='—';
-    document.getElementById('dash-status-sub').textContent='Not judged';
-  }
+  renderDashboard();
 }
 
-function savePermanent(){
-  const inc=collectIncome();
-  const cats=collectCategories();
-  incomeSources.forEach(s=>s.amount=inc.data[s.id]||0);
-  categories.forEach(c=>c.planned=cats.data[c.id]?.planned||0);
-  saveProfile({incomeSources,categories});
-}
-
+function savePermanent(){const inc=collectIncome(),cats=collectCategories();incomeSources.forEach(s=>s.amount=inc.data[s.id]||0);categories.forEach(c=>c.planned=cats.data[c.id]?.planned||0);saveProfile({incomeSources,categories})}
 function saveDraft(){
-  const inc=collectIncome();
-  const cats=collectCategories();
-  const entry={
-    ...(getEntry()||{}),
-    key:key(),month:MONTHS[curMonth],year:curYear,
-    income:inc.data,totalIncome:inc.total,
-    categories:cats.data,totalPlanned:cats.planned,totalActual:cats.actual,
-    kept:cats.kept,totalCats:cats.count,
-    debt:parseFloat(document.getElementById('debt')?.value)||0,
-    comment:document.getElementById('comment')?.value||'',
-    updatedAt:Date.now()
-  };
-  const idx=history.findIndex(h=>h.key===entry.key);
-  if(idx>=0)history[idx]=entry; else history.unshift(entry);
-  saveHistory();
-  renderHistory();
-renderBehavior();
-renderWealthEngine();
-renderFinancialIdentity();
-renderLongTermTrajectory();
-renderMissions();
-renderExecutiveDashboard();
-renderCoach();
-setTimeout(()=>{renderProgressCharts();renderExecutiveDashboard();},200);
-  recalc();
+  const inc=collectIncome(),cats=collectCategories();
+  const entry={...(getEntry()||{}),key:key(),month:MONTHS[curMonth],year:curYear,income:inc.data,totalIncome:inc.total,categories:cats.data,totalPlanned:cats.planned,totalActual:cats.actual,kept:cats.kept,totalCats:cats.count,debt:parseFloat(document.getElementById('debt')?.value)||0,comment:document.getElementById('comment')?.value||'',updatedAt:Date.now()};
+  const idx=history.findIndex(h=>h.key===entry.key);if(idx>=0)history[idx]=entry;else history.unshift(entry);
+  saveHistory();renderHistory();renderDashboard();
 }
 
-function gradeMonth(totalIncome,totalActual,debt,kept,totalCats){
-  const savings=monthlySavings(totalIncome,totalActual,debt);
-  const sr=totalIncome?(savings/totalIncome)*100:0;
-  const keptRatio=totalCats?kept/totalCats:0;
-  let grade='D',title='Financial Danger',score=35,msg='Your structure is unstable. Spending and income need immediate correction.';
-  if(sr>=35&&keptRatio>=.95){grade='A+';title='Elite Wealth Builder';score=96;msg='Excellent. You kept a large percentage of your income and respected nearly all budgets.'}
-  else if(sr>=25&&keptRatio>=.8){grade='A';title='Strong Discipline';score=86;msg='Strong month. You are keeping serious money and your spending is mostly controlled.'}
-  else if(sr>=20){grade='B+';title='Healthy but Improvable';score=78;msg='Good month. You are saving, but there is still room to improve budget discipline or lifestyle control.'}
-  else if(sr>=10){grade='B';title='Stable';score=68;msg='You are stable, but not yet building wealth aggressively.'}
-  else if(sr>=0){grade='C';title='Consumption Heavy';score=55;msg='Most of your income is being consumed. Wealth acceleration is weak.'}
-  return {grade,title,score,msg,savingsRate:Math.round(sr)}
+function gradeMonth(totalIncome,totalActual,debt,kept,totalCats,cats){
+  const save=monthlySavingsFromData(cats,totalActual?0:0,totalActual);
+  const sr=totalIncome?(save/totalIncome)*100:0,kr=totalCats?kept/totalCats:0;
+  if(sr>=35&&kr>=.9)return{grade:'A+',title:'Elite Wealth Builder',score:96,msg:'Excellent capital retention and discipline.',savingsRate:Math.round(sr)}
+  if(sr>=25&&kr>=.75)return{grade:'A',title:'Strong Discipline',score:86,msg:'Strong month. You are keeping serious money.',savingsRate:Math.round(sr)}
+  if(sr>=20)return{grade:'B+',title:'Healthy but Improvable',score:78,msg:'Good month, but still room to improve.',savingsRate:Math.round(sr)}
+  if(sr>=10)return{grade:'B',title:'Stable',score:68,msg:'Stable, but not yet aggressive wealth building.',savingsRate:Math.round(sr)}
+  return{grade:'C',title:'Consumption Heavy',score:55,msg:'Most income is being consumed.',savingsRate:Math.round(sr)}
 }
-
 function judgeMonth(){
   savePermanent();
-  const inc=collectIncome();
-  const cats=collectCategories();
-  const debt=parseFloat(document.getElementById('debt')?.value)||0;
+  const inc=collectIncome(),cats=collectCategories(),debt=parseFloat(document.getElementById('debt')?.value)||0;
   if(!inc.total&&!cats.actual){alert('Enter income or actual spending first.');return}
-  const g=gradeMonth(inc.total,cats.actual,debt,cats.kept,cats.count);
-  const entry={
-    key:key(),month:MONTHS[curMonth],year:curYear,
-    income:inc.data,totalIncome:inc.total,
-    categories:cats.data,totalPlanned:cats.planned,totalActual:cats.actual,
-    kept:cats.kept,totalCats:cats.count,
-    debt,comment:document.getElementById('comment')?.value||'',
-    ...g,judgedAt:Date.now(),updatedAt:Date.now()
-  };
-  const idx=history.findIndex(h=>h.key===entry.key);
-  if(idx>=0)history[idx]=entry; else history.unshift(entry);
-  saveHistory();
-  renderVerdict(entry);
-  renderHistory();
-  renderBehavior();
-  renderWealthEngine();
-  renderFinancialIdentity();
-  renderLongTermTrajectory();
-  renderMissions();
-  renderExecutiveDashboard();
-  renderCoach();
-  setTimeout(()=>{renderProgressCharts();renderExecutiveDashboard();},200);
-  recalc();
-  showSection('savings',document.querySelector('.tab:nth-child(3)'));
+  const g=gradeMonth(inc.total,cats.actual,debt,cats.kept,cats.count,cats.data);
+  const entry={key:key(),month:MONTHS[curMonth],year:curYear,income:inc.data,totalIncome:inc.total,categories:cats.data,totalPlanned:cats.planned,totalActual:cats.actual,kept:cats.kept,totalCats:cats.count,debt,comment:document.getElementById('comment')?.value||'',...g,judgedAt:Date.now()};
+  const idx=history.findIndex(h=>h.key===entry.key);if(idx>=0)history[idx]=entry;else history.unshift(entry);
+  saveHistory();renderHistory();renderDashboard();showSection('dashboard',document.querySelector('.nav button'));
 }
 
-function renderVerdict(entry){
-  const grade=document.getElementById('verdict-grade'),msg=document.getElementById('verdict-msg');
-  grade.textContent=entry.grade||'—';
-  grade.style.color=entry.grade==='A+'||entry.grade==='A'?'var(--green)':entry.grade==='B+'||entry.grade==='B'?'var(--blue)':entry.grade==='C'?'var(--amber)':'var(--red)';
-  msg.innerHTML=`<strong>${entry.title||''}</strong><br>${entry.msg||'Enter your data and judge the month.'}<br><br>Savings rate: <strong>${entry.savingsRate??0}%</strong>.<br>Calculated Monthly Savings: <strong>${fmt(monthlySavings(entry.totalIncome,entry.totalActual,entry.debt||0))}</strong>.<br><span style='color:var(--muted)'>Formula: Savings category + positive budget difference.</span>`;
+function sortedJudged(){return history.filter(h=>h.score!=null).sort((a,b)=>(a.year*100+MONTHS.indexOf(a.month))-(b.year*100+MONTHS.indexOf(b.month)))}
+function latest(){const c=getEntry();if(c&&c.score!=null)return c;const d=sortedJudged();return d[d.length-1]||c}
+function runwayText(m){if(!isFinite(m)||m<=0)return'0 days';if(m<.1)return Math.max(1,Math.round(m*30))+' day(s)';if(m<1)return m.toFixed(2)+' mo';return m.toFixed(1)+' mo'}
+function identity(entry){
+  if(!entry)return{name:'—',desc:'Judge your month',type:'warn'}
+  const save=monthlySavingsFromData(entry.categories,entry.totalPlanned,entry.totalActual);
+  const sr=entry.totalIncome?save/entry.totalIncome*100:0;
+  const kr=entry.totalCats?entry.kept/entry.totalCats*100:0;
+  if(sr>=35&&kr>=85)return{name:'Capital Accumulator',desc:'You convert income into capital.',type:'good'}
+  if(sr>=25)return{name:'Wealth Builder',desc:'You are building wealth discipline.',type:'good'}
+  if(sr>=15)return{name:'Stable Operator',desc:'Stable, but needs acceleration.',type:'warn'}
+  return{name:'Lifestyle Consumer',desc:'Consumption is dominating.',type:'bad'}
 }
-
-
-
-function wealthProfileKey(){
-  return 'wd_phase1_wealth_profile';
-}
-
-function loadWealthProfile(){
-  try{return JSON.parse(localStorage.getItem(wealthProfileKey())||'{}')}catch(e){return {}}
-}
-
-function saveWealthInputs(){
-  const p=loadWealthProfile();
-  p.investments=parseFloat(document.getElementById('wealth-investments')?.value)||0;
-  p.businessReinvestment=parseFloat(document.getElementById('business-reinvestment')?.value)||0;
-  p.wealthGoal=parseFloat(document.getElementById('wealth-goal')?.value)||0;
-  p.assetStocks=parseFloat(document.getElementById('asset-stocks')?.value)||0;
-  p.assetCrypto=parseFloat(document.getElementById('asset-crypto')?.value)||0;
-  p.assetProperty=parseFloat(document.getElementById('asset-property')?.value)||0;
-  p.assetBusiness=parseFloat(document.getElementById('asset-business')?.value)||0;
-  localStorage.setItem(wealthProfileKey(),JSON.stringify(p));
-}
-
-function loadWealthInputs(){
-  const p=loadWealthProfile();
-  const i=document.getElementById('wealth-investments');
-  const b=document.getElementById('business-reinvestment');
-  const g=document.getElementById('wealth-goal');
-  if(i)i.value=p.investments||'';
-  if(b)b.value=p.businessReinvestment||'';
-  if(g)g.value=p.wealthGoal||'';
-}
-
-function setMetric(id,value,status,statusColor){
-  const v=document.getElementById(id);
-  const s=document.getElementById(id.replace(/ratio|score|accumulation|allocation/,'status'));
-  if(v)v.textContent=value;
-  if(s){s.textContent=status;s.style.color=statusColor}
-}
-
-function scoreStatus(score, reverse=false){
-  if(reverse){
-    if(score<=25)return ['Low Risk','var(--green)'];
-    if(score<=50)return ['Moderate','var(--amber)'];
-    if(score<=75)return ['High','var(--red)'];
-    return ['Dangerous','var(--red)'];
+function sumCat(entry,term){return Object.values(entry?.categories||{}).reduce((s,c)=>(c.name||'').toLowerCase().includes(term)?s+(c.actual||0):s,0)}
+function destroyCharts(){Object.values(charts).forEach(c=>{try{c.destroy()}catch(e){}});charts={}}
+function renderDashboard(){
+  const entry=latest();if(!entry)return;
+  const save=monthlySavingsFromData(entry.categories,entry.totalPlanned,entry.totalActual),ef=totalEmergencyFund(),runway=entry.totalActual?ef/entry.totalActual:0,totalSave=totalSavingsBalance();
+  document.getElementById('dash-emergency').textContent=fmt(ef);
+  document.getElementById('dash-runway').textContent=runwayText(runway);
+  document.getElementById('runway-big').textContent=runwayText(runway);
+  document.getElementById('runway-fill').style.width=Math.min(100,runway/6*100)+'%';
+  const id=identity(entry);document.getElementById('dash-identity').textContent=id.name;document.getElementById('dash-identity-note').textContent=id.desc;document.getElementById('side-identity').textContent='● '+id.name;document.getElementById('identity-name').textContent=id.name;document.getElementById('identity-desc').textContent=id.desc;
+  const target=entry.totalActual*6;document.getElementById('ef-target-fill').style.width=Math.min(100,target?ef/target*100:0)+'%';document.getElementById('ef-target-note').textContent=target?Math.round(ef/target*100)+'% of 6-month target':'—';
+  document.getElementById('w100-fill').style.width=Math.min(100,totalSave/100000*100)+'%';document.getElementById('w100-note').textContent=Math.round(totalSave/100000*100)+'% of GH₵100k';
+  const food=sumCat(entry,'food'),shows=sumCat(entry,'shows'),sr=entry.totalIncome?save/entry.totalIncome*100:0;
+  const missions=[];if(food/entry.totalIncome>.18)missions.push('Keep Food under 18%');if(sr<25)missions.push('Save at least '+fmt(entry.totalIncome*.25));if(shows>0)missions.push('No impulse entertainment spending');if(!missions.length)missions.push('Maintain current discipline');
+  document.getElementById('mission-list').innerHTML=missions.map(m=>`<div class="mission"><span class="check"></span><span>${m}</span><span>0/1</span></div>`).join('');
+  document.getElementById('missions-full').innerHTML=document.getElementById('mission-list').innerHTML;
+  let cur=0,best=0;sortedJudged().forEach(m=>{const sv=monthlySavingsFromData(m.categories,m.totalPlanned,m.totalActual),r=m.totalIncome?sv/m.totalIncome*100:0,good=r>=20&&(m.kept/m.totalCats)>=.7;if(good){cur++;best=Math.max(best,cur)}else cur=0});
+  document.getElementById('streak').textContent=cur;document.getElementById('best-streak').textContent=best;
+  document.getElementById('coach-text').innerHTML=`Your biggest leak is lifestyle consumption. Reducing Food and Shows by 15% could increase yearly savings by <strong>${fmt((food+shows)*.15*12)}</strong>.`;
+  document.getElementById('coach-full').innerHTML=document.getElementById('coach-text').innerHTML;
+  document.getElementById('pressure-text').textContent=sr<15?'You are financing comfort instead of building capital.':'Your capital retention is improving. Keep the pressure on consistency.';
+  const entries=Object.entries(entry.income||{}).filter(x=>(x[1]||0)>0).sort((a,b)=>b[1]-a[1]);if(entries.length){const dep=entry.totalIncome?entries[0][1]/entry.totalIncome*100:0;document.getElementById('income-intel').innerHTML=`${Math.round(dep)}% of your income depends on <strong>${entries[0][0]}</strong>. ${dep>80?'Your financial freedom remains vulnerable.':'Diversification is improving.'}`}
+  const cats=Object.values(entry.categories||{}).filter(c=>c.actual>0).sort((a,b)=>b.actual-a.actual),top=cats.slice(0,5),sum=top.reduce((s,c)=>s+c.actual,0)||1,colors=['#5b4df3','#ff4d6d','#f59e0b','#0ea5e9','#94a3b8'];
+  document.getElementById('breakdown-bar').innerHTML=top.map((c,i)=>`<span style="width:${c.actual/sum*100}%;background:${colors[i]}"></span>`).join('');
+  document.getElementById('breakdown-legend').innerHTML=top.map((c,i)=>`<div class="mission"><span style="width:8px;height:8px;border-radius:50%;background:${colors[i]}"></span><span>${c.name}</span><strong>${fmt(c.actual)}</strong></div>`).join('');
+  document.getElementById('top-cats').innerHTML=cats.slice(0,3).map(c=>{const pct=c.planned?Math.round(c.actual/c.planned*100):100,over=c.planned?c.actual-c.planned:0;return`<div class="mission"><span>•</span><span>${c.name}<br><small>${fmt(c.actual)} / ${pct}%</small></span><strong style="color:${over>0?'var(--red)':'var(--green)'}">${over>0?'+':''}${Math.round(over)}</strong></div>`}).join('');
+  document.getElementById('trajectory-content').innerHTML=`At your current savings pace, 1 year projection is <strong>${fmt(save*12)}</strong>, 5 years is <strong>${fmt(save*60)}</strong>, and 10 years is <strong>${fmt(save*120)}</strong>.`;
+  if(typeof Chart!=='undefined'){destroyCharts();const data=sortedJudged(),labels=data.map(m=>SHORT[MONTHS.indexOf(m.month)]+' '+String(m.year).slice(-2)),savings=data.map(m=>monthlySavingsFromData(m.categories,m.totalPlanned,m.totalActual)),efSeries=data.map((m,i)=>data.slice(0,i+1).reduce((s,x)=>s+emergencyCat(x.categories),0)),disc=data.map(m=>m.totalCats?Math.round(m.kept/m.totalCats*100):0),opts={responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#475569'}}},scales:{x:{ticks:{color:'#94a3b8'},grid:{display:false}},y:{ticks:{color:'#94a3b8'},grid:{color:'#eef2f7'}}}};
+    const w=document.getElementById('wealthChart');if(w)charts.w=new Chart(w,{type:'line',data:{labels,datasets:[{label:'Savings',data:savings,tension:.35},{label:'Emergency Fund',data:efSeries,tension:.35}]},options:opts});
+    const is=document.getElementById('incomeSpendChart');if(is)charts.is=new Chart(is,{type:'doughnut',data:{labels:['Income','Spending'],datasets:[{data:[entry.totalIncome,entry.totalActual]}]},options:{responsive:true,maintainAspectRatio:false}});
+    const d=document.getElementById('disciplineChart');if(d)charts.d=new Chart(d,{type:'line',data:{labels,datasets:[{label:'Discipline %',data:disc,tension:.35}]},options:opts});
+    const p=document.getElementById('progressChart');if(p)charts.p=new Chart(p,{type:'line',data:{labels,datasets:[{label:'Savings',data:savings,tension:.35}]},options:opts});
   }
-  if(score>=80)return ['Excellent','var(--green)'];
-  if(score>=65)return ['Strong','#7dffb3'];
-  if(score>=50)return ['Average','var(--amber)'];
-  if(score>=35)return ['Weak','#ff884d'];
-  return ['Critical','var(--red)'];
-}
-
-
-
-function getEmergencyFundAddedThisMonth(entry){
-  if(!entry || !entry.categories) return 0;
-
-  const fund = Object.values(entry.categories).find(c =>
-    (c.name || '').trim().toLowerCase() === 'emergency fund'
-  );
-
-  return fund ? (parseFloat(fund.actual)||0) : 0;
-}
-
-function getTotalEmergencyFund(){
-  const seen = new Set();
-
-  return history.reduce((sum, record) => {
-    if(!record || record.score == null || !record.key || seen.has(record.key)) return sum;
-    seen.add(record.key);
-    return sum + getEmergencyFundAddedThisMonth(record);
-  }, 0);
-}
-
-function getEmergencyFundFromCategories(entry){
-  return getTotalEmergencyFund();
-}
-
-function latestJudgedEntry(){
-  const data=history.filter(h=>h&&h.score!=null);
-  if(!data.length)return null;
-  return data.sort((a,b)=>(b.year*100+MONTHS.indexOf(b.month))-(a.year*100+MONTHS.indexOf(a.month)))[0];
-}
-
-
-function latestJudgedForIdentity(){
-  const data=history.filter(h=>h&&h.score!=null);
-  if(!data.length)return null;
-  return data.sort((a,b)=>(b.year*100+MONTHS.indexOf(b.month))-(a.year*100+MONTHS.indexOf(a.month)))[0];
-}
-
-function getIdentityMetrics(entry){
-  if(!entry)return null;
-  const income=entry.totalIncome||0;
-  const actual=entry.totalActual||0;
-  const monthlySave=monthlySavings(entry.totalIncome,entry.totalActual,entry.debt||0);
-  const savingsRate=income ? (monthlySave/income)*100 : 0;
-  const keptRatio=entry.totalCats ? (entry.kept/entry.totalCats)*100 : 0;
-  const incomeValues=Object.values(entry.income||{}).map(v=>parseFloat(v)||0).filter(v=>v>0);
-  const largestIncome=Math.max(...incomeValues,0);
-  const dependency=income ? (largestIncome/income)*100 : 100;
-  const totalEmergency=typeof getTotalEmergencyFund==='function' ? getTotalEmergencyFund() : 0;
-  const runway=actual ? totalEmergency/actual : 0;
-  const wealthProfile=loadWealthProfile ? loadWealthProfile() : {};
-  const investments=(parseFloat(wealthProfile.investments)||0)+(parseFloat(wealthProfile.assetStocks)||0)+(parseFloat(wealthProfile.assetCrypto)||0)+(parseFloat(wealthProfile.assetProperty)||0)+(parseFloat(wealthProfile.assetBusiness)||0);
-  const businessReinvestment=parseFloat(wealthProfile.businessReinvestment)||0;
-  const investmentRate=income ? ((investments+businessReinvestment)/income)*100 : 0;
-  return {income,actual,monthlySave,savingsRate,keptRatio,dependency,runway,investmentRate,incomeSources:incomeValues.length};
-}
-
-function determineFinancialIdentity(m){
-  if(!m)return {name:'Unknown',desc:'Judge a month first.',type:'warn'};
-
-  if(m.savingsRate>=35 && m.investmentRate>=15 && m.runway>=3 && m.incomeSources>=2){
-    return {
-      name:'Capital Accumulator',
-      desc:'You are not just saving. You are converting income into capital and building future financial power.',
-      type:'good'
-    };
-  }
-
-  if(m.savingsRate>=25 && m.keptRatio>=80){
-    return {
-      name:'Wealth Builder',
-      desc:'You keep a strong portion of your income and control spending. You are building wealth discipline.',
-      type:'good'
-    };
-  }
-
-  if(m.investmentRate>=10 && m.savingsRate>=15){
-    return {
-      name:'Emerging Investor',
-      desc:'You are beginning to move money from consumption into assets or business growth.',
-      type:'good'
-    };
-  }
-
-  if(m.savingsRate>=15 && m.keptRatio>=60){
-    return {
-      name:'Stable Operator',
-      desc:'Your finances are stable and reasonably controlled, but you are not yet accelerating wealth strongly.',
-      type:'warn'
-    };
-  }
-
-  if(m.savingsRate<10 && m.actual/m.income>0.85){
-    return {
-      name:'Lifestyle Consumer',
-      desc:'Most of your income is being consumed. Your money is supporting lifestyle more than future freedom.',
-      type:'bad'
-    };
-  }
-
-  if(m.runway<1 && m.savingsRate<10){
-    return {
-      name:'Financially Fragile',
-      desc:'Your system has low savings and weak emergency protection. A shock could destabilize you.',
-      type:'bad'
-    };
-  }
-
-  return {
-    name:'Stable Operator',
-    desc:'You are managing your money, but the next level is to turn more income into capital.',
-    type:'warn'
-  };
-}
-
-function renderFinancialIdentity(){
-  const entry=latestJudgedForIdentity();
-  const nameEl=document.getElementById('financial-identity-name');
-  const descEl=document.getElementById('financial-identity-desc');
-  const reasonsEl=document.getElementById('identity-reasons');
-
-  if(!entry){
-    if(nameEl)nameEl.textContent='NO IDENTITY YET';
-    if(descEl)descEl.textContent='Judge at least one month to reveal your financial identity.';
-    if(reasonsEl)reasonsEl.innerHTML='';
-    return;
-  }
-
-  const m=getIdentityMetrics(entry);
-  const identity=determineFinancialIdentity(m);
-
-  if(nameEl){
-    nameEl.textContent=identity.name;
-    nameEl.style.color=identity.type==='good'?'var(--green)':identity.type==='bad'?'var(--red)':'var(--amber)';
-  }
-  if(descEl)descEl.textContent=identity.desc;
-
-  const cards=[];
-  function card(type,title,text){
-    const cls=type==='good'?'behavior-good':type==='bad'?'behavior-bad':'behavior-warn';
-    const icon=type==='good'?'🟢':type==='bad'?'🔴':'🟡';
-    cards.push(`<div class="behavior-card ${cls}">
-      <div class="behavior-title">${icon} ${title}</div>
-      <div class="behavior-text">${text}</div>
-    </div>`);
-  }
-
-  card(m.savingsRate>=20?'good':'warn','Savings Behavior',`Your current savings rate is <strong>${Math.round(m.savingsRate)}%</strong>. Wealth builders usually stay above <strong>20–30%</strong>.`);
-  card(m.keptRatio>=80?'good':m.keptRatio>=60?'warn':'bad','Budget Discipline',`You respected <strong>${Math.round(m.keptRatio)}%</strong> of your planned categories.`);
-  card(m.dependency<=70?'good':'warn','Income Dependence',`Your largest income source represents about <strong>${Math.round(m.dependency)}%</strong> of income. Lower dependence means more freedom.`);
-  card(m.runway>=3?'good':m.runway>=1?'warn':'bad','Emergency Strength',`Your emergency runway is about <strong>${m.runway.toFixed(1)} months</strong>. Aim for <strong>3–6 months</strong>.`);
-  card(m.investmentRate>=10?'good':'warn','Investment Behavior',`Your investment/business growth allocation is <strong>${Math.round(m.investmentRate)}%</strong>.`);
-
-  if(reasonsEl)reasonsEl.innerHTML=cards.join('');
-}
-
-function averageMonthlySavings(){
-  const data=history.filter(h=>h&&h.score!=null);
-  if(!data.length)return 0;
-  return data.reduce((sum,h)=>sum+monthlySavings(h.totalIncome,h.totalActual,h.debt||0),0)/data.length;
-}
-
-function renderLongTermTrajectory(){
-  const entry=latestJudgedForIdentity();
-  const summary=document.getElementById('trajectory-summary');
-  const adviceEl=document.getElementById('trajectory-advice');
-
-  if(!entry){
-    if(summary)summary.innerHTML='Judge at least one month before the app can project long-term trajectory.';
-    return;
-  }
-
-  const avgSave=averageMonthlySavings();
-  const totalCapital=totalSavingsBalance();
-  const totalEmergency=typeof getTotalEmergencyFund==='function' ? getTotalEmergencyFund() : 0;
-  const monthlySpend=entry.totalActual||0;
-  const m=getIdentityMetrics(entry);
-
-  const oneYear=avgSave*12;
-  const fiveYear=avgSave*60;
-  const tenYear=avgSave*120;
-
-  const needEmergency=monthlySpend*6;
-  const emergencyGap=Math.max(0,needEmergency-totalEmergency);
-  const monthsToEmergency=avgSave>0 ? Math.ceil(emergencyGap/avgSave) : Infinity;
-
-  const milestone=100000;
-  const milestoneGap=Math.max(0,milestone-totalCapital);
-  const monthsTo100k=avgSave>0 ? Math.ceil(milestoneGap/avgSave) : Infinity;
-
-  const fiScore=Math.round(
-    Math.min(100,
-      (Math.min(m.savingsRate,40)/40*45)+
-      (Math.min(m.runway,6)/6*30)+
-      ((100-Math.min(m.dependency,100))/100*25)
-    )
-  );
-
-  function monthText(x){
-    if(!isFinite(x))return 'Never';
-    if(x<=0)return 'Now';
-    if(x<12)return x+' mo';
-    return (x/12).toFixed(1)+' yrs';
-  }
-
-  document.getElementById('traj-1y').textContent=fmt(oneYear);
-  document.getElementById('traj-5y').textContent=fmt(fiveYear);
-  document.getElementById('traj-10y').textContent=fmt(tenYear);
-  document.getElementById('traj-emergency').textContent=monthText(monthsToEmergency);
-  document.getElementById('traj-100k').textContent=monthText(monthsTo100k);
-  document.getElementById('traj-fi').textContent=fiScore>=70?'Strong':fiScore>=45?'Moderate':'Weak';
-  document.getElementById('traj-fi').style.color=fiScore>=70?'var(--green)':fiScore>=45?'var(--amber)':'var(--red)';
-
-  if(summary){
-    summary.innerHTML=`At your current average pace of <strong>${fmt(avgSave)}</strong> retained per month, you could retain about <strong>${fmt(oneYear)}</strong> in 1 year, <strong>${fmt(fiveYear)}</strong> in 5 years, and <strong>${fmt(tenYear)}</strong> in 10 years.`;
-  }
-
-  const cards=[];
-  function card(type,title,text){
-    const cls=type==='good'?'behavior-good':type==='bad'?'behavior-bad':'behavior-warn';
-    const icon=type==='good'?'🟢':type==='bad'?'🔴':'🟡';
-    cards.push(`<div class="behavior-card ${cls}">
-      <div class="behavior-title">${icon} ${title}</div>
-      <div class="behavior-text">${text}</div>
-    </div>`);
-  }
-
-  if(avgSave<=0){
-    card('bad','Trajectory Problem','You are not retaining enough monthly capital to build long-term wealth. Increase savings or reduce consumption.');
-  }else{
-    card('good','Capital Momentum',`You are currently retaining around <strong>${fmt(avgSave)}</strong> per judged month on average.`);
-  }
-
-  if(monthsToEmergency<=12){
-    card('good','Emergency Fund Projection',`At this pace, your 6-month emergency fund target can be reached in about <strong>${monthText(monthsToEmergency)}</strong>.`);
-  }else{
-    card('warn','Emergency Fund Projection',`Your 6-month emergency fund target may take <strong>${monthText(monthsToEmergency)}</strong>. Consider prioritizing it.`);
-  }
-
-  if(monthsTo100k<=60){
-    card('good','GH₵100k Milestone',`At this pace, GH₵100k could be reached in about <strong>${monthText(monthsTo100k)}</strong>.`);
-  }else{
-    card('warn','GH₵100k Milestone',`At this pace, GH₵100k may take about <strong>${monthText(monthsTo100k)}</strong>. To accelerate, increase monthly retained capital.`);
-  }
-
-  card(fiScore>=70?'good':fiScore>=45?'warn':'bad','Financial Independence Probability',`Current probability is <strong>${fiScore>=70?'strong':fiScore>=45?'moderate':'weak'}</strong>. It depends mainly on savings rate, runway and income diversification.`);
-
-  if(adviceEl)adviceEl.innerHTML=cards.join('');
-}
-
-function renderWealthEngine(){
-  loadWealthInputs();
-
-  const entry=latestJudgedEntry();
-  const advice=[];
-  const main=document.getElementById('wealth-main-answer');
-
-  if(!entry){
-    if(main)main.innerHTML='Judge at least one month first. Wealth analysis needs monthly data.';
-    return;
-  }
-
-  const p=loadWealthProfile();
-  const income=entry.totalIncome||0;
-  const actual=entry.totalActual||0;
-  const monthlySave=monthlySavings(entry.totalIncome,entry.totalActual,entry.debt||0);
-  const totalSavings=totalSavingsBalance();
-  const investments=parseFloat(p.investments)||0;
-  const emergencyFund=getTotalEmergencyFund();
-  const emergencyFundThisMonth=getEmergencyFundAddedThisMonth(entry);
-  const businessReinvestment=parseFloat(p.businessReinvestment)||0;
-  const wealthGoal=parseFloat(p.wealthGoal)||100000;
-
-  const wealthBuildingMoney=monthlySave+investments+businessReinvestment;
-  const investmentRatio=income?Math.round(((investments+businessReinvestment)/income)*100):0;
-  const capitalRate=income?Math.round((wealthBuildingMoney/income)*100):0;
-
-  const incomeValues=Object.values(entry.income||{}).map(v=>parseFloat(v)||0).filter(v=>v>0);
-  const largestIncome=Math.max(...incomeValues,0);
-  const incomeDependency=income?largestIncome/income:1;
-  const diversificationScore=Math.round((1-incomeDependency)*100);
-
-  const essentialMonthlySpend=actual || 1;
-  const runwayMonths=essentialMonthlySpend?emergencyFund/essentialMonthlySpend:0;
-
-  const freedomScore=Math.max(0,Math.min(100,Math.round(
-    (diversificationScore*.45)+(Math.min(runwayMonths,12)/12*35)+(Math.min(capitalRate,40)/40*20)
-  )));
-
-  const assetAllocationRate=income?Math.round(((investments+businessReinvestment+monthlySave)/income)*100):0;
-
-  const [invLabel,invColor]=scoreStatus(investmentRatio*4);
-  const [divLabel,divColor]=scoreStatus(diversificationScore);
-  const [capLabel,capColor]=scoreStatus(capitalRate*2);
-  const [freeLabel,freeColor]=scoreStatus(freedomScore);
-  const runwayLabel=runwayMonths>=6?'Strong':runwayMonths>=3?'Acceptable':runwayMonths>=1?'Weak':'Critical';
-  const runwayColor=runwayMonths>=6?'var(--green)':runwayMonths>=3?'var(--amber)':'var(--red)';
-  const assetLabel=assetAllocationRate>=35?'Wealth Builder':assetAllocationRate>=20?'Good':assetAllocationRate>=10?'Weak':'Consumption Heavy';
-  const assetColor=assetAllocationRate>=35?'var(--green)':assetAllocationRate>=20?'#7dffb3':assetAllocationRate>=10?'var(--amber)':'var(--red)';
-
-  document.getElementById('investment-ratio').textContent=investmentRatio+'%';
-  document.getElementById('investment-status').textContent=invLabel;
-  document.getElementById('investment-status').style.color=invColor;
-
-  document.getElementById('diversification-score').textContent=diversificationScore;
-  document.getElementById('diversification-status').textContent=divLabel;
-  document.getElementById('diversification-status').style.color=divColor;
-
-  document.getElementById('capital-accumulation').textContent=capitalRate+'%';
-  document.getElementById('capital-status').textContent=capLabel;
-  document.getElementById('capital-status').style.color=capColor;
-
-  document.getElementById('freedom-score').textContent=freedomScore;
-  document.getElementById('freedom-status').textContent=freeLabel;
-  document.getElementById('freedom-status').style.color=freeColor;
-
-  
-  let runwayDisplay = '0.0 MO';
-
-  if(runwayMonths > 0 && runwayMonths < 0.1){
-    const days = Math.max(1, Math.round(runwayMonths * 30));
-    runwayDisplay = `< ${days} day${days>1?'s':''}`;
-  }else if(runwayMonths > 0 && runwayMonths < 1){
-    runwayDisplay = runwayMonths.toFixed(2)+' MO';
-  }else{
-    runwayDisplay = runwayMonths.toFixed(1)+' MO';
-  }
-
-  document.getElementById('runway-score').innerHTML=runwayDisplay;
-
-  document.getElementById('runway-status').textContent=runwayLabel;
-  document.getElementById('runway-status').style.color=runwayColor;
-
-  const totalEmergencyEl=document.getElementById('total-emergency-fund');
-  const emergencyStatusEl=document.getElementById('emergency-fund-status');
-  if(totalEmergencyEl) totalEmergencyEl.textContent=fmt(emergencyFund);
-  if(emergencyStatusEl){
-    emergencyStatusEl.textContent = emergencyFund > 0 ? `+${fmt(emergencyFundThisMonth)} this month` : 'No fund yet';
-    emergencyStatusEl.style.color = emergencyFund > 0 ? 'var(--green)' : 'var(--amber)';
-  }
-
-
-  document.getElementById('asset-allocation').textContent=assetAllocationRate+'%';
-  document.getElementById('asset-status').textContent=assetLabel;
-  document.getElementById('asset-status').style.color=assetColor;
-
-  const makingWealthier = capitalRate>=25 && freedomScore>=50 && runwayMonths>=2;
-
-  if(main){
-    main.innerHTML = makingWealthier
-      ? `Yes — this behavior is moving you toward wealth. You are retaining <strong>${capitalRate}%</strong> of income as savings, capital, or business growth money.`
-      : `Not enough yet. You are tracking money, but your behavior is not aggressively building wealth. Capital allocation is <strong>${capitalRate}%</strong> and freedom score is <strong>${freedomScore}</strong>.`;
-  }
-
-  function push(type,title,text){
-    const cls=type==='good'?'behavior-good':type==='bad'?'behavior-bad':'behavior-warn';
-    const icon=type==='good'?'🟢':type==='bad'?'🔴':'🟡';
-    advice.push(`<div class="behavior-card ${cls}">
-      <div class="behavior-title">${icon} ${title}</div>
-      <div class="behavior-text">${text}</div>
-    </div>`);
-  }
-
-  if(investmentRatio<10){
-    push('bad','Investment Ratio Too Low',`Only <strong>${investmentRatio}%</strong> of income is going to investments or business reinvestment. A serious wealth-building target should start around <strong>10–20%</strong>.`);
-  }else if(investmentRatio<20){
-    push('warn','Investment Ratio Improving',`You are keeping/reinvesting <strong>${investmentRatio}%</strong>. Good start. Push toward <strong>30%</strong> for stronger wealth acceleration.`);
-  }else{
-    push('good','Investment Ratio Strong',`You are allocating <strong>${investmentRatio}%</strong> to investments/business reinvestment. This is wealth-building behavior.`);
-  }
-
-  if(diversificationScore<25){
-    push('bad','Income Concentration Risk',`Most of your income depends on one source. If that source stops, your financial system becomes vulnerable. Add or grow a second income stream.`);
-  }else if(diversificationScore<50){
-    push('warn','Income Diversification Moderate',`You have some diversification, but one income source still dominates. Keep growing scalable income.`);
-  }else{
-    push('good','Income Diversification Strong',`Your income is spread across multiple sources. This improves resilience and freedom.`);
-  }
-
-  
-  if(emergencyFund <= 0){
-    push('warn','Emergency Fund Category Missing',`Create a category named <strong>Emergency Fund</strong>. Each month, enter the amount you added in Actual. The app will accumulate it automatically.`);
-  }
-
-  if(runwayMonths<1){
-    push('bad','Emergency Runway Critical',`Your emergency fund covers less than <strong>1 month</strong> of expenses. Build this before increasing lifestyle spending.`);
-  }else if(runwayMonths<3){
-    push('warn','Emergency Runway Weak',`You can survive about <strong>${runwayMonths.toFixed(1)} months</strong>. Aim for at least <strong>3–6 months</strong>.`);
-  }else{
-    push('good','Emergency Runway Healthy',`You can survive about <strong>${runwayMonths.toFixed(1)} months</strong> without income. This gives you financial breathing room.`);
-  }
-
-  if(wealthGoal>0 && wealthBuildingMoney>0){
-    const months=Math.ceil(Math.max(0,wealthGoal-totalSavings)/wealthBuildingMoney);
-    push('warn','Capital Milestone Projection',`At the current monthly wealth-building pace of <strong>${fmt(wealthBuildingMoney)}</strong>, your <strong>${fmt(wealthGoal)}</strong> milestone could take about <strong>${months}</strong> months.`);
-  }
-
-  
-  const assetTotal = investments;
-  if(assetTotal > 0){
-    const parts = [
-      ['Stocks/Funds', assetStocks],
-      ['Crypto', assetCrypto],
-      ['Land/Property', assetProperty],
-      ['Business Assets', assetBusiness],
-      ['Other Investments', investmentMain]
-    ].filter(x=>x[1]>0).map(x=>`${x[0]}: <strong>${fmt(x[1])}</strong>`).join(', ');
-
-    push('good','Investment Breakdown',`Your investment allocation this month: ${parts || '<strong>'+fmt(assetTotal)+'</strong>'}.`);
-  }else{
-    push('warn','No Investment Yet',`You currently have no investment amount entered. Savings protects you, but investment is what starts compounding wealth over time.`);
-  }
-
-  const list=document.getElementById('wealth-advice-list');
-  if(list)list.innerHTML=advice.join('');
-}
-
-function sumCatFromEntry(entry, nameIncludes){
-  if(!entry || !entry.categories) return 0;
-  const term = nameIncludes.toLowerCase();
-  return Object.values(entry.categories).reduce((sum,c)=>{
-    const n=(c.name||'').toLowerCase();
-    return n.includes(term) ? sum + (parseFloat(c.actual)||0) : sum;
-  },0);
-}
-
-function judgedHistory(){
-  return history
-    .filter(h=>h && h.score!=null)
-    .sort((a,b)=>(a.year*100+MONTHS.indexOf(a.month))-(b.year*100+MONTHS.indexOf(b.month)));
-}
-
-function avg(arr){
-  if(!arr.length) return 0;
-  return arr.reduce((a,b)=>a+b,0)/arr.length;
-}
-
-function addBehaviorCard(items,type,title,text){
-  const cls = type === 'good' ? 'behavior-good' : type === 'bad' ? 'behavior-bad' : 'behavior-warn';
-  const icon = type === 'good' ? '🟢' : type === 'bad' ? '🔴' : '🟡';
-  items.push(`<div class="behavior-card ${cls}">
-    <div class="behavior-title">${icon} ${title}</div>
-    <div class="behavior-text">${text}</div>
-  </div>`);
-}
-
-function renderBehavior(){
-  const list=document.getElementById('behavior-list');
-  if(!list) return;
-
-  const data=judgedHistory();
-  const items=[];
-
-  if(data.length < 2){
-    list.innerHTML=`<div class="behavior-card behavior-warn">
-      <div class="behavior-title">🟡 Not enough history yet</div>
-      <div class="behavior-text">Judge at least 2 months before the app can detect reliable financial behavior patterns.</div>
-    </div>`;
-    return;
-  }
-
-  const last=data[data.length-1];
-  const prev=data[data.length-2];
-
-  const lastIncome=last.totalIncome||0;
-  const prevIncome=prev.totalIncome||0;
-  const lastActual=last.totalActual||0;
-  const prevActual=prev.totalActual||0;
-
-  const lastSavings=monthlySavings(last.totalIncome,last.totalActual,last.debt||0);
-  const prevSavings=monthlySavings(prev.totalIncome,prev.totalActual,prev.debt||0);
-
-  const lastSpendRate=lastIncome ? (lastActual/lastIncome)*100 : 0;
-  const prevSpendRate=prevIncome ? (prevActual/prevIncome)*100 : 0;
-
-  const lastSavingsRate=lastIncome ? (lastSavings/lastIncome)*100 : 0;
-  const prevSavingsRate=prevIncome ? (prevSavings/prevIncome)*100 : 0;
-
-  // Discipline
-  const keptRatio = last.totalCats ? (last.kept/last.totalCats)*100 : 0;
-  if(keptRatio >= 85){
-    addBehaviorCard(items,'good','Discipline Pattern',`You respected <strong>${Math.round(keptRatio)}%</strong> of your planned categories this month. That shows strong budget discipline.`);
-  }else if(keptRatio >= 60){
-    addBehaviorCard(items,'warn','Discipline Pattern',`You respected <strong>${Math.round(keptRatio)}%</strong> of your planned categories. Your discipline is acceptable, but several categories still need control.`);
-  }else{
-    addBehaviorCard(items,'bad','Discipline Pattern',`You respected only <strong>${Math.round(keptRatio)}%</strong> of your planned categories. This suggests weak execution, not just weak planning.`);
-  }
-
-  // Lifestyle inflation
-  const incomeChange = prevIncome ? ((lastIncome-prevIncome)/prevIncome)*100 : 0;
-  const spendChange = prevActual ? ((lastActual-prevActual)/prevActual)*100 : 0;
-
-  if(incomeChange > 0 && spendChange > incomeChange + 10){
-    addBehaviorCard(items,'bad','Lifestyle Inflation',`Your income increased by <strong>${Math.round(incomeChange)}%</strong>, but spending increased by <strong>${Math.round(spendChange)}%</strong>. Lifestyle is growing faster than income.`);
-  }else if(incomeChange > 0 && spendChange <= incomeChange){
-    addBehaviorCard(items,'good','Lifestyle Inflation',`Income increased by <strong>${Math.round(incomeChange)}%</strong> while spending stayed controlled. This is wealth-building behavior.`);
-  }else{
-    addBehaviorCard(items,'warn','Lifestyle Inflation',`No strong lifestyle inflation detected this month. Keep watching whether spending grows faster than income.`);
-  }
-
-  // Impulsivity proxy: overspend categories
-  const overCats = Object.values(last.categories||{}).filter(c=>(c.planned||0)>0 && (c.actual||0)>(c.planned||0));
-  if(overCats.length >= 4){
-    const worst = overCats.sort((a,b)=>(b.actual-b.planned)-(a.actual-a.planned))[0];
-    addBehaviorCard(items,'bad','Impulsivity Signal',`You overspent in <strong>${overCats.length}</strong> categories. Biggest slip: <strong>${worst.name}</strong> by <strong>${fmt((worst.actual||0)-(worst.planned||0))}</strong>. This may indicate impulse spending or weak category boundaries.`);
-  }else if(overCats.length > 0){
-    addBehaviorCard(items,'warn','Impulsivity Signal',`You overspent in <strong>${overCats.length}</strong> categories. Not critical, but these are the places to watch next month.`);
-  }else{
-    addBehaviorCard(items,'good','Impulsivity Signal',`No category overspending detected. Your behavior looks controlled this month.`);
-  }
-
-  // Emotional consumption proxy: Food + Shows + Fiancee + Personal lifestyle
-  const food = sumCatFromEntry(last,'food');
-  const shows = sumCatFromEntry(last,'shows');
-  const fiancee = sumCatFromEntry(last,'fiancée') + sumCatFromEntry(last,'fiancee');
-  const lifestyle = food + shows + fiancee;
-  const lifestyleRate = lastIncome ? (lifestyle/lastIncome)*100 : 0;
-
-  if(lifestyleRate > 40){
-    addBehaviorCard(items,'bad','Emotional / Lifestyle Consumption',`Food, Shows and relationship/lifestyle spending represent about <strong>${Math.round(lifestyleRate)}%</strong> of income. This suggests comfort or emotional consumption is dominating your money flow.`);
-  }else if(lifestyleRate > 25){
-    addBehaviorCard(items,'warn','Emotional / Lifestyle Consumption',`Lifestyle consumption is around <strong>${Math.round(lifestyleRate)}%</strong> of income. It is not dangerous yet, but it can block wealth building if it keeps growing.`);
-  }else{
-    addBehaviorCard(items,'good','Emotional / Lifestyle Consumption',`Lifestyle consumption is under control at around <strong>${Math.round(lifestyleRate)}%</strong> of income.`);
-  }
-
-  // Monthly pattern: savings trend
-  if(lastSavingsRate > prevSavingsRate + 5){
-    addBehaviorCard(items,'good','Monthly Savings Pattern',`Savings rate improved from <strong>${Math.round(prevSavingsRate)}%</strong> to <strong>${Math.round(lastSavingsRate)}%</strong>. Your behavior is improving.`);
-  }else if(lastSavingsRate + 5 < prevSavingsRate){
-    addBehaviorCard(items,'bad','Monthly Savings Pattern',`Savings rate dropped from <strong>${Math.round(prevSavingsRate)}%</strong> to <strong>${Math.round(lastSavingsRate)}%</strong>. Something in your behavior became more consumption-heavy.`);
-  }else{
-    addBehaviorCard(items,'warn','Monthly Savings Pattern',`Savings rate is mostly stable at around <strong>${Math.round(lastSavingsRate)}%</strong>. Stable is good, but growth requires pushing it higher.`);
-  }
-
-  // Habits: 3-month repeated overspend if enough data
-  if(data.length >= 3){
-    const recent=data.slice(-3);
-    const repeated={};
-    recent.forEach(m=>{
-      Object.values(m.categories||{}).forEach(c=>{
-        if((c.planned||0)>0 && (c.actual||0)>(c.planned||0)){
-          repeated[c.name]=(repeated[c.name]||0)+1;
-        }
-      });
-    });
-    const chronic=Object.entries(repeated).filter(([_,count])=>count>=2).map(([name])=>name);
-    if(chronic.length){
-      addBehaviorCard(items,'bad','Repeated Habit Detected',`These categories overspent in at least 2 of the last 3 judged months: <strong>${chronic.join(', ')}</strong>. This is no longer an accident; it is a habit.`);
-    }else{
-      addBehaviorCard(items,'good','Repeated Habit Detected',`No repeated overspending habit detected across the last 3 judged months.`);
-    }
-  }
-
-  list.innerHTML=items.join('');
 }
 
 function renderHistory(){
-  const list=document.getElementById('history-list');
-  if(!history.length){list.innerHTML='<div class="small">No history yet.</div>';return}
-  list.innerHTML=history.slice().sort((a,b)=>(b.year*100+MONTHS.indexOf(b.month))-(a.year*100+MONTHS.indexOf(a.month))).map(h=>`
-    <div class="hist-row" onclick="openEntry('${h.key}')">
-      <div><div class="strong">${h.month} ${h.year}</div><div class="small">${h.grade||'Draft'}</div></div>
-      <div><div class="small">Income</div><div>${fmt(h.totalIncome)}</div></div>
-      <div><div class="small">Actual</div><div>${fmt(h.totalActual)}</div></div>
-      <div><div class="small">Savings</div><div>${fmt(monthlySavings(h.totalIncome,h.totalActual,h.debt||0))}</div></div>
-      <div><div class="small">Score</div><div>${h.score??'—'}</div></div>
-      <button class="x" onclick="event.stopPropagation();deleteEntry('${h.key}')">✕</button>
-    </div>`).join('');
+  const list=document.getElementById('history-list');if(!history.length){list.innerHTML='<div class="alert-text">No history yet.</div>';return}
+  list.innerHTML=history.slice().sort((a,b)=>(b.year*100+MONTHS.indexOf(b.month))-(a.year*100+MONTHS.indexOf(a.month))).map(h=>`<div class="mission" onclick="openEntry('${h.key}')"><span>•</span><span><strong>${h.month} ${h.year}</strong><br><small>${h.grade||'Draft'} · Income ${fmt(h.totalIncome)} · Actual ${fmt(h.totalActual)}</small></span><button class="x" onclick="event.stopPropagation();deleteEntry('${h.key}')">✕</button></div>`).join('')
 }
+function openEntry(k){const e=history.find(h=>h.key===k);if(!e)return;curYear=e.year;curMonth=MONTHS.indexOf(e.month);updateMonthLabel();loadMonth();showSection('dashboard',document.querySelector('.nav button'))}
+function deleteEntry(k){history=history.filter(h=>h.key!==k);saveHistory();renderHistory();recalc()}
+function clearCurrentMonth(){categories.forEach(c=>{const el=document.getElementById('ac-'+c.id);if(el)el.value=''});document.getElementById('debt').value='';document.getElementById('comment').value='';saveDraft();recalc()}
+function clearAllData(){if(confirm('Delete all local data?')){localStorage.removeItem(S);localStorage.removeItem(P);history=[];getDefaults();loadMonth();renderHistory()}}
 
-function openEntry(k){
-  const e=history.find(h=>h.key===k); if(!e)return;
-  curYear=e.year; curMonth=MONTHS.indexOf(e.month);
-  updateMonthLabel(); loadMonth(); showAll(document.querySelector('.tab:nth-child(5)'));
-}
+function loadMonth(){getDefaults();renderIncome();renderCategories();const e=getEntry();document.getElementById('debt').value=e?.debt||'';document.getElementById('comment').value=e?.comment||'';recalc()}
+function changeMonth(d){saveDraft();curMonth+=d;if(curMonth>11){curMonth=0;curYear++}if(curMonth<0){curMonth=11;curYear--}updateMonthLabel();loadMonth()}
 
-function deleteEntry(k){history=history.filter(h=>h.key!==k); saveHistory(); renderHistory(); recalc()}
-function clearCurrentMonth(){
-  categories.forEach(c=>{const el=document.getElementById('ac-'+c.id);if(el)el.value=''});
-  document.getElementById('debt').value='';
-  document.getElementById('comment').value='';
-  saveDraft(); recalc();
-}
-function clearAllData(){if(confirm('Delete all local data?')){localStorage.removeItem(S);localStorage.removeItem(P);history=[];getProfileDefaults();loadMonth();renderHistory()}}
-
-function loadMonth(){
-  getProfileDefaults();
-  renderIncome();
-  renderCategories();
-  const entry=getEntry();
-  document.getElementById('debt').value=entry?.debt||'';
-  document.getElementById('comment').value=entry?.comment||'';
-  if(entry?.score!=null)renderVerdict(entry); else renderVerdict({});
-  recalc();
-}
-
-function changeMonth(d){
-  saveDraft();
-  curMonth+=d;
-  if(curMonth>11){curMonth=0;curYear++}
-  if(curMonth<0){curMonth=11;curYear--}
-  updateMonthLabel(); loadMonth();
-}
-function showSection(id,btn){
-  document.querySelectorAll('.section').forEach(s=>s.classList.remove('show'));
-  document.getElementById(id).classList.add('show');
-  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
-  if(btn)btn.classList.add('active');
-}
-function showAll(btn){
-  document.querySelectorAll('.section').forEach(s=>s.classList.add('show'));
-  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
-  if(btn)btn.classList.add('active');
-}
-
-loadHistory();
-updateMonthLabel();
-loadMonth();
-loadWealthInputs();
-renderHistory();
-renderWealthEngine();
+loadHistory();updateMonthLabel();loadMonth();renderHistory();renderDashboard();
 </script>
 </body>
 </html>
