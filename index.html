@@ -30,7 +30,45 @@ body{font-family:var(--f);background:var(--bg);color:var(--text);min-height:100v
 .dlbl{font-size:9px;letter-spacing:1.6px;color:var(--muted);text-transform:uppercase;margin-bottom:6px}
 .dval{font-family:var(--d);font-size:34px;line-height:1}
 .dsub{font-size:11px;color:var(--muted);margin-top:5px}
-.tabs{position:sticky;top:0;z-index:50;background:var(--bg);display:grid;grid-template-columns:repeat(12,1fr);gap:8px;padding:10px 0;margin-bottom:10px}
+.tabs{
+position:sticky;
+top:0;
+z-index:50;
+background:rgba(10,10,14,.92);
+backdrop-filter:blur(12px);
+display:flex;
+gap:10px;
+padding:12px 0;
+margin-bottom:14px;
+overflow-x:auto;
+scrollbar-width:none;
+}
+.tabs::-webkit-scrollbar{display:none}
+.tab{
+min-width:120px;
+flex:0 0 auto;
+padding:14px 18px;
+border-radius:16px;
+font-size:14px;
+font-weight:800;
+display:flex;
+align-items:center;
+justify-content:center;
+gap:8px;
+white-space:nowrap;
+transition:.25s;
+}
+.tab.active{
+transform:translateY(-2px);
+box-shadow:0 10px 24px rgba(0,255,136,.12);
+}
+@media(max-width:700px){
+.tab{
+min-width:105px;
+font-size:13px;
+padding:12px 14px;
+}
+}
 @media(max-width:760px){.tabs{grid-template-columns:repeat(3,1fr)}}
 .tab{border:1px solid var(--border);background:var(--card);color:var(--text);padding:11px 8px;border-radius:12px;font-weight:800;font-size:12px;cursor:pointer}
 .tab.active,.tab:hover{border-color:var(--green);color:var(--green);background:rgba(0,255,136,.06)}
