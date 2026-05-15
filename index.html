@@ -30,7 +30,7 @@ body{font-family:var(--f);background:var(--bg);color:var(--text);min-height:100v
 .dlbl{font-size:9px;letter-spacing:1.6px;color:var(--muted);text-transform:uppercase;margin-bottom:6px}
 .dval{font-family:var(--d);font-size:34px;line-height:1}
 .dsub{font-size:11px;color:var(--muted);margin-top:5px}
-.tabs{position:sticky;top:0;z-index:50;background:var(--bg);display:grid;grid-template-columns:repeat(9,1fr);gap:8px;padding:10px 0;margin-bottom:10px}
+.tabs{position:sticky;top:0;z-index:50;background:var(--bg);display:grid;grid-template-columns:repeat(12,1fr);gap:8px;padding:10px 0;margin-bottom:10px}
 @media(max-width:760px){.tabs{grid-template-columns:repeat(3,1fr)}}
 .tab{border:1px solid var(--border);background:var(--card);color:var(--text);padding:11px 8px;border-radius:12px;font-weight:800;font-size:12px;cursor:pointer}
 .tab.active,.tab:hover{border-color:var(--green);color:var(--green);background:rgba(0,255,136,.06)}
@@ -110,7 +110,18 @@ body{font-family:var(--f);background:var(--bg);color:var(--text);min-height:100v
 .traj-value{font-family:var(--d);font-size:38px;line-height:1}
 .traj-desc{font-size:12px;color:var(--muted);line-height:1.6;margin-top:8px}
 
+
+.mission-card{background:linear-gradient(180deg,#111119,#09090d);border:1px solid rgba(77,159,255,.2);border-radius:18px;padding:18px}
+.mission-title{font-family:var(--d);font-size:38px;line-height:1;color:var(--blue)}
+.mission-item{padding:10px 0;border-bottom:1px solid var(--border);font-size:14px;line-height:1.6}
+.mission-item:last-child{border-bottom:none}
+.chart-wrap{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:14px}
+.pressure-banner{background:rgba(255,59,59,.08);border:1px solid rgba(255,59,59,.25);border-radius:16px;padding:16px;margin-top:12px}
+.pressure-title{font-size:13px;font-weight:900;color:var(--red);margin-bottom:6px}
+.pressure-text{font-size:14px;color:var(--muted);line-height:1.7}
+
 </style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 <div class="hdr">
@@ -142,6 +153,9 @@ body{font-family:var(--f);background:var(--bg);color:var(--text);min-height:100v
     <button class="tab" onclick="showSection('wealth',this)">💰 Wealth</button>
     <button class="tab" onclick="showSection('identity',this)">🪪 Identity</button>
     <button class="tab" onclick="showSection('trajectory',this)">🚀 Trajectory</button>
+    <button class="tab" onclick="showSection('missions',this)">🎯 Missions</button>
+    <button class="tab" onclick="showSection('coach',this)">🤖 Coach</button>
+    <button class="tab" onclick="showSection('progress',this)">📈 Progress</button>
     <button class="tab" onclick="showSection('history',this)">🕒 History</button>
     <button class="tab" onclick="showAll(this)">👁 All</button>
   </div>
@@ -419,6 +433,81 @@ body{font-family:var(--f);background:var(--bg);color:var(--text);min-height:100v
     <div class="behavior-grid" id="trajectory-advice"></div>
   </section>
 
+
+  <section id="missions" class="section">
+    <div class="sec-title">
+      <div class="sec-label">Missions & Challenges</div>
+      <button class="btn" onclick="renderMissions()">Refresh Missions</button>
+    </div>
+
+    <div class="mission-card">
+      <div class="mission-title">NEXT MONTH MISSION</div>
+      <div id="mission-list"></div>
+    </div>
+
+    <div class="trajectory-grid">
+      <div class="traj-card">
+        <div class="traj-title">Discipline Streak</div>
+        <div class="traj-value" id="discipline-streak">—</div>
+        <div class="traj-desc">Consecutive months with healthy discipline.</div>
+      </div>
+
+      <div class="traj-card">
+        <div class="traj-title">Wealth Momentum</div>
+        <div class="traj-value" id="wealth-momentum">—</div>
+        <div class="traj-desc">Direction of your capital growth.</div>
+      </div>
+
+      <div class="traj-card">
+        <div class="traj-title">Consistency Score</div>
+        <div class="traj-value" id="consistency-score">—</div>
+        <div class="traj-desc">Measures stability of financial discipline.</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="coach" class="section">
+    <div class="sec-title">
+      <div class="sec-label">AI Financial Coach</div>
+      <button class="btn" onclick="renderCoach()">Refresh Coach</button>
+    </div>
+
+    <div class="wealth-question">
+      <div class="wealth-question-title">AI FINANCIAL COACH</div>
+      <div class="wealth-question-text">
+        The coach analyzes your behavior and gives direct financial advice.
+      </div>
+    </div>
+
+    <div class="behavior-grid" id="coach-advice"></div>
+
+    <div class="pressure-banner">
+      <div class="pressure-title">WEALTH PRESSURE SYSTEM</div>
+      <div class="pressure-text" id="pressure-system">
+        The app will sometimes challenge your financial behavior honestly.
+      </div>
+    </div>
+  </section>
+
+  <section id="progress" class="section">
+    <div class="sec-title">
+      <div class="sec-label">Visual Wealth Progress</div>
+      <button class="btn" onclick="renderProgressCharts()">Refresh Charts</button>
+    </div>
+
+    <div class="trajectory-grid">
+      <div class="chart-wrap"><canvas id="savingsChart"></canvas></div>
+      <div class="chart-wrap"><canvas id="freedomChart"></canvas></div>
+      <div class="chart-wrap"><canvas id="disciplineChart"></canvas></div>
+    </div>
+
+    <div class="trajectory-grid" style="margin-top:10px">
+      <div class="chart-wrap"><canvas id="lifestyleChart"></canvas></div>
+      <div class="chart-wrap"><canvas id="incomeChart"></canvas></div>
+      <div class="chart-wrap"><canvas id="runwayChart"></canvas></div>
+    </div>
+  </section>
+
   <section id="history" class="section">
     <div class="sec-title"><div class="sec-label">Monthly History</div><button class="btn" onclick="clearAllData()">Clear All</button></div>
     <div id="history-list"></div>
@@ -635,6 +724,9 @@ renderBehavior();
 renderWealthEngine();
 renderFinancialIdentity();
 renderLongTermTrajectory();
+renderMissions();
+renderCoach();
+setTimeout(renderProgressCharts,200);
   recalc();
 }
 
@@ -675,6 +767,9 @@ function judgeMonth(){
   renderWealthEngine();
   renderFinancialIdentity();
   renderLongTermTrajectory();
+  renderMissions();
+  renderCoach();
+  setTimeout(renderProgressCharts,200);
   recalc();
   showSection('savings',document.querySelector('.tab:nth-child(3)'));
 }
