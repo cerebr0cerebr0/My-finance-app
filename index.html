@@ -30,7 +30,7 @@ body{font-family:var(--f);background:var(--bg);color:var(--text);min-height:100v
 .dlbl{font-size:9px;letter-spacing:1.6px;color:var(--muted);text-transform:uppercase;margin-bottom:6px}
 .dval{font-family:var(--d);font-size:34px;line-height:1}
 .dsub{font-size:11px;color:var(--muted);margin-top:5px}
-.tabs{position:sticky;top:0;z-index:50;background:var(--bg);display:grid;grid-template-columns:repeat(7,1fr);gap:8px;padding:10px 0;margin-bottom:10px}
+.tabs{position:sticky;top:0;z-index:50;background:var(--bg);display:grid;grid-template-columns:repeat(9,1fr);gap:8px;padding:10px 0;margin-bottom:10px}
 @media(max-width:760px){.tabs{grid-template-columns:repeat(3,1fr)}}
 .tab{border:1px solid var(--border);background:var(--card);color:var(--text);padding:11px 8px;border-radius:12px;font-weight:800;font-size:12px;cursor:pointer}
 .tab.active,.tab:hover{border-color:var(--green);color:var(--green);background:rgba(0,255,136,.06)}
@@ -99,6 +99,17 @@ body{font-family:var(--f);background:var(--bg);color:var(--text);min-height:100v
 .asset-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:10px}
 @media(max-width:620px){.asset-grid{grid-template-columns:1fr}}
 
+
+.identity-card{background:linear-gradient(180deg,#111119,#09090d);border:1px solid rgba(0,255,136,.18);border-radius:18px;padding:20px;margin-top:10px}
+.identity-name{font-family:var(--d);font-size:48px;line-height:1;color:var(--green)}
+.identity-desc{font-size:14px;color:var(--muted);line-height:1.7;margin-top:10px}
+.trajectory-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px}
+@media(max-width:760px){.trajectory-grid{grid-template-columns:1fr}}
+.traj-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px}
+.traj-title{font-size:10px;letter-spacing:1.6px;color:var(--muted);text-transform:uppercase;margin-bottom:8px}
+.traj-value{font-family:var(--d);font-size:38px;line-height:1}
+.traj-desc{font-size:12px;color:var(--muted);line-height:1.6;margin-top:8px}
+
 </style>
 </head>
 <body>
@@ -129,6 +140,8 @@ body{font-family:var(--f);background:var(--bg);color:var(--text);min-height:100v
     <button class="tab" onclick="showSection('savings',this)">🏦 Savings</button>
     <button class="tab" onclick="showSection('behavior',this)">🧠 Behavior</button>
     <button class="tab" onclick="showSection('wealth',this)">💰 Wealth</button>
+    <button class="tab" onclick="showSection('identity',this)">🪪 Identity</button>
+    <button class="tab" onclick="showSection('trajectory',this)">🚀 Trajectory</button>
     <button class="tab" onclick="showSection('history',this)">🕒 History</button>
     <button class="tab" onclick="showAll(this)">👁 All</button>
   </div>
@@ -331,6 +344,79 @@ body{font-family:var(--f);background:var(--bg);color:var(--text);min-height:100v
 
     <div class="sec-title"><div class="sec-label">Wealth Advice</div></div>
     <div class="behavior-grid" id="wealth-advice-list"></div>
+  </section>
+
+
+  <section id="identity" class="section">
+    <div class="sec-title">
+      <div class="sec-label">Financial Identity System</div>
+      <button class="btn" onclick="renderFinancialIdentity()">Refresh Identity</button>
+    </div>
+
+    <div class="identity-card">
+      <div class="identity-name" id="financial-identity-name">—</div>
+      <div class="identity-desc" id="financial-identity-desc">
+        Judge at least one month to reveal your current financial identity.
+      </div>
+    </div>
+
+    <div class="behavior-grid" id="identity-reasons"></div>
+  </section>
+
+  <section id="trajectory" class="section">
+    <div class="sec-title">
+      <div class="sec-label">Long-Term Trajectory</div>
+      <button class="btn" onclick="renderLongTermTrajectory()">Refresh Projection</button>
+    </div>
+
+    <div class="wealth-question">
+      <div class="wealth-question-title">WHERE IS THIS TAKING YOU?</div>
+      <div class="wealth-question-text" id="trajectory-summary">
+        The app projects your 1-year, 5-year, and 10-year direction based on your current financial pace.
+      </div>
+    </div>
+
+    <div class="trajectory-grid">
+      <div class="traj-card">
+        <div class="traj-title">1 Year Projection</div>
+        <div class="traj-value" id="traj-1y">—</div>
+        <div class="traj-desc" id="traj-1y-desc">Projected capital retained in 12 months.</div>
+      </div>
+
+      <div class="traj-card">
+        <div class="traj-title">5 Year Projection</div>
+        <div class="traj-value" id="traj-5y">—</div>
+        <div class="traj-desc" id="traj-5y-desc">Projected capital retained in 5 years.</div>
+      </div>
+
+      <div class="traj-card">
+        <div class="traj-title">10 Year Projection</div>
+        <div class="traj-value" id="traj-10y">—</div>
+        <div class="traj-desc" id="traj-10y-desc">Projected capital retained in 10 years.</div>
+      </div>
+    </div>
+
+    <div class="trajectory-grid">
+      <div class="traj-card">
+        <div class="traj-title">Emergency Fund Target</div>
+        <div class="traj-value" id="traj-emergency">—</div>
+        <div class="traj-desc">Estimated time to reach 6 months of expenses.</div>
+      </div>
+
+      <div class="traj-card">
+        <div class="traj-title">GH₵100k Milestone</div>
+        <div class="traj-value" id="traj-100k">—</div>
+        <div class="traj-desc">Estimated time to reach GH₵100,000 retained capital.</div>
+      </div>
+
+      <div class="traj-card">
+        <div class="traj-title">Financial Independence Probability</div>
+        <div class="traj-value" id="traj-fi">—</div>
+        <div class="traj-desc">Simple probability based on savings pace, income diversity and runway.</div>
+      </div>
+    </div>
+
+    <div class="behavior-grid" id="trajectory-advice"></div>
   </section>
 
   <section id="history" class="section">
@@ -547,6 +633,8 @@ function saveDraft(){
   renderHistory();
 renderBehavior();
 renderWealthEngine();
+renderFinancialIdentity();
+renderLongTermTrajectory();
   recalc();
 }
 
@@ -585,6 +673,8 @@ function judgeMonth(){
   renderHistory();
   renderBehavior();
   renderWealthEngine();
+  renderFinancialIdentity();
+  renderLongTermTrajectory();
   recalc();
   showSection('savings',document.querySelector('.tab:nth-child(3)'));
 }
@@ -679,6 +769,225 @@ function latestJudgedEntry(){
   const data=history.filter(h=>h&&h.score!=null);
   if(!data.length)return null;
   return data.sort((a,b)=>(b.year*100+MONTHS.indexOf(b.month))-(a.year*100+MONTHS.indexOf(a.month)))[0];
+}
+
+
+function latestJudgedForIdentity(){
+  const data=history.filter(h=>h&&h.score!=null);
+  if(!data.length)return null;
+  return data.sort((a,b)=>(b.year*100+MONTHS.indexOf(b.month))-(a.year*100+MONTHS.indexOf(a.month)))[0];
+}
+
+function getIdentityMetrics(entry){
+  if(!entry)return null;
+  const income=entry.totalIncome||0;
+  const actual=entry.totalActual||0;
+  const monthlySave=monthlySavings(entry.totalIncome,entry.totalActual,entry.debt||0);
+  const savingsRate=income ? (monthlySave/income)*100 : 0;
+  const keptRatio=entry.totalCats ? (entry.kept/entry.totalCats)*100 : 0;
+  const incomeValues=Object.values(entry.income||{}).map(v=>parseFloat(v)||0).filter(v=>v>0);
+  const largestIncome=Math.max(...incomeValues,0);
+  const dependency=income ? (largestIncome/income)*100 : 100;
+  const totalEmergency=typeof getTotalEmergencyFund==='function' ? getTotalEmergencyFund() : 0;
+  const runway=actual ? totalEmergency/actual : 0;
+  const wealthProfile=loadWealthProfile ? loadWealthProfile() : {};
+  const investments=(parseFloat(wealthProfile.investments)||0)+(parseFloat(wealthProfile.assetStocks)||0)+(parseFloat(wealthProfile.assetCrypto)||0)+(parseFloat(wealthProfile.assetProperty)||0)+(parseFloat(wealthProfile.assetBusiness)||0);
+  const businessReinvestment=parseFloat(wealthProfile.businessReinvestment)||0;
+  const investmentRate=income ? ((investments+businessReinvestment)/income)*100 : 0;
+  return {income,actual,monthlySave,savingsRate,keptRatio,dependency,runway,investmentRate,incomeSources:incomeValues.length};
+}
+
+function determineFinancialIdentity(m){
+  if(!m)return {name:'Unknown',desc:'Judge a month first.',type:'warn'};
+
+  if(m.savingsRate>=35 && m.investmentRate>=15 && m.runway>=3 && m.incomeSources>=2){
+    return {
+      name:'Capital Accumulator',
+      desc:'You are not just saving. You are converting income into capital and building future financial power.',
+      type:'good'
+    };
+  }
+
+  if(m.savingsRate>=25 && m.keptRatio>=80){
+    return {
+      name:'Wealth Builder',
+      desc:'You keep a strong portion of your income and control spending. You are building wealth discipline.',
+      type:'good'
+    };
+  }
+
+  if(m.investmentRate>=10 && m.savingsRate>=15){
+    return {
+      name:'Emerging Investor',
+      desc:'You are beginning to move money from consumption into assets or business growth.',
+      type:'good'
+    };
+  }
+
+  if(m.savingsRate>=15 && m.keptRatio>=60){
+    return {
+      name:'Stable Operator',
+      desc:'Your finances are stable and reasonably controlled, but you are not yet accelerating wealth strongly.',
+      type:'warn'
+    };
+  }
+
+  if(m.savingsRate<10 && m.actual/m.income>0.85){
+    return {
+      name:'Lifestyle Consumer',
+      desc:'Most of your income is being consumed. Your money is supporting lifestyle more than future freedom.',
+      type:'bad'
+    };
+  }
+
+  if(m.runway<1 && m.savingsRate<10){
+    return {
+      name:'Financially Fragile',
+      desc:'Your system has low savings and weak emergency protection. A shock could destabilize you.',
+      type:'bad'
+    };
+  }
+
+  return {
+    name:'Stable Operator',
+    desc:'You are managing your money, but the next level is to turn more income into capital.',
+    type:'warn'
+  };
+}
+
+function renderFinancialIdentity(){
+  const entry=latestJudgedForIdentity();
+  const nameEl=document.getElementById('financial-identity-name');
+  const descEl=document.getElementById('financial-identity-desc');
+  const reasonsEl=document.getElementById('identity-reasons');
+
+  if(!entry){
+    if(nameEl)nameEl.textContent='NO IDENTITY YET';
+    if(descEl)descEl.textContent='Judge at least one month to reveal your financial identity.';
+    if(reasonsEl)reasonsEl.innerHTML='';
+    return;
+  }
+
+  const m=getIdentityMetrics(entry);
+  const identity=determineFinancialIdentity(m);
+
+  if(nameEl){
+    nameEl.textContent=identity.name;
+    nameEl.style.color=identity.type==='good'?'var(--green)':identity.type==='bad'?'var(--red)':'var(--amber)';
+  }
+  if(descEl)descEl.textContent=identity.desc;
+
+  const cards=[];
+  function card(type,title,text){
+    const cls=type==='good'?'behavior-good':type==='bad'?'behavior-bad':'behavior-warn';
+    const icon=type==='good'?'🟢':type==='bad'?'🔴':'🟡';
+    cards.push(`<div class="behavior-card ${cls}">
+      <div class="behavior-title">${icon} ${title}</div>
+      <div class="behavior-text">${text}</div>
+    </div>`);
+  }
+
+  card(m.savingsRate>=20?'good':'warn','Savings Behavior',`Your current savings rate is <strong>${Math.round(m.savingsRate)}%</strong>. Wealth builders usually stay above <strong>20–30%</strong>.`);
+  card(m.keptRatio>=80?'good':m.keptRatio>=60?'warn':'bad','Budget Discipline',`You respected <strong>${Math.round(m.keptRatio)}%</strong> of your planned categories.`);
+  card(m.dependency<=70?'good':'warn','Income Dependence',`Your largest income source represents about <strong>${Math.round(m.dependency)}%</strong> of income. Lower dependence means more freedom.`);
+  card(m.runway>=3?'good':m.runway>=1?'warn':'bad','Emergency Strength',`Your emergency runway is about <strong>${m.runway.toFixed(1)} months</strong>. Aim for <strong>3–6 months</strong>.`);
+  card(m.investmentRate>=10?'good':'warn','Investment Behavior',`Your investment/business growth allocation is <strong>${Math.round(m.investmentRate)}%</strong>.`);
+
+  if(reasonsEl)reasonsEl.innerHTML=cards.join('');
+}
+
+function averageMonthlySavings(){
+  const data=history.filter(h=>h&&h.score!=null);
+  if(!data.length)return 0;
+  return data.reduce((sum,h)=>sum+monthlySavings(h.totalIncome,h.totalActual,h.debt||0),0)/data.length;
+}
+
+function renderLongTermTrajectory(){
+  const entry=latestJudgedForIdentity();
+  const summary=document.getElementById('trajectory-summary');
+  const adviceEl=document.getElementById('trajectory-advice');
+
+  if(!entry){
+    if(summary)summary.innerHTML='Judge at least one month before the app can project long-term trajectory.';
+    return;
+  }
+
+  const avgSave=averageMonthlySavings();
+  const totalCapital=totalSavingsBalance();
+  const totalEmergency=typeof getTotalEmergencyFund==='function' ? getTotalEmergencyFund() : 0;
+  const monthlySpend=entry.totalActual||0;
+  const m=getIdentityMetrics(entry);
+
+  const oneYear=avgSave*12;
+  const fiveYear=avgSave*60;
+  const tenYear=avgSave*120;
+
+  const needEmergency=monthlySpend*6;
+  const emergencyGap=Math.max(0,needEmergency-totalEmergency);
+  const monthsToEmergency=avgSave>0 ? Math.ceil(emergencyGap/avgSave) : Infinity;
+
+  const milestone=100000;
+  const milestoneGap=Math.max(0,milestone-totalCapital);
+  const monthsTo100k=avgSave>0 ? Math.ceil(milestoneGap/avgSave) : Infinity;
+
+  const fiScore=Math.round(
+    Math.min(100,
+      (Math.min(m.savingsRate,40)/40*45)+
+      (Math.min(m.runway,6)/6*30)+
+      ((100-Math.min(m.dependency,100))/100*25)
+    )
+  );
+
+  function monthText(x){
+    if(!isFinite(x))return 'Never';
+    if(x<=0)return 'Now';
+    if(x<12)return x+' mo';
+    return (x/12).toFixed(1)+' yrs';
+  }
+
+  document.getElementById('traj-1y').textContent=fmt(oneYear);
+  document.getElementById('traj-5y').textContent=fmt(fiveYear);
+  document.getElementById('traj-10y').textContent=fmt(tenYear);
+  document.getElementById('traj-emergency').textContent=monthText(monthsToEmergency);
+  document.getElementById('traj-100k').textContent=monthText(monthsTo100k);
+  document.getElementById('traj-fi').textContent=fiScore>=70?'Strong':fiScore>=45?'Moderate':'Weak';
+  document.getElementById('traj-fi').style.color=fiScore>=70?'var(--green)':fiScore>=45?'var(--amber)':'var(--red)';
+
+  if(summary){
+    summary.innerHTML=`At your current average pace of <strong>${fmt(avgSave)}</strong> retained per month, you could retain about <strong>${fmt(oneYear)}</strong> in 1 year, <strong>${fmt(fiveYear)}</strong> in 5 years, and <strong>${fmt(tenYear)}</strong> in 10 years.`;
+  }
+
+  const cards=[];
+  function card(type,title,text){
+    const cls=type==='good'?'behavior-good':type==='bad'?'behavior-bad':'behavior-warn';
+    const icon=type==='good'?'🟢':type==='bad'?'🔴':'🟡';
+    cards.push(`<div class="behavior-card ${cls}">
+      <div class="behavior-title">${icon} ${title}</div>
+      <div class="behavior-text">${text}</div>
+    </div>`);
+  }
+
+  if(avgSave<=0){
+    card('bad','Trajectory Problem','You are not retaining enough monthly capital to build long-term wealth. Increase savings or reduce consumption.');
+  }else{
+    card('good','Capital Momentum',`You are currently retaining around <strong>${fmt(avgSave)}</strong> per judged month on average.`);
+  }
+
+  if(monthsToEmergency<=12){
+    card('good','Emergency Fund Projection',`At this pace, your 6-month emergency fund target can be reached in about <strong>${monthText(monthsToEmergency)}</strong>.`);
+  }else{
+    card('warn','Emergency Fund Projection',`Your 6-month emergency fund target may take <strong>${monthText(monthsToEmergency)}</strong>. Consider prioritizing it.`);
+  }
+
+  if(monthsTo100k<=60){
+    card('good','GH₵100k Milestone',`At this pace, GH₵100k could be reached in about <strong>${monthText(monthsTo100k)}</strong>.`);
+  }else{
+    card('warn','GH₵100k Milestone',`At this pace, GH₵100k may take about <strong>${monthText(monthsTo100k)}</strong>. To accelerate, increase monthly retained capital.`);
+  }
+
+  card(fiScore>=70?'good':fiScore>=45?'warn':'bad','Financial Independence Probability',`Current probability is <strong>${fiScore>=70?'strong':fiScore>=45?'moderate':'weak'}</strong>. It depends mainly on savings rate, runway and income diversification.`);
+
+  if(adviceEl)adviceEl.innerHTML=cards.join('');
 }
 
 function renderWealthEngine(){
