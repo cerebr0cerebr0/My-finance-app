@@ -30,43 +30,7 @@ body{font-family:var(--f);background:var(--bg);color:var(--text);min-height:100v
 .dlbl{font-size:9px;letter-spacing:1.6px;color:var(--muted);text-transform:uppercase;margin-bottom:6px}
 .dval{font-family:var(--d);font-size:34px;line-height:1}
 .dsub{font-size:11px;color:var(--muted);margin-top:5px}
-
-.tabs{
-display:flex;
-flex-direction:column;
-gap:10px;
-}
-
-.tab{
-width:100%;
-padding:16px 18px;
-border-radius:16px;
-font-size:14px;
-font-weight:800;
-display:flex;
-align-items:center;
-justify-content:flex-start;
-gap:10px;
-white-space:nowrap;
-transition:.25s;
-}
-
-.tab.active{
-transform:translateX(4px);
-box-shadow:0 10px 24px rgba(0,255,136,.12);
-}
-
-@media(max-width:980px){
-.tabs{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
-}
-.tab{
-justify-content:center;
-padding:14px 12px;
-}
-}
-
+.tabs{position:sticky;top:0;z-index:50;background:var(--bg);display:grid;grid-template-columns:repeat(13,1fr);gap:8px;padding:10px 0;margin-bottom:10px}
 @media(max-width:760px){.tabs{grid-template-columns:repeat(3,1fr)}}
 .tab{border:1px solid var(--border);background:var(--card);color:var(--text);padding:11px 8px;border-radius:12px;font-weight:800;font-size:12px;cursor:pointer}
 .tab.active,.tab:hover{border-color:var(--green);color:var(--green);background:rgba(0,255,136,.06)}
@@ -157,360 +121,115 @@ padding:14px 12px;
 .pressure-text{font-size:14px;color:var(--muted);line-height:1.7}
 
 
-.app-layout{
-display:grid;
-grid-template-columns:240px 1fr;
-gap:18px;
-align-items:start;
+/* EXECUTIVE DASHBOARD */
+.exec-dashboard{
+  display:grid;
+  gap:14px;
 }
-
-.sidebar{
-position:sticky;
-top:14px;
-height:calc(100vh - 28px);
-overflow:auto;
-padding-right:6px;
-}
-
-.main-content{
-min-width:0;
-}
-
-@media(max-width:980px){
-.app-layout{
-grid-template-columns:1fr;
-}
-.sidebar{
-position:relative;
-height:auto;
-overflow:visible;
-padding-right:0;
-}
-}
-
-
-/* PREMIUM DASHBOARD REDESIGN */
-:root{
-  --panel:#0f0f14;
-  --panel2:#15151c;
-  --soft:#1d1d27;
-  --glow:rgba(0,255,136,.18);
-}
-
-body{
+.exec-hero{
   background:
-    radial-gradient(circle at top left, rgba(0,255,136,.08), transparent 28%),
-    radial-gradient(circle at top right, rgba(77,159,255,.07), transparent 24%),
-    var(--bg);
-}
-
-.hdr{
-  display:none;
-}
-
-.wrap{
-  max-width:1320px;
-  padding:18px;
-}
-
-.app-layout{
-  grid-template-columns:280px 1fr;
-  gap:22px;
-}
-
-.sidebar{
-  background:linear-gradient(180deg,rgba(17,17,22,.96),rgba(10,10,14,.96));
-  border:1px solid var(--border);
-  border-radius:26px;
-  padding:18px;
-  box-shadow:0 24px 70px rgba(0,0,0,.35);
-}
-
-.brand-block{
-  padding:14px 12px 18px;
-  border-bottom:1px solid var(--border);
-  margin-bottom:16px;
-}
-
-.brand-kicker{
-  font-size:10px;
-  letter-spacing:2.5px;
-  color:var(--muted);
-  text-transform:uppercase;
-  margin-bottom:8px;
-}
-
-.brand-name{
-  font-family:var(--d);
-  font-size:44px;
-  line-height:.9;
-  letter-spacing:1px;
-}
-
-.brand-name span{
-  color:var(--green);
-}
-
-.brand-sub{
-  font-size:12px;
-  line-height:1.6;
-  color:var(--muted);
-  margin-top:10px;
-}
-
-.side-mini-card{
-  margin-top:16px;
-  background:rgba(0,255,136,.05);
-  border:1px solid rgba(0,255,136,.15);
-  border-radius:18px;
-  padding:14px;
-}
-
-.side-mini-label{
-  font-size:9px;
-  letter-spacing:1.6px;
-  color:var(--muted);
-  text-transform:uppercase;
-}
-
-.side-mini-value{
-  font-family:var(--d);
-  font-size:34px;
-  color:var(--green);
-  margin-top:4px;
-}
-
-.tabs{
-  gap:8px;
-}
-
-.tab{
-  background:transparent;
-  border:1px solid transparent;
-  color:var(--muted);
-  font-size:13px;
-  border-radius:16px;
-  padding:14px 14px;
-}
-
-.tab:hover{
-  background:rgba(255,255,255,.04);
-  color:var(--text);
-  border-color:var(--border);
-}
-
-.tab.active{
-  background:linear-gradient(90deg,rgba(0,255,136,.14),rgba(0,255,136,.03));
-  border-color:rgba(0,255,136,.35);
-  color:var(--green);
-  transform:none;
-  box-shadow:none;
-}
-
-.main-content{
-  background:rgba(10,10,14,.45);
-  border:1px solid rgba(255,255,255,.04);
-  border-radius:28px;
-  padding:20px;
-  min-height:calc(100vh - 36px);
-}
-
-.dashboard-hero{
-  background:
-    linear-gradient(135deg,rgba(0,255,136,.11),rgba(77,159,255,.06) 45%,rgba(187,119,255,.04)),
-    linear-gradient(180deg,var(--panel2),var(--panel));
+    radial-gradient(circle at top left, rgba(0,255,136,.12), transparent 35%),
+    linear-gradient(135deg,#15151d,#0c0c11);
   border:1px solid rgba(0,255,136,.18);
-  border-radius:28px;
+  border-radius:24px;
   padding:24px;
-  margin-bottom:18px;
-  box-shadow:0 24px 70px rgba(0,0,0,.25);
 }
-
-.hero-row{
-  display:flex;
-  align-items:flex-end;
-  justify-content:space-between;
-  gap:18px;
-}
-
-.hero-kicker{
+.exec-kicker{
   font-size:10px;
-  color:var(--muted);
   letter-spacing:2.2px;
+  color:var(--muted);
   text-transform:uppercase;
   margin-bottom:8px;
 }
-
-.hero-title{
+.exec-title{
   font-family:var(--d);
-  font-size:clamp(44px,7vw,76px);
+  font-size:clamp(48px,8vw,82px);
   line-height:.85;
 }
-
-.hero-title span{
-  color:var(--green);
-}
-
-.hero-sub{
+.exec-title span{color:var(--green)}
+.exec-sub{
   color:var(--muted);
   font-size:14px;
   line-height:1.7;
+  max-width:720px;
   margin-top:12px;
-  max-width:620px;
 }
-
-.hero-month{
-  text-align:right;
-  min-width:210px;
+.exec-summary{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
 }
-
-.hero-month-label{
+@media(max-width:900px){.exec-summary{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:540px){.exec-summary{grid-template-columns:1fr}}
+.exec-card{
+  background:linear-gradient(180deg,#15151c,#0f0f14);
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:16px;
+}
+.exec-label{
   font-size:10px;
-  letter-spacing:2px;
   color:var(--muted);
+  letter-spacing:1.7px;
   text-transform:uppercase;
   margin-bottom:8px;
 }
-
-.hero-month .month-nav{
-  margin:0;
-}
-
-.hero-month .mlabel{
-  font-size:34px;
-}
-
-.hero-month .mbtn{
-  background:rgba(255,255,255,.04);
-}
-
-.dashboard{
-  grid-template-columns:repeat(5,minmax(150px,1fr));
-  gap:12px;
-  margin-bottom:18px;
-}
-
-.dcard{
-  background:linear-gradient(180deg,var(--panel2),var(--panel));
-  border:1px solid var(--border);
-  border-radius:22px;
-  padding:18px;
-  transition:.2s;
-}
-
-.dcard:hover{
-  transform:translateY(-2px);
-  border-color:rgba(0,255,136,.25);
-}
-
-.dlbl{
-  font-size:10px;
-  letter-spacing:1.8px;
-  margin-bottom:9px;
-}
-
-.dval{
+.exec-value{
+  font-family:var(--d);
   font-size:38px;
+  line-height:1;
 }
-
-.dsub{
-  font-size:11px;
+.exec-note{
+  color:var(--muted);
+  font-size:12px;
   line-height:1.5;
+  margin-top:6px;
 }
-
-.section{
-  background:linear-gradient(180deg,rgba(17,17,22,.8),rgba(12,12,16,.72));
-  border:1px solid rgba(255,255,255,.05);
-  border-radius:24px;
-  padding:18px;
+.exec-main-grid{
+  display:grid;
+  grid-template-columns:1.2fr .8fr;
+  gap:12px;
 }
-
-.section.show + .section.show{
-  margin-top:16px;
-}
-
-.sec-title{
-  margin-top:0;
-  padding-bottom:10px;
-  border-bottom:1px solid rgba(255,255,255,.06);
-}
-
-.sec-label{
-  color:var(--text);
-  font-weight:900;
-}
-
-.card,.wealth-metric,.behavior-card,.traj-card,.chart-wrap,.verdict,.mission-card,.identity-card,.wealth-question{
-  background:linear-gradient(180deg,var(--panel2),var(--panel));
+@media(max-width:900px){.exec-main-grid{grid-template-columns:1fr}}
+.exec-panel{
+  background:linear-gradient(180deg,#121218,#0c0c11);
+  border:1px solid var(--border);
   border-radius:20px;
+  padding:16px;
 }
-
-.btn{
-  background:rgba(255,255,255,.04);
+.exec-panel-title{
+  font-size:11px;
+  color:var(--muted);
+  letter-spacing:1.8px;
+  text-transform:uppercase;
+  margin-bottom:12px;
+}
+.exec-chart{
+  height:260px;
+}
+.exec-list{
+  display:grid;
+  gap:10px;
+}
+.exec-alert{
+  background:#101015;
+  border:1px solid var(--border);
   border-radius:14px;
+  padding:13px;
 }
-
-.btn:hover{
-  background:rgba(0,255,136,.08);
+.exec-alert-title{
+  font-weight:900;
+  font-size:13px;
+  margin-bottom:5px;
 }
-
-.table-head,.row,.total-row{
-  grid-template-columns:1.45fr .9fr .9fr .65fr 38px;
+.exec-alert-text{
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.6;
 }
-
-.cell{
-  background:#0d0d12;
-  border-color:#22222c;
-}
-
-.total-row{
-  background:rgba(0,255,136,.03);
-  border:1px solid rgba(0,255,136,.10);
-  border-radius:16px;
-  padding:12px;
-}
-
-@media(max-width:1050px){
-  .app-layout{
-    grid-template-columns:1fr;
-  }
-  .sidebar{
-    position:relative;
-    height:auto;
-  }
-  .brand-block{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:12px;
-  }
-  .tabs{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(130px,1fr));
-  }
-  .hero-row{
-    flex-direction:column;
-    align-items:flex-start;
-  }
-  .hero-month{
-    text-align:left;
-  }
-}
-
-@media(max-width:760px){
-  .wrap{
-    padding:10px;
-  }
-  .dashboard{
-    grid-template-columns:repeat(2,1fr);
-  }
-  .main-content{
-    padding:12px;
-  }
-  .dashboard-hero{
-    padding:18px;
-  }
-}
+.exec-status-good{color:var(--green)}
+.exec-status-warn{color:var(--amber)}
+.exec-status-bad{color:var(--red)}
 
 </style>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -522,11 +241,24 @@ body{
   <div class="hdr-sub">Revenus, dépenses, historique, catégories, savings, budget vs actual.</div>
 </div>
 
+<div class="month-nav">
+  <button class="mbtn" onclick="changeMonth(-1)">‹</button>
+  <div class="mlabel" id="month-label"></div>
+  <button class="mbtn" onclick="changeMonth(1)">›</button>
+</div>
 
 <div class="wrap">
-  
+  <div class="dashboard">
+    <div class="dcard"><div class="dlbl">Income</div><div class="dval" id="dash-income">GH₵0</div><div class="dsub">Total monthly income</div></div>
+    <div class="dcard"><div class="dlbl">Planned</div><div class="dval" id="dash-planned" style="color:var(--amber)">GH₵0</div><div class="dsub">Budget plan</div></div>
+    <div class="dcard"><div class="dlbl">Actual</div><div class="dval" id="dash-actual" style="color:var(--blue)">GH₵0</div><div class="dsub">Real spending</div></div>
+    <div class="dcard"><div class="dlbl">Savings</div><div class="dval" id="dash-savings" style="color:var(--green)">GH₵0</div><div class="dsub">Income - actual - debt</div></div>
+    <div class="dcard"><div class="dlbl">Status</div><div class="dval" id="dash-status">—</div><div class="dsub" id="dash-status-sub">Not judged</div></div>
+  </div>
+
   <div class="tabs">
-    <button class="tab active" onclick="showSection('income',this)">💼 Income</button>
+    <button class="tab active" onclick="showSection('dashboard',this)">🏠 Dashboard</button>
+    <button class="tab" onclick="showSection('income',this)">💼 Income</button>
     <button class="tab" onclick="showSection('budget',this)">📊 Budget</button>
     <button class="tab" onclick="showSection('savings',this)">🏦 Savings</button>
     <button class="tab" onclick="showSection('behavior',this)">🧠 Behavior</button>
@@ -540,7 +272,83 @@ body{
     <button class="tab" onclick="showAll(this)">👁 All</button>
   </div>
 
-  <section id="income" class="section show">
+
+  <section id="dashboard" class="section show">
+    <div class="exec-dashboard">
+      <div class="exec-hero">
+        <div class="exec-kicker">Wealth Discipline Dashboard</div>
+        <div class="exec-title">YOUR MONEY<br><span>COMMAND CENTER</span></div>
+        <div class="exec-sub">
+          One view for income, spending, savings, emergency runway, identity, missions, pressure alerts and progress.
+        </div>
+      </div>
+
+      <div class="exec-summary">
+        <div class="exec-card">
+          <div class="exec-label">This Month Verdict</div>
+          <div class="exec-value" id="ex-verdict">—</div>
+          <div class="exec-note" id="ex-verdict-note">Judge the month to see status.</div>
+        </div>
+
+        <div class="exec-card">
+          <div class="exec-label">Monthly Savings</div>
+          <div class="exec-value" id="ex-monthly-savings" style="color:var(--green)">GH₵0</div>
+          <div class="exec-note">Savings category + positive budget difference.</div>
+        </div>
+
+        <div class="exec-card">
+          <div class="exec-label">Total Savings Balance</div>
+          <div class="exec-value" id="ex-total-savings" style="color:var(--blue)">GH₵0</div>
+          <div class="exec-note">Accumulated judged monthly savings.</div>
+        </div>
+
+        <div class="exec-card">
+          <div class="exec-label">Emergency Runway</div>
+          <div class="exec-value" id="ex-runway" style="color:var(--amber)">—</div>
+          <div class="exec-note">How long you survive if income stops.</div>
+        </div>
+      </div>
+
+      <div class="exec-main-grid">
+        <div class="exec-panel">
+          <div class="exec-panel-title">Savings Evolution</div>
+          <div class="exec-chart"><canvas id="execSavingsChart"></canvas></div>
+        </div>
+
+        <div class="exec-panel">
+          <div class="exec-panel-title">Current Identity</div>
+          <div class="identity-name" id="ex-identity" style="font-size:42px">—</div>
+          <div class="identity-desc" id="ex-identity-desc">Judge a month to identify your financial behavior.</div>
+        </div>
+      </div>
+
+      <div class="exec-main-grid">
+        <div class="exec-panel">
+          <div class="exec-panel-title">Income vs Spending</div>
+          <div class="exec-chart"><canvas id="execIncomeSpendChart"></canvas></div>
+        </div>
+
+        <div class="exec-panel">
+          <div class="exec-panel-title">Important Alerts</div>
+          <div class="exec-list" id="exec-alerts"></div>
+        </div>
+      </div>
+
+      <div class="exec-main-grid">
+        <div class="exec-panel">
+          <div class="exec-panel-title">Discipline Trend</div>
+          <div class="exec-chart"><canvas id="execDisciplineChart"></canvas></div>
+        </div>
+
+        <div class="exec-panel">
+          <div class="exec-panel-title">Next Month Mission</div>
+          <div class="exec-list" id="exec-missions"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="income" class="section">
     <div class="sec-title"><div class="sec-label">Income Sources</div><button class="btn" onclick="addIncome()">＋ Add Income</button></div>
     <div class="grid" id="income-list"></div>
   </section>
@@ -893,8 +701,6 @@ body{
     <div id="history-list"></div>
   </section>
 </div>
-</div>
-</div>
 
 <script>
 const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -1070,11 +876,9 @@ function recalc(){
   const entry=getEntry();
   if(entry?.score!=null){
     document.getElementById('dash-status').textContent=entry.grade;
-    const side=document.getElementById('side-status'); if(side) side.textContent=entry.grade;
     document.getElementById('dash-status-sub').textContent=entry.title;
   }else{
     document.getElementById('dash-status').textContent='—';
-    const side=document.getElementById('side-status'); if(side) side.textContent='—';
     document.getElementById('dash-status-sub').textContent='Not judged';
   }
 }
@@ -1109,8 +913,9 @@ renderWealthEngine();
 renderFinancialIdentity();
 renderLongTermTrajectory();
 renderMissions();
+renderExecutiveDashboard();
 renderCoach();
-setTimeout(renderProgressCharts,200);
+setTimeout(()=>{renderProgressCharts();renderExecutiveDashboard();},200);
   recalc();
 }
 
@@ -1152,8 +957,9 @@ function judgeMonth(){
   renderFinancialIdentity();
   renderLongTermTrajectory();
   renderMissions();
+  renderExecutiveDashboard();
   renderCoach();
-  setTimeout(renderProgressCharts,200);
+  setTimeout(()=>{renderProgressCharts();renderExecutiveDashboard();},200);
   recalc();
   showSection('savings',document.querySelector('.tab:nth-child(3)'));
 }
